@@ -13,24 +13,6 @@
     "fullVol": "100",
     "photo": "img/Tobacco Honey.png",
     "status": "in_stock"
-  }
-],
-
-[
-  {
-    "brand": "Maison Francis Kurkdjian",
-    "nameUK": "Maison Francis Kurkdjia Baccarat Rouge 540",
-    "namePL": "Maison Francis Kurkdjiа Baccarat Rouge 540",
-    "category": "uniseks",
-    "descUK": "Преміальний набір унісекс ароматів. Ідеально підходить для знайомства з брендом або як подарунок. Стійкий шлейф, висока якість.",
-    "descPL": "Zestaw luksusowych perfum unisex. Idealny na prezent lub do testowania zapachów. Długa trwałość i wysoka jakość.",
-    "price2ml": 30,
-    "price5ml": 50,
-    "price10ml": 80,
-    "fullPrice": 650,
-    "fullVol": "70",
-    "photo": "img/Maison Francis Kurkdjia Baccarat Rouge 540",
-    "status": "in_stock"
   },
  {
     "brand": "NASOMATTO",
@@ -44,7 +26,7 @@
     "price10ml": 230,
     "fullPrice": 750,
     "fullVol": "30ml",
-    "photo": "img/Blamage.jpg",
+    "photo": "img/Blamage.webp",
     "status": "in_stock"
   }
 ]
