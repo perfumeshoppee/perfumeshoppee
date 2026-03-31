@@ -1,1 +1,17 @@
-[]
+[
+  {
+    "brand": "GUERLAIN  ",
+    "nameUK": "Tobacco Honey",
+    "namePL": "Tobacco Honey",
+    "category": "uniseks",
+    "descUK": "Розкішний аромат з нотами меду, тютюну та амбри. Теплий, солодкий та неймовірно стійкий.",
+    "descPL": "Luksusowy zapach z nutami miodu, tytoniu i bursztynu. Ciepły, słodki i niezwykle trwały.",
+    "price2ml": 30,
+    "price5ml": 54,
+    "price10ml": 80,
+    "fullPrice": 1200,
+    "fullVol": "100",
+    "photo": "img/Tobacco Honey.png",
+    "status": "in_stock"
+  }
+]
