@@ -8,6 +8,7 @@
         :root {
             --gold: #d4af37; --gold-dark: #aa882c; --text: #1a1a1a; 
             --sub: #777; --bg: #ffffff; --card: #fcfcfc;
+            --green: #28a745; /* Зелений для наявності */
         }
 
         body { 
@@ -64,7 +65,9 @@
         .card-img { height: 150px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
         .card img { max-width: 100%; max-height: 100%; object-fit: contain; }
         
-        .status-badge { position: absolute; top: 10px; right: 10px; font-size: 10px; background: #fff; padding: 4px 8px; border-radius: 10px; border: 1px solid #eee; font-weight: 600;}
+        /* БЕДЖ СТАТУСУ */
+        .status-badge { position: absolute; top: 10px; right: 10px; font-size: 10px; background: #fff; padding: 4px 8px; border-radius: 10px; border: 1px solid #eee; font-weight: 800;}
+        .status-badge.in-stock { color: var(--green); border-color: var(--green); } /* Зелений колір */
 
         .brand { font-size: 9px; text-transform: uppercase; letter-spacing: 1.5px; color: #aaa; font-weight: 700; margin-bottom: 4px; }
         .title { font-size: 14px; font-weight: 700; margin: 0 0 8px; height: 2.6em; line-height: 1.3; overflow: hidden; }
@@ -85,7 +88,6 @@
         .price-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
         .price-row b { color: var(--gold-dark); }
         
-        /* ЦЕНТРОВАНА КНОПКА */
         .btn-wrapper { display: flex; justify-content: center; width: 100%; margin-top: 10px; }
         .buy-btn { 
             display: inline-block; width: 100%; padding: 18px; background: #24A1DE; color: #fff; 
@@ -128,7 +130,10 @@
 </div>
 
 <script>
+    // Твоє посилання (замінив формат на .csv автоматично в коді)
+    const SHEET_LINK = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv";
     const TELEGRAM_NICK = "elenafragrance";
+    
     let allProducts = [];
     let curLang = 'uk';
     let curCat = 'all';
@@ -140,10 +145,35 @@
 
     async function init() {
         try {
-            const r = await fetch('products.json');
-            allProducts = await r.json();
+            const response = await fetch(SHEET_LINK);
+            const data = await response.text();
+            allProducts = parseCSV(data);
             setLang('uk');
-        } catch(e) { console.error("Помилка завантаження файлу"); }
+        } catch(e) { 
+            console.error("Помилка завантаження:", e);
+        }
+    }
+
+    function parseCSV(csv) {
+        const lines = csv.split('\n');
+        const result = [];
+        const headers = lines[0].split(',').map(h => h.trim().replace(/[\r\n]/g, ''));
+
+        for (let i = 1; i < lines.length; i++) {
+            if (!lines[i].trim()) continue;
+            const currentline = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
+            const obj = {};
+            headers.forEach((header, index) => {
+                let val = currentline[index] ? currentline[index].trim().replace(/^"|"$/g, '') : "";
+                if (header.includes('price') || header === 'fullPrice') {
+                    obj[header] = parseFloat(val) || 0;
+                } else {
+                    obj[header] = val;
+                }
+            });
+            result.push(obj);
+        }
+        return result;
     }
 
     function setLang(l) {
@@ -166,16 +196,11 @@
 
     function setCategory(c) { curCat = c; renderFilters(); filterProducts(); }
 
-    function formatP(pln) { 
-        if(!pln || pln === 0) return "—";
-        return pln + " zł"; 
-    }
-
     function filterProducts() {
         const q = document.getElementById('searchInput').value.toLowerCase();
         const filtered = allProducts.filter(p => {
-            const name = (curLang === 'uk' ? p.nameUK : p.namePL).toLowerCase();
-            const brand = p.brand.toLowerCase();
+            const name = (curLang === 'uk' ? (p.nameUK || "") : (p.namePL || "")).toLowerCase();
+            const brand = (p.brand || "").toLowerCase();
             let matchCat = (curCat === 'all' || p.category === curCat);
             if (curCat === 'female' && p.category === 'uniseks') matchCat = true;
             if (curCat === 'male' && p.category === 'uniseks') matchCat = true;
@@ -187,47 +212,48 @@
     function renderGrid(data) {
         document.getElementById('grid').innerHTML = data.map(p => {
             let stText = UI[curLang].in;
+            let stClass = "";
             if(p.status === 'order') stText = UI[curLang].order_st;
-            if(p.status === 'out') stText = UI[curLang].out;
+            else if(p.status === 'out') stText = UI[curLang].out;
+            else if(p.status === 'in_stock') stClass = "in-stock"; // Додаємо клас для зеленого кольору
+
+            const photoPath = p.photo.includes('img/') ? p.photo : 'img/' + p.photo;
 
             return `
             <div class="card" onclick='openModal(${JSON.stringify(p)})'>
-                <div class="status-badge">${stText}</div>
-                <div class="card-img"><img src="${p.photo}"></div>
+                <div class="status-badge ${stClass}">${stText}</div>
+                <div class="card-img"><img src="${photoPath}"></div>
                 <div class="brand">${p.brand}</div>
                 <div class="title">${curLang === 'uk' ? p.nameUK : p.namePL}</div>
-                <div class="price">${UI[curLang].from} ${formatP(p.price2ml || p.price10ml)}</div>
+                <div class="price">${UI[curLang].from} ${(p.price2ml || p.price10ml)} zł</div>
             </div>`;
         }).join('');
     }
 
     function openModal(p) {
-        document.getElementById('m-img').src = p.photo;
+        const photoPath = p.photo.includes('img/') ? p.photo : 'img/' + p.photo;
+        document.getElementById('m-img').src = photoPath;
         document.getElementById('m-brand').innerText = p.brand;
         document.getElementById('m-title').innerText = curLang === 'uk' ? p.nameUK : p.namePL;
         document.getElementById('m-desc').innerText = curLang === 'uk' ? p.descUK : p.descPL;
         
         let pricesHTML = '';
         if(p.category === 'set') {
-            pricesHTML = `<div class="price-row"><span>Набір</span><b>${formatP(p.price10ml)}</b></div>`;
+            pricesHTML = `<div class="price-row"><span>Набір</span><b>${p.price10ml} zł</b></div>`;
         } else {
-            if(p.price2ml > 0) pricesHTML += `<div class="price-row"><span>2 ml</span><b>${formatP(p.price2ml)}</b></div>`;
-            if(p.price5ml > 0) pricesHTML += `<div class="price-row"><span>5 ml</span><b>${formatP(p.price5ml)}</b></div>`;
-            if(p.price10ml > 0) pricesHTML += `<div class="price-row"><span>10 ml</span><b>${formatP(p.price10ml)}</b></div>`;
+            if(p.price2ml > 0) pricesHTML += `<div class="price-row"><span>2 ml</span><b>${p.price2ml} zł</b></div>`;
+            if(p.price5ml > 0) pricesHTML += `<div class="price-row"><span>5 ml</span><b>${p.price5ml} zł</b></div>`;
+            if(p.price10ml > 0) pricesHTML += `<div class="price-row"><span>10 ml</span><b>${p.price10ml} zł</b></div>`;
             if (p.fullPrice > 0) {
-                pricesHTML += `
-                <div class="price-row" style="margin-top:15px; border-top:1px solid #eee; padding-top:15px; font-weight:bold;">
-                    <span>Флакон (${p.fullVol})</span>
-                    <b>${formatP(p.fullPrice)}</b>
-                </div>`;
+                pricesHTML += `<div class="price-row" style="margin-top:15px; border-top:1px solid #eee; padding-top:15px; font-weight:bold;"><span>Флакон (${p.fullVol})</span><b>${p.fullPrice} zł</b></div>`;
             }
         }
         
         document.getElementById('m-prices').innerHTML = pricesHTML;
         const btn = document.getElementById('m-tg');
         btn.innerText = UI[curLang].order;
-        const text = encodeURIComponent(`Привіт! Хочу замовити ${p.brand} ${p.nameUK} (ціна ${formatP(p.price2ml || p.price10ml)})`);
-        btn.href = `https://t.me/${TELEGRAM_NICK}?text=${text}`;
+        const msg = encodeURIComponent(`Привіт! Хочу замовити ${p.brand} ${p.nameUK}`);
+        btn.href = `https://t.me/${TELEGRAM_NICK}?text=${msg}`;
         
         document.getElementById('pModal').style.display = "block";
         document.body.style.overflow = "hidden";
