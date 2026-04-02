@@ -130,7 +130,6 @@
 </div>
 
 <script>
-    // Твоє посилання (замінив формат на .csv автоматично в коді)
     const SHEET_LINK = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv";
     const TELEGRAM_NICK = "elenafragrance";
     
@@ -149,31 +148,31 @@
             const data = await response.text();
             allProducts = parseCSV(data);
             setLang('uk');
-        } catch(e) { 
-            console.error("Помилка завантаження:", e);
-        }
+        } catch(e) { console.error("Помилка:", e); }
     }
 
     function parseCSV(csv) {
         const lines = csv.split('\n');
         const result = [];
         const headers = lines[0].split(',').map(h => h.trim().replace(/[\r\n]/g, ''));
-
         for (let i = 1; i < lines.length; i++) {
             if (!lines[i].trim()) continue;
             const currentline = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
             const obj = {};
             headers.forEach((header, index) => {
                 let val = currentline[index] ? currentline[index].trim().replace(/^"|"$/g, '') : "";
-                if (header.includes('price') || header === 'fullPrice') {
-                    obj[header] = parseFloat(val) || 0;
-                } else {
-                    obj[header] = val;
-                }
+                obj[header] = val;
             });
             result.push(obj);
         }
         return result;
+    }
+
+    // Функція для перевірки: посилання це чи назва файлу
+    function getImgUrl(photoValue) {
+        if (!photoValue) return 'img/placeholder.jpg'; // якщо пусто
+        if (photoValue.startsWith('http')) return photoValue; // якщо це посилання
+        return 'img/' + photoValue; // якщо просто назва файлу на GitHub
     }
 
     function setLang(l) {
@@ -215,14 +214,12 @@
             let stClass = "";
             if(p.status === 'order') stText = UI[curLang].order_st;
             else if(p.status === 'out') stText = UI[curLang].out;
-            else if(p.status === 'in_stock') stClass = "in-stock"; // Додаємо клас для зеленого кольору
-
-            const photoPath = p.photo.includes('img/') ? p.photo : 'img/' + p.photo;
+            else if(p.status === 'in_stock') stClass = "in-stock";
 
             return `
             <div class="card" onclick='openModal(${JSON.stringify(p)})'>
                 <div class="status-badge ${stClass}">${stText}</div>
-                <div class="card-img"><img src="${photoPath}"></div>
+                <div class="card-img"><img src="${getImgUrl(p.photo)}"></div>
                 <div class="brand">${p.brand}</div>
                 <div class="title">${curLang === 'uk' ? p.nameUK : p.namePL}</div>
                 <div class="price">${UI[curLang].from} ${(p.price2ml || p.price10ml)} zł</div>
@@ -231,8 +228,7 @@
     }
 
     function openModal(p) {
-        const photoPath = p.photo.includes('img/') ? p.photo : 'img/' + p.photo;
-        document.getElementById('m-img').src = photoPath;
+        document.getElementById('m-img').src = getImgUrl(p.photo);
         document.getElementById('m-brand').innerText = p.brand;
         document.getElementById('m-title').innerText = curLang === 'uk' ? p.nameUK : p.namePL;
         document.getElementById('m-desc').innerText = curLang === 'uk' ? p.descUK : p.descPL;
@@ -252,7 +248,7 @@
         document.getElementById('m-prices').innerHTML = pricesHTML;
         const btn = document.getElementById('m-tg');
         btn.innerText = UI[curLang].order;
-        const msg = encodeURIComponent(`Привіт! Хочу замовити ${p.brand} ${p.nameUK}`);
+        const msg = encodeURIComponent(`Доброго дня! Хочу замовити ${p.brand} ${p.nameUK}`);
         btn.href = `https://t.me/${TELEGRAM_NICK}?text=${msg}`;
         
         document.getElementById('pModal').style.display = "block";
