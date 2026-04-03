@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>perfume.shoppee • Luxury Edition</title>
     <style>
-        /* Світла тема за замовчуванням */
+        /* БІЛА ТЕМА ЗА ЗАМОВЧУВАННЯМ */
         :root { 
             --bg: #ffffff; 
             --card-bg: #f9f9f9; 
@@ -14,13 +14,10 @@
             --border: #eee;
             --gold-gradient: linear-gradient(135deg, #fdfc47 0%, #bf9b30 50%, #fdfc47 100%);
             --gold-shine: linear-gradient(to right, #bf9b30 20%, #fdfc47 40%, #fdfc47 60%, #bf9b30 80%);
-            --gold-text: #d4af37; 
-            --sale-red: #ff0000; 
-            --stock-green: #2ecc71; 
-            --stock-out-color: #666;
+            --gold-text: #d4af37; --sale-red: #ff0000; --stock-green: #2ecc71; --stock-out-color: #666;
         }
 
-        /* Темна тема (включається кнопкою) */
+        /* ТЕМНА ТЕМА ПРИ ПЕРЕМИКАННІ */
         body.dark-theme { 
             --bg: #0a0a0a; 
             --card-bg: #161616; 
@@ -28,7 +25,7 @@
             --sub-text: #666; 
             --border: #222; 
         }
-
+        
         body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); color: var(--text); transition: 0.3s; -webkit-tap-highlight-color: transparent; }
         
         header { padding: 40px 20px 10px; text-align: center; }
@@ -40,12 +37,13 @@
         @keyframes shine { to { background-position: 200% center; } }
         
         .subtitle { font-size: 11px; color: var(--sub-text); text-transform: uppercase; letter-spacing: 1px; margin: 8px auto 25px; max-width: 80%; line-height: 1.5; }
-        .controls { padding: 0 15px; max-width: 600px; margin: 0 auto; position: sticky; top: 15px; z-index: 100; }
+        
+        .controls { padding: 0 15px; max-width: 600px; margin: 20px auto; position: sticky; top: 15px; z-index: 100; }
         #searchInput { width: 100%; padding: 16px 25px; border-radius: 35px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
         
-        .filter-section { padding: 20px; display: flex; justify-content: center; }
+        .filter-section { padding: 10px 20px 20px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
         .filter-toggle-btn { background: var(--gold-gradient); color: #000; border: none; padding: 12px 30px; border-radius: 25px; font-weight: 800; cursor: pointer; }
-        .filter-menu { display: none; padding: 10px; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .filter-menu { display: none; padding: 10px; flex-wrap: wrap; gap: 8px; justify-content: center; width: 100%; }
         .filter-menu.active { display: flex; }
         .f-btn { background: var(--card-bg); border: 1px solid var(--border); padding: 10px 18px; border-radius: 18px; color: var(--sub-text); font-size: 12px; font-weight: 700; cursor: pointer; }
         .f-btn.active { background: var(--gold-gradient) !important; color: #000 !important; border: none !important; }
@@ -104,12 +102,13 @@
     <input type="text" id="searchInput" onkeyup="refresh()">
 </div>
 
+<div id="dynamic-content"></div>
+
 <div class="filter-section">
     <button class="filter-toggle-btn" onclick="toggleFilterMenu()" id="f-label"></button>
+    <div class="filter-menu" id="filterMenu"></div>
 </div>
-<div class="filter-menu" id="filterMenu"></div>
 
-<div id="dynamic-content"></div>
 <div id="catalog-area"></div>
 
 <div id="pModal" class="modal" onclick="if(event.target == this) closeModal()">
@@ -138,12 +137,11 @@
 
     const UI = {
         uk: { sub: "Твоя колекція ароматів починається тут. Працюємо виключно з оригінальною продукцією.", search: "Пошук бренду...", from: "від", hits: "Хіти продажу", news: "Новинки", sales: "Знижки %", catalog: "Каталог", filter: "Фільтри ↓", sale_tag: "ЗНИЖКА", stock_in: "✓ В наявності", stock_out: "✕ Немає в наявності", cats: {all: "Усі", female: "Жіночі", male: "Чоловічі", uniseks: "Унісекс", set: "Набори"} },
-        pl: { sub: "Twoja kolekcja zapachów zaczyna się tutaj. Pracujemy wyłącznie z oryginalnymi produktami.", search: "Szukaj...", from: "od", hits: "Hity sprzedaży", news: "Nowości", sales: "Zniżki %", catalog: "Katalog", filter: "Filtry ↓", sale_tag: "ZNIŻКА", stock_in: "✓ Dostępny", stock_out: "✕ Brak w magazynie", cats: {all: "Wszystkie", female: "Damskie", male: "Męskie", uniseks: "Unisex", set: "Zestawy"} }
+        pl: { sub: "Twoja kolekcja zapachów zaczyna się tutaj. Pracujemy wyłącznie z oryginalnymi produktami.", search: "Szukaj...", from: "od", hits: "Hity sprzedaży", news: "Nowości", sales: "Zniżki %", catalog: "Katalog", filter: "Filtry ↓", sale_tag: "ZNIŻKA", stock_in: "✓ Dostępny", stock_out: "✕ Brak w magazynie", cats: {all: "Wszystkie", female: "Damskie", male: "Męskie", uniseks: "Unisex", set: "Zestawy"} }
     };
 
     function toggleTheme() {
         document.body.classList.toggle('dark-theme');
-        // Якщо є клас dark-theme, показуємо Сонце, якщо ні — Місяць
         document.getElementById('themeBtn').innerText = document.body.classList.contains('dark-theme') ? '☀️' : '🌙';
     }
 
@@ -196,7 +194,7 @@
         curCat = k;
         renderFilters();
         refresh();
-        toggleFilterMenu();
+        if(document.getElementById('filterMenu').classList.contains('active')) toggleFilterMenu();
     }
 
     function refresh() {
@@ -216,8 +214,10 @@
             if(hits.length) content += `<div class="section-header"><h2 class="section-title">${UI[curLang].hits}</h2></div><div class="carousel">${hits.map(p => getCard(p)).join('')}</div>`;
             if(news.length) content += `<div class="section-header"><h2 class="section-title">${UI[curLang].news}</h2></div><div class="carousel">${news.map(p => getCard(p)).join('')}</div>`;
             if(sales.length) content += `<div class="section-header"><h2 class="section-title" style="color:var(--sale-red); font-weight:900;">${UI[curLang].sales}</h2></div><div class="carousel">${sales.map(p => getCard(p)).join('')}</div>`;
+            
             content += `<div class="section-header"><h2 class="section-title">${UI[curLang].catalog}</h2></div>`;
         }
+        
         document.getElementById('dynamic-content').innerHTML = content;
         document.getElementById('catalog-area').innerHTML = `<div class="product-grid">${filtered.map(p => getCard(p)).join('')}</div>`;
     }
