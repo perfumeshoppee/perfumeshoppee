@@ -8,46 +8,33 @@
         :root { --gold: #d4af37; --gold-dark: #aa882c; --text: #1a1a1a; --sub: #777; --bg: #ffffff; --card: #fcfcfc; }
         body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); color: var(--text); -webkit-tap-highlight-color: transparent; }
         header { padding: 30px 20px 10px; text-align: center; }
-        
         .logo { font-size: 2.2em; font-weight: 900; letter-spacing: -1.5px; margin: 0; color: var(--gold-dark); text-transform: lowercase; }
         .subtitle { font-size: 13px; color: var(--sub); margin: 8px auto 20px; }
-
         .controls { padding: 0 15px; max-width: 600px; margin: 0 auto; }
         #searchInput { width: 100%; padding: 14px 20px; border-radius: 30px; border: 1px solid #eee; font-size: 16px; outline: none; background: #f9f9f9; box-sizing: border-box; }
-        
         .filter-bar { display: flex; overflow-x: auto; gap: 8px; margin: 15px 0; padding: 0 15px 5px; scrollbar-width: none; }
         .filter-bar::-webkit-scrollbar { display: none; }
         .filter-btn { flex: 0 0 auto; background: #fff; border: 1px solid #eee; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; }
         .filter-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
-
-        /* СТИЛЬ КАРУСЕЛИ КАК НА ВИДЕО */
         .section-header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-top: 25px; }
-        .section-title { font-size: 1.2em; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
-        
+        .section-title { font-size: 1.1em; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
         .carousel { display: flex; overflow-x: auto; gap: 15px; padding: 10px 20px 20px; scrollbar-width: none; scroll-snap-type: x mandatory; }
         .carousel::-webkit-scrollbar { display: none; }
         .carousel .card { flex: 0 0 160px; scroll-snap-align: start; }
-
         .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px 80px; }
-        
-        .card { background: var(--card); border-radius: 20px; padding: 12px; text-align: center; border: 1px solid #f2f2f2; position: relative; transition: 0.2s; display: flex; flex-direction: column; }
+        .card { background: var(--card); border-radius: 20px; padding: 12px; text-align: center; border: 1px solid #f2f2f2; position: relative; display: flex; flex-direction: column; }
         .card-img { height: 130px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
         .card img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        
         .status-badge { position: absolute; top: 8px; right: 8px; font-size: 8px; background: rgba(255,255,255,0.9); padding: 3px 6px; border-radius: 8px; border: 1px solid #eee; font-weight: 700; }
-
         .brand { font-size: 9px; text-transform: uppercase; color: #aaa; font-weight: 700; margin-top: auto; }
         .title { font-size: 13px; font-weight: 700; margin: 4px 0; height: 2.6em; line-height: 1.3; overflow: hidden; }
         .price { color: var(--gold-dark); font-weight: 800; font-size: 14px; }
-
-        /* MODAL */
         .modal { display: none; position: fixed; z-index: 3000; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); }
         .modal-content { background: #fff; width: 90%; max-width: 400px; margin: auto; position: relative; top: 50%; transform: translateY(-50%); border-radius: 30px; padding: 25px; box-sizing: border-box; text-align: center; }
         .price-list { background: #f8f8f8; padding: 15px; border-radius: 15px; margin: 15px 0; text-align: left; }
         .price-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px; }
-        
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .btn { padding: 14px; border-radius: 15px; text-decoration: none; font-weight: 800; font-size: 13px; color: #fff; }
+        .btn { padding: 14px; border-radius: 15px; text-decoration: none; font-weight: 800; font-size: 13px; color: #fff; display: flex; align-items: center; justify-content: center; }
         .btn-tg { background: #24A1DE; }
         .btn-inst { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
     </style>
@@ -82,21 +69,29 @@
 </div>
 
 <script>
-    const SPREADSHEET_URL = 'ВСТАВ_СВОЄ_CSV_ПОСИЛАННЯ_ТУТ'; 
+    // 1. ВСТАВ СЮДИ CSV ПОСИЛАННЯ З ТАБЛИЦІ (Крок: Файл -> Опублікувати -> .csv)
+    const SPREADSHEET_URL = 'ВСТАВ_СЮДИ_ПОСИЛАННЯ_НА_CSV'; 
     const INSTA_URL = 'https://instagram.com/perfume.shoppee_ukraine'; 
     const TG_NICK = "elenafragrance";
 
     let allProducts = [];
-    let curCat = 'home'; 
+    let curCat = 'home';
 
     async function init() {
+        if (!SPREADSHEET_URL.includes('https')) {
+            document.getElementById('main-content').innerHTML = '<p style="text-align:center; padding: 20px;">Помилка: встав посилання на CSV у коді!</p>';
+            return;
+        }
         try {
             const response = await fetch(SPREADSHEET_URL);
             const text = await response.text();
             allProducts = parseCSV(text);
             renderFilters();
             renderHome();
-        } catch(e) { console.error(e); }
+        } catch(e) {
+            console.error(e);
+            document.getElementById('main-content').innerHTML = '<p style="text-align:center;">Помилка завантаження даних.</p>';
+        }
     }
 
     function parseCSV(csv) {
@@ -132,16 +127,12 @@
     function renderHome() {
         const hits = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes');
         const news = allProducts.filter(p => p.isNew?.toLowerCase() === 'yes');
-        
         let html = '';
         if(hits.length) html += `<div class="section-header"><h2 class="section-title">Хіти продажу</h2></div><div class="carousel">${hits.map(p => getCardHTML(p)).join('')}</div>`;
         if(news.length) html += `<div class="section-header"><h2 class="section-title">Новинки</h2></div><div class="carousel">${news.map(p => getCardHTML(p)).join('')}</div>`;
-        
-        // Для "Найкращих пропозицій" можна просто вивести залишок
-        const offers = allProducts.slice(0, 6);
-        html += `<div class="section-header"><h2 class="section-title">Найкращі пропозиції</h2></div><div class="product-grid" style="padding:10px 15px">${offers.map(p => getCardHTML(p)).join('')}</div>`;
-        
-        document.getElementById('main-content').innerHTML = html;
+        const others = allProducts.filter(p => p.isBest?.toLowerCase() !== 'yes' && p.isNew?.toLowerCase() !== 'yes').slice(0, 8);
+        if(others.length) html += `<div class="section-header"><h2 class="section-title">Каталог</h2></div><div class="product-grid" style="padding:10px 15px">${others.map(p => getCardHTML(p)).join('')}</div>`;
+        document.getElementById('main-content').innerHTML = html || '<p style="text-align:center; padding:20px;">Товарів не знайдено. Перевір таблицю.</p>';
     }
 
     function filterProducts() {
@@ -155,14 +146,14 @@
     }
 
     function getCardHTML(p) {
-        const photoUrl = p.photo.includes('http') ? p.photo : 'img/' + p.photo;
+        const photoUrl = p.photo.includes('http') ? p.photo : p.photo; // Тепер просто ім'я файлу
         let st = "В наявності";
         if(p.status === 'out') st = "Немає";
         if(p.status === 'order') st = "Під замовлення";
         return `
             <div class="card" onclick='openModal(${JSON.stringify(p)})'>
                 <div class="status-badge">${st}</div>
-                <div class="card-img"><img src="${photoUrl}"></div>
+                <div class="card-img"><img src="${photoUrl}" onerror="this.src='https://via.placeholder.com/150?text=No+Photo'"></div>
                 <div class="brand">${p.brand}</div>
                 <div class="title">${p.nameUK}</div>
                 <div class="price">від ${p.price2ml || p.price10ml} zł</div>
@@ -170,17 +161,15 @@
     }
 
     function openModal(p) {
-        document.getElementById('m-img').src = p.photo.includes('http') ? p.photo : 'img/' + p.photo;
+        document.getElementById('m-img').src = p.photo;
         document.getElementById('m-brand').innerText = p.brand;
         document.getElementById('m-title').innerText = p.nameUK;
         document.getElementById('m-desc').innerText = p.descUK;
-        
         let pr = '';
         if(p.price2ml > 0) pr += `<div class="price-row"><span>2 ml</span><b>${p.price2ml} zł</b></div>`;
         if(p.price5ml > 0) pr += `<div class="price-row"><span>5 ml</span><b>${p.price5ml} zł</b></div>`;
         if(p.price10ml > 0) pr += `<div class="price-row"><span>10 ml</span><b>${p.price10ml} zł</b></div>`;
         if(p.fullPrice > 0) pr += `<div class="price-row" style="border-top:1px solid #eee; margin-top:5px; padding-top:5px;"><span>Флакон (${p.fullVol})</span><b>${p.fullPrice} zł</b></div>`;
-        
         document.getElementById('m-prices').innerHTML = pr;
         document.getElementById('m-tg').href = `https://t.me/${TG_NICK}?text=Хочу замовити ${p.brand} ${p.nameUK}`;
         document.getElementById('m-inst').href = INSTA_URL;
