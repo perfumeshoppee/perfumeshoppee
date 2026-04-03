@@ -3,75 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>perfume.shoppee • Luxury Shop</title>
+    <title>perfume.shoppee • Luxury Gold Edition</title>
     <style>
-        :root { --gold: #d4af37; --gold-dark: #aa882c; --text: #1a1a1a; --sub: #777; --bg: #ffffff; --card: #fcfcfc; --sale: #e74c3c; }
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; background: var(--bg); color: var(--text); -webkit-tap-highlight-color: transparent; line-height: 1.4; overflow-x: hidden; }
+        :root { 
+            --gold-gradient: linear-gradient(135deg, #fdfc47 0%, #bf9b30 50%, #fdfc47 100%);
+            --gold-shine: linear-gradient(to right, #bf9b30 20%, #fdfc47 40%, #fdfc47 60%, #bf9b30 80%);
+            --gold-text: #d4af37;
+            --bg-dark: #0a0a0a;
+            --card-dark: #161616;
+            --sale-red: #e74c3c;
+        }
         
-        /* Плавна поява */
-        .fade-in { animation: fadeIn 0.6s ease forwards; opacity: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; background: var(--bg-dark); color: #fff; -webkit-tap-highlight-color: transparent; line-height: 1.4; overflow-x: hidden; }
+        
+        .fade-in { animation: fadeIn 0.8s ease forwards; opacity: 0; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
         header { padding: 40px 20px 10px; text-align: center; }
+        
         .lang-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
-        .lang-switch button { background: #f5f5f5; border: none; padding: 10px 20px; border-radius: 25px; font-size: 11px; font-weight: 800; color: #aaa; cursor: pointer; transition: 0.3s; }
-        .lang-switch button.active { background: var(--text); color: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .lang-switch button { background: #1a1a1a; border: 1px solid #333; padding: 10px 20px; border-radius: 25px; font-size: 11px; font-weight: 800; color: #888; cursor: pointer; transition: 0.3s; }
+        .lang-switch button.active { background: var(--gold-gradient); color: #000; border: none; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4); }
 
-        .logo { font-size: 2.4em; font-weight: 900; letter-spacing: -2px; margin: 0; color: var(--text); text-transform: lowercase; }
-        .subtitle { font-size: 13px; color: var(--sub); margin: 8px auto 25px; max-width: 250px; }
+        /* АНІМОВАНЕ ЗОЛОТЕ ЛОГО */
+        .logo { 
+            font-size: 2.6em; font-weight: 900; letter-spacing: -2px; margin: 0; text-transform: lowercase; 
+            background: var(--gold-shine); background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: shine 3s linear infinite;
+            filter: drop-shadow(0 0 5px rgba(212, 175, 55, 0.2));
+        }
+        @keyframes shine { to { background-position: 200% center; } }
 
-        .controls { padding: 0 15px; max-width: 600px; margin: 0 auto; position: sticky; top: 10px; z-index: 100; }
-        #searchInput { width: 100%; padding: 16px 25px; border-radius: 35px; border: 1px solid #eee; font-size: 16px; outline: none; background: rgba(255,255,255,0.9); backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.05); box-sizing: border-box; }
+        .subtitle { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 2px; margin: 8px auto 25px; }
+
+        .controls { padding: 0 15px; max-width: 600px; margin: 0 auto; position: sticky; top: 15px; z-index: 100; }
+        #searchInput { width: 100%; padding: 16px 25px; border-radius: 35px; border: 1px solid #222; font-size: 16px; outline: none; background: rgba(30, 30, 30, 0.9); backdrop-filter: blur(20px); color: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); box-sizing: border-box; }
         
         .filter-section { padding: 25px 20px 10px; display: flex; justify-content: center; }
-        .filter-toggle-btn { background: #f5f5f5; color: var(--text); border: none; padding: 12px 30px; border-radius: 25px; font-weight: 800; font-size: 14px; cursor: pointer; transition: 0.3s; }
-        .filter-toggle-btn:active { transform: scale(0.95); }
+        .filter-toggle-btn { background: var(--gold-gradient); color: #000; border: none; padding: 12px 30px; border-radius: 25px; font-weight: 800; font-size: 14px; cursor: pointer; box-shadow: 0 5px 20px rgba(166, 124, 0, 0.4); }
         
         .filter-menu { display: none; padding: 10px 20px; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 10px; }
         .filter-menu.active { display: flex; animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes slideDown { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
         
-        .f-btn { background: #fff; border: 1px solid #eee; padding: 10px 18px; border-radius: 18px; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; }
-        .f-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+        .f-btn { background: #161616; border: 1px solid #333; padding: 10px 18px; border-radius: 18px; font-size: 12px; font-weight: 700; color: #aaa; cursor: pointer; }
+        .f-btn.active { background: var(--gold-gradient); color: #000; border: none; }
 
-        .section-header { padding: 0 25px; margin-top: 30px; }
-        .section-title { font-size: 1.2em; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: #ccc; }
+        .section-header { padding: 0 25px; margin-top: 35px; }
+        .section-title { font-size: 1.1em; font-weight: 900; text-transform: uppercase; letter-spacing: 3px; color: #444; border-bottom: 1px solid #222; padding-bottom: 8px; }
         
-        .carousel { display: flex; overflow-x: auto; gap: 18px; padding: 15px 20px 25px; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+        .carousel { display: flex; overflow-x: auto; gap: 18px; padding: 15px 20px 25px; scrollbar-width: none; }
         .carousel::-webkit-scrollbar { display: none; }
         .carousel .card { flex: 0 0 170px; }
 
         .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 0 15px 100px; }
         
-        .card { background: var(--card); border-radius: 25px; padding: 15px; text-align: center; border: 1px solid #f8f8f8; position: relative; display: flex; flex-direction: column; min-height: 270px; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+        .card { background: var(--card-dark); border-radius: 25px; padding: 15px; text-align: center; border: 1px solid #222; position: relative; display: flex; flex-direction: column; min-height: 280px; transition: 0.3s; }
         .card:active { transform: scale(0.97); }
-        .card-img { height: 130px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
-        .card img { max-width: 90%; max-height: 90%; object-fit: contain; }
+        .card-img { height: 130px; display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
+        .card img { max-width: 90%; max-height: 90%; object-fit: contain; filter: drop-shadow(0 5px 15px rgba(0,0,0,0.5)); }
         
-        .status-badge { position: absolute; top: 12px; right: 12px; font-size: 8px; background: rgba(255,255,255,0.8); padding: 4px 8px; border-radius: 10px; font-weight: 800; border: 1px solid #eee; }
-        .sale-badge { position: absolute; top: 12px; left: 12px; font-size: 9px; background: var(--sale); color: #fff; padding: 4px 10px; border-radius: 10px; font-weight: 900; box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3); }
+        .status-badge { position: absolute; top: 12px; right: 12px; font-size: 8px; background: rgba(0,0,0,0.6); color: #ccc; padding: 4px 8px; border-radius: 10px; border: 1px solid #333; }
+        .sale-badge { position: absolute; top: 12px; left: 12px; font-size: 9px; background: var(--sale-red); color: #fff; padding: 4px 10px; border-radius: 10px; font-weight: 900; }
 
-        .brand { font-size: 10px; text-transform: uppercase; color: #bbb; font-weight: 800; margin-top: auto; letter-spacing: 1px; }
-        .title { font-size: 14px; font-weight: 700; margin: 6px 0; height: 2.8em; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; color: #333; }
+        .brand { font-size: 10px; text-transform: uppercase; color: #666; font-weight: 800; margin-top: auto; letter-spacing: 1.5px; }
+        .title { font-size: 14px; font-weight: 700; margin: 6px 0; height: 2.8em; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
         
-        .price-wrapper { margin-top: 5px; }
-        .price { font-weight: 900; font-size: 15px; color: var(--text); }
-        .price.sale { color: var(--sale); }
+        .price { font-weight: 900; font-size: 16px; color: var(--gold-text); }
+        .price.sale { color: var(--sale-red); }
 
-        /* MODAL GLASSMORPHISM */
-        .modal { display: none; position: fixed; z-index: 3000; inset: 0; background: rgba(255,255,255,0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); }
-        .modal-content { background: #fff; width: 92%; max-width: 400px; margin: auto; position: relative; top: 50%; transform: translateY(-50%); border-radius: 35px; padding: 30px; box-sizing: border-box; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.15); border: 1px solid rgba(255,255,255,0.3); }
-        #m-img { max-height: 180px; margin-bottom: 20px; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.1)); }
-        .price-list { background: #f9f9f9; padding: 18px; border-radius: 20px; margin: 20px 0; text-align: left; }
-        .price-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px; align-items: center; }
-        .m-old-p { text-decoration: line-through; color: #bbb; font-size: 12px; margin-right: 8px; }
-        .m-new-p { color: var(--sale); font-weight: 900; font-size: 16px; }
+        /* МОДАЛКА */
+        .modal { display: none; position: fixed; z-index: 3000; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(15px); }
+        .modal-content { background: #111; width: 92%; max-width: 400px; margin: auto; position: relative; top: 50%; transform: translateY(-50%); border-radius: 35px; padding: 30px; box-sizing: border-box; text-align: center; border: 1px solid #333; }
+        #m-img { max-height: 180px; margin-bottom: 20px; filter: drop-shadow(0 10px 20px rgba(212, 175, 55, 0.2)); }
+        
+        .price-list { background: #1a1a1a; padding: 18px; border-radius: 20px; margin: 20px 0; text-align: left; border: 1px solid #222; }
+        .price-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 12px; align-items: center; }
+        .m-old-p { text-decoration: line-through; color: #555; font-size: 12px; margin-right: 8px; }
+        .m-new-p { color: var(--sale-red); font-weight: 900; font-size: 17px; }
         
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .btn { padding: 16px; border-radius: 20px; text-decoration: none; font-weight: 800; font-size: 14px; color: #fff; transition: 0.3s; }
-        .btn-tg { background: #222; }
-        .btn-inst { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
-        .btn:active { transform: scale(0.95); }
+        .btn { padding: 16px; border-radius: 20px; text-decoration: none; font-weight: 800; font-size: 13px; text-transform: uppercase; transition: 0.3s; }
+        .btn-tg { background: #222; color: #fff; border: 1px solid #444; }
+        .btn-inst { background: var(--gold-gradient); color: #000; }
     </style>
 </head>
 <body>
@@ -86,7 +101,7 @@
 </header>
 
 <div class="controls">
-    <input type="text" id="searchInput" onkeyup="filterProducts()" placeholder="...">
+    <input type="text" id="searchInput" onkeyup="filterProducts()">
 </div>
 
 <div id="home-carousels"></div>
@@ -125,8 +140,8 @@
     let curCat = 'all';
 
     const UI = {
-        uk: { sub: "Твоя колекція ароматів. Оригінальна продукція.", search: "Пошук бренду або назви...", from: "від", in: "В наявності", order: "Замовлення", out: "Немає", hits: "Хіти", news: "Новинки", catalog: "Каталог", filter: "Фільтри ↓", sale_tag: "ЗНИЖКА", cats: {all: "Усі", sale: "Акції %", female: "Жіночі", male: "Чоловічі", uniseks: "Унісекс", set: "Набори"} },
-        pl: { sub: "Twoja kolekcja zapachów. Oryginały.", search: "Szukaj zapachu...", from: "od", in: "Dostępny", order: "Na zamówienie", out: "Brak", hits: "Hity", news: "Nowości", catalog: "Katalog", filter: "Filtry ↓", sale_tag: "PROMOCJA", cats: {all: "Wszystkie", sale: "Promocje %", female: "Damskie", male: "Męskie", uniseks: "Unisex", set: "Zestawy"} }
+        uk: { sub: "Оригінальна парфумерія • Luxury Collection", search: "Пошук бренду або назви...", from: "від", in: "В наявності", order: "Замовлення", out: "Немає", hits: "Хіти продажу", news: "Новинки", catalog: "Каталог", filter: "Фільтри ↓", sale_tag: "АКЦІЯ", cats: {all: "Усі", sale: "Акції %", female: "Жіночі", male: "Чоловічі", uniseks: "Унісекс", set: "Набори"} },
+        pl: { sub: "Oryginalne perfumy • Luxury Collection", search: "Szukaj zapachu...", from: "od", in: "Dostępny", order: "Na zamówienie", out: "Brak", hits: "Bestsellery", news: "Nowości", catalog: "Katalog", filter: "Filtry ↓", sale_tag: "PROMOCJA", cats: {all: "Wszystkie", sale: "Promocje %", female: "Damskie", male: "Męskie", uniseks: "Unisex", set: "Zestawy"} }
     };
 
     async function init() {
@@ -199,7 +214,7 @@
     function filterProducts() {
         const q = document.getElementById('searchInput').value.toLowerCase();
         const filtered = allProducts.filter(p => {
-            const matchSearch = (p.brand + p.nameUK + p.namePL).toLowerCase().includes(q);
+            const matchSearch = (p.brand + (curLang==='uk'?p.nameUK:p.namePL)).toLowerCase().includes(q);
             let matchCat = (curCat === 'all' || p.category === curCat);
             if(curCat === 'sale') matchCat = (p.old2ml || p.old5ml || p.old10ml || p.oldFull);
             return matchSearch && matchCat;
@@ -240,13 +255,13 @@
             {v: '2 ml', p: p.price2ml, o: p.old2ml},
             {v: '5 ml', p: p.price5ml, o: p.old5ml},
             {v: '10 ml', p: p.price10ml, o: p.old10ml},
-            {v: `Full Bottle (${p.fullVol})`, p: p.fullPrice, o: p.oldFull}
+            {v: `Bottle (${p.fullVol})`, p: p.fullPrice, o: p.oldFull}
         ];
 
         sizes.forEach(s => {
             if(parseFloat(s.p) > 0) {
                 pr += `<div class="price-row">
-                    <span>${s.v}</span>
+                    <span style="color:#888">${s.v}</span>
                     <div>
                         ${s.o ? `<span class="m-old-p">${s.o} zł</span>` : ''}
                         <span class="${s.o ? 'm-new-p' : ''}">${s.p} zł</span>
