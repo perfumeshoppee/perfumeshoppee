@@ -12,7 +12,7 @@
         .subtitle { font-size: 13px; color: var(--sub); margin: 8px auto 20px; }
         .controls { padding: 0 15px; max-width: 600px; margin: 0 auto; }
         #searchInput { width: 100%; padding: 14px 20px; border-radius: 30px; border: 1px solid #eee; font-size: 16px; outline: none; background: #f9f9f9; box-sizing: border-box; }
-        .filter-bar { display: flex; overflow-x: auto; gap: 8px; margin: 15px 0; padding: 0 15px 5px; scrollbar-width: none; }
+        .filter-bar { display: flex; overflow-x: auto; gap: 8px; margin: 15px 0; padding: 0 15px 10px; scrollbar-width: none; }
         .filter-bar::-webkit-scrollbar { display: none; }
         .filter-btn { flex: 0 0 auto; background: #fff; border: 1px solid #eee; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; }
         .filter-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
@@ -22,8 +22,8 @@
         .carousel::-webkit-scrollbar { display: none; }
         .carousel .card { flex: 0 0 160px; scroll-snap-align: start; }
         .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px 80px; }
-        .card { background: var(--card); border-radius: 20px; padding: 12px; text-align: center; border: 1px solid #f2f2f2; position: relative; display: flex; flex-direction: column; }
-        .card-img { height: 130px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+        .card { background: var(--card); border-radius: 20px; padding: 12px; text-align: center; border: 1px solid #f2f2f2; position: relative; display: flex; flex-direction: column; min-height: 230px; }
+        .card-img { height: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
         .card img { max-width: 100%; max-height: 100%; object-fit: contain; }
         .status-badge { position: absolute; top: 8px; right: 8px; font-size: 8px; background: rgba(255,255,255,0.9); padding: 3px 6px; border-radius: 8px; border: 1px solid #eee; font-weight: 700; }
         .brand { font-size: 9px; text-transform: uppercase; color: #aaa; font-weight: 700; margin-top: auto; }
@@ -52,14 +52,15 @@
 </div>
 
 <div id="main-content">
-    </div>
+    <p style="text-align:center; padding:50px; color:#aaa;">Завантаження ароматів...</p>
+</div>
 
 <div id="pModal" class="modal" onclick="if(event.target == this) closeModal()">
     <div class="modal-content">
-        <img id="m-img" style="max-height:150px; margin-bottom:15px;">
+        <img id="m-img" style="max-height:150px; margin-bottom:15px; border-radius:10px;">
         <div id="m-brand" class="brand"></div>
         <h2 id="m-title" style="margin:5px 0; font-size: 18px;"></h2>
-        <p id="m-desc" style="font-size:12px; color:#666;"></p>
+        <p id="m-desc" style="font-size:12px; color:#666; margin-bottom:15px;"></p>
         <div class="price-list" id="m-prices"></div>
         <div class="btn-group">
             <a href="#" id="m-tg" class="btn btn-tg">Telegram</a>
@@ -69,8 +70,8 @@
 </div>
 
 <script>
-    // 1. ВСТАВ СЮДИ CSV ПОСИЛАННЯ З ТАБЛИЦІ (Крок: Файл -> Опублікувати -> .csv)
-    const SPREADSHEET_URL = 'ВСТАВ_СЮДИ_ПОСИЛАННЯ_НА_CSV'; 
+    // Прямая ссылка на CSV твоей таблицы
+    const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv'; 
     const INSTA_URL = 'https://instagram.com/perfume.shoppee_ukraine'; 
     const TG_NICK = "elenafragrance";
 
@@ -78,10 +79,6 @@
     let curCat = 'home';
 
     async function init() {
-        if (!SPREADSHEET_URL.includes('https')) {
-            document.getElementById('main-content').innerHTML = '<p style="text-align:center; padding: 20px;">Помилка: встав посилання на CSV у коді!</p>';
-            return;
-        }
         try {
             const response = await fetch(SPREADSHEET_URL);
             const text = await response.text();
@@ -90,7 +87,7 @@
             renderHome();
         } catch(e) {
             console.error(e);
-            document.getElementById('main-content').innerHTML = '<p style="text-align:center;">Помилка завантаження даних.</p>';
+            document.getElementById('main-content').innerHTML = '<p style="text-align:center; padding:20px;">Помилка зв\'язку з таблицею.</p>';
         }
     }
 
@@ -100,14 +97,16 @@
         let result = [];
         for (let i = 1; i < lines.length; i++) {
             if (!lines[i]) continue;
+            // Регулярка для обработки запятых внутри кавычек
             const currentline = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
             const obj = {};
             headers.forEach((header, index) => {
-                obj[header] = currentline[index] ? currentline[index].trim().replace(/^"|"$/g, '') : "";
+                let val = currentline[index] ? currentline[index].trim().replace(/^"|"$/g, '') : "";
+                obj[header] = val;
             });
             result.push(obj);
         }
-        return result.sort((a, b) => a.brand.localeCompare(b.brand));
+        return result.sort((a, b) => (a.brand || "").localeCompare(b.brand || ""));
     }
 
     function renderFilters() {
@@ -122,6 +121,7 @@
         renderFilters();
         if (c === 'home') renderHome();
         else filterProducts();
+        window.scrollTo({top: 0, behavior: 'smooth'});
     }
 
     function renderHome() {
@@ -130,15 +130,17 @@
         let html = '';
         if(hits.length) html += `<div class="section-header"><h2 class="section-title">Хіти продажу</h2></div><div class="carousel">${hits.map(p => getCardHTML(p)).join('')}</div>`;
         if(news.length) html += `<div class="section-header"><h2 class="section-title">Новинки</h2></div><div class="carousel">${news.map(p => getCardHTML(p)).join('')}</div>`;
-        const others = allProducts.filter(p => p.isBest?.toLowerCase() !== 'yes' && p.isNew?.toLowerCase() !== 'yes').slice(0, 8);
+        const others = allProducts.filter(p => p.isBest?.toLowerCase() !== 'yes' && p.isNew?.toLowerCase() !== 'yes').slice(0, 10);
         if(others.length) html += `<div class="section-header"><h2 class="section-title">Каталог</h2></div><div class="product-grid" style="padding:10px 15px">${others.map(p => getCardHTML(p)).join('')}</div>`;
-        document.getElementById('main-content').innerHTML = html || '<p style="text-align:center; padding:20px;">Товарів не знайдено. Перевір таблицю.</p>';
+        document.getElementById('main-content').innerHTML = html || '<p style="text-align:center; padding:20px;">Заповніть товари в таблиці!</p>';
     }
 
     function filterProducts() {
         const q = document.getElementById('searchInput').value.toLowerCase();
         const filtered = allProducts.filter(p => {
-            const matchSearch = p.brand.toLowerCase().includes(q) || p.nameUK.toLowerCase().includes(q);
+            const brand = (p.brand || "").toLowerCase();
+            const name = (p.nameUK || "").toLowerCase();
+            const matchSearch = brand.includes(q) || name.includes(q);
             const matchCat = (curCat === 'all' || p.category === curCat);
             return matchSearch && matchCat;
         });
@@ -146,14 +148,14 @@
     }
 
     function getCardHTML(p) {
-        const photoUrl = p.photo.includes('http') ? p.photo : p.photo; // Тепер просто ім'я файлу
+        const imgPath = p.photo.includes('http') ? p.photo : 'img/' + p.photo;
         let st = "В наявності";
         if(p.status === 'out') st = "Немає";
-        if(p.status === 'order') st = "Під замовлення";
+        if(p.status === 'order') st = "Замовлення";
         return `
             <div class="card" onclick='openModal(${JSON.stringify(p)})'>
                 <div class="status-badge">${st}</div>
-                <div class="card-img"><img src="${photoUrl}" onerror="this.src='https://via.placeholder.com/150?text=No+Photo'"></div>
+                <div class="card-img"><img src="${imgPath}" onerror="this.src='https://via.placeholder.com/150?text=Logo'"></div>
                 <div class="brand">${p.brand}</div>
                 <div class="title">${p.nameUK}</div>
                 <div class="price">від ${p.price2ml || p.price10ml} zł</div>
@@ -161,7 +163,8 @@
     }
 
     function openModal(p) {
-        document.getElementById('m-img').src = p.photo;
+        const imgPath = p.photo.includes('http') ? p.photo : 'img/' + p.photo;
+        document.getElementById('m-img').src = imgPath;
         document.getElementById('m-brand').innerText = p.brand;
         document.getElementById('m-title').innerText = p.nameUK;
         document.getElementById('m-desc').innerText = p.descUK;
