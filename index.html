@@ -6,33 +6,49 @@
     <title>perfume.shoppee • Shop</title>
     <style>
         :root { --gold: #d4af37; --gold-dark: #aa882c; --text: #1a1a1a; --sub: #777; --bg: #ffffff; --card: #fcfcfc; }
-        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); color: var(--text); -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); color: var(--text); -webkit-tap-highlight-color: transparent; line-height: 1.4; }
+        
         header { padding: 30px 20px 10px; text-align: center; }
+        .lang-switch { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+        .lang-switch button { background: #f0f0f0; border: none; padding: 8px 16px; border-radius: 20px; font-size: 11px; font-weight: 800; color: #888; cursor: pointer; transition: 0.3s; }
+        .lang-switch button.active { background: var(--gold); color: #fff; }
+
         .logo { font-size: 2.2em; font-weight: 900; letter-spacing: -1.5px; margin: 0; color: var(--gold-dark); text-transform: lowercase; }
         .subtitle { font-size: 13px; color: var(--sub); margin: 8px auto 20px; }
-        .controls { padding: 0 15px; max-width: 600px; margin: 0 auto; }
+
+        .controls { padding: 0 15px; max-width: 600px; margin: 0 auto; position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.9); backdrop-filter: blur(10px); padding-top: 10px; }
         #searchInput { width: 100%; padding: 14px 20px; border-radius: 30px; border: 1px solid #eee; font-size: 16px; outline: none; background: #f9f9f9; box-sizing: border-box; }
-        .filter-bar { display: flex; overflow-x: auto; gap: 8px; margin: 15px 0; padding: 0 15px 10px; scrollbar-width: none; }
+        
+        .filter-bar { display: flex; overflow-x: auto; gap: 8px; margin: 15px 0; padding-bottom: 10px; scrollbar-width: none; }
         .filter-bar::-webkit-scrollbar { display: none; }
-        .filter-btn { flex: 0 0 auto; background: #fff; border: 1px solid #eee; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; }
+        .filter-btn { flex: 0 0 auto; background: #fff; border: 1px solid #eee; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; }
         .filter-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+
         .section-header { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-top: 25px; }
         .section-title { font-size: 1.1em; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        
         .carousel { display: flex; overflow-x: auto; gap: 15px; padding: 10px 20px 20px; scrollbar-width: none; scroll-snap-type: x mandatory; }
         .carousel::-webkit-scrollbar { display: none; }
         .carousel .card { flex: 0 0 160px; scroll-snap-align: start; }
+
         .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 0 15px 80px; }
-        .card { background: var(--card); border-radius: 20px; padding: 12px; text-align: center; border: 1px solid #f2f2f2; position: relative; display: flex; flex-direction: column; min-height: 230px; }
+        
+        .card { background: var(--card); border-radius: 20px; padding: 12px; text-align: center; border: 1px solid #f2f2f2; position: relative; display: flex; flex-direction: column; min-height: 240px; box-sizing: border-box; }
         .card-img { height: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
-        .card img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        .status-badge { position: absolute; top: 8px; right: 8px; font-size: 8px; background: rgba(255,255,255,0.9); padding: 3px 6px; border-radius: 8px; border: 1px solid #eee; font-weight: 700; }
-        .brand { font-size: 9px; text-transform: uppercase; color: #aaa; font-weight: 700; margin-top: auto; }
-        .title { font-size: 13px; font-weight: 700; margin: 4px 0; height: 2.6em; line-height: 1.3; overflow: hidden; }
+        .card img { max-width: 100%; max-height: 100%; object-fit: contain; pointer-events: none; }
+        
+        .status-badge { position: absolute; top: 8px; right: 8px; font-size: 8px; background: rgba(255,255,255,0.9); padding: 3px 6px; border-radius: 8px; border: 1px solid #eee; font-weight: 700; text-transform: uppercase; }
+
+        .brand { font-size: 9px; text-transform: uppercase; color: #aaa; font-weight: 700; margin-top: auto; letter-spacing: 0.5px; }
+        .title { font-size: 13px; font-weight: 700; margin: 4px 0; height: 2.6em; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
         .price { color: var(--gold-dark); font-weight: 800; font-size: 14px; }
+
+        /* MODAL */
         .modal { display: none; position: fixed; z-index: 3000; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); }
         .modal-content { background: #fff; width: 90%; max-width: 400px; margin: auto; position: relative; top: 50%; transform: translateY(-50%); border-radius: 30px; padding: 25px; box-sizing: border-box; text-align: center; }
+        #m-img { max-height: 160px; margin-bottom: 15px; border-radius: 10px; }
         .price-list { background: #f8f8f8; padding: 15px; border-radius: 15px; margin: 15px 0; text-align: left; }
-        .price-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 5px; }
+        .price-row { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 6px; }
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .btn { padding: 14px; border-radius: 15px; text-decoration: none; font-weight: 800; font-size: 13px; color: #fff; display: flex; align-items: center; justify-content: center; }
         .btn-tg { background: #24A1DE; }
@@ -42,22 +58,24 @@
 <body>
 
 <header>
+    <div class="lang-switch">
+        <button id="btn-pl" onclick="setLang('pl')">PL</button>
+        <button id="btn-uk" onclick="setLang('uk')" class="active">UA</button>
+    </div>
     <h1 class="logo">perfume.shoppee</h1>
-    <p class="subtitle">Твоя колекція ароматів. Оригінальна продукція.</p>
+    <p class="subtitle" id="h-sub"></p>
 </header>
 
 <div class="controls">
-    <input type="text" id="searchInput" placeholder="Пошук аромату..." onkeyup="filterProducts()">
+    <input type="text" id="searchInput" onkeyup="filterProducts()">
     <div class="filter-bar" id="filterBar"></div>
 </div>
 
-<div id="main-content">
-    <p style="text-align:center; padding:50px; color:#aaa;">Завантаження ароматів...</p>
-</div>
+<div id="main-content"></div>
 
 <div id="pModal" class="modal" onclick="if(event.target == this) closeModal()">
     <div class="modal-content">
-        <img id="m-img" style="max-height:150px; margin-bottom:15px; border-radius:10px;">
+        <img id="m-img" src="">
         <div id="m-brand" class="brand"></div>
         <h2 id="m-title" style="margin:5px 0; font-size: 18px;"></h2>
         <p id="m-desc" style="font-size:12px; color:#666; margin-bottom:15px;"></p>
@@ -70,25 +88,26 @@
 </div>
 
 <script>
-    // Прямая ссылка на CSV твоей таблицы
     const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv'; 
-    const INSTA_URL = 'https://instagram.com/perfume.shoppee_ukraine'; 
+    const INSTA_URL = 'https://www.instagram.com/perfume.shoppee?igsh=MWdya2RqbHpweW5vbQ=='; 
     const TG_NICK = "elenafragrance";
 
     let allProducts = [];
+    let curLang = 'uk';
     let curCat = 'home';
+
+    const UI = {
+        uk: { sub: "Твоя колекція ароматів. Оригінальна продукція.", search: "Пошук бренду або назви...", from: "від", in: "В наявності", order_st: "Замовлення", out: "Немає", hits: "Хіти продажу", news: "Новинки", catalog: "Усі аромати", cats: {home:"Головна", all:"Усі", female:"Жіночі", male:"Чоловічі", uniseks:"Унісекс", set:"Набори"} },
+        pl: { sub: "Twoja kolekcja zapachów. Oryginały.", search: "Szukaj zapachu...", from: "od", in: "Dostępny", order_st: "Na zamówienie", out: "Brak", hits: "Bestsellery", news: "Nowości", catalog: "Wszystkie zapachy", cats: {home:"Główna", all:"Wszystkie", female:"Damskie", male:"Męskie", uniseks:"Unisex", set:"Zestawy"} }
+    };
 
     async function init() {
         try {
             const response = await fetch(SPREADSHEET_URL);
             const text = await response.text();
             allProducts = parseCSV(text);
-            renderFilters();
-            renderHome();
-        } catch(e) {
-            console.error(e);
-            document.getElementById('main-content').innerHTML = '<p style="text-align:center; padding:20px;">Помилка зв\'язку з таблицею.</p>';
-        }
+            setLang('uk');
+        } catch(e) { console.error("Data error:", e); }
     }
 
     function parseCSV(csv) {
@@ -97,49 +116,58 @@
         let result = [];
         for (let i = 1; i < lines.length; i++) {
             if (!lines[i]) continue;
-            // Регулярка для обработки запятых внутри кавычек
             const currentline = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/); 
             const obj = {};
             headers.forEach((header, index) => {
-                let val = currentline[index] ? currentline[index].trim().replace(/^"|"$/g, '') : "";
-                obj[header] = val;
+                obj[header] = currentline[index] ? currentline[index].trim().replace(/^"|"$/g, '') : "";
             });
             result.push(obj);
         }
         return result.sort((a, b) => (a.brand || "").localeCompare(b.brand || ""));
     }
 
+    function setLang(l) {
+        curLang = l;
+        document.querySelectorAll('.lang-switch button').forEach(b => b.classList.remove('active'));
+        document.getElementById('btn-' + l).classList.add('active');
+        document.getElementById('h-sub').innerText = UI[l].sub;
+        document.getElementById('searchInput').placeholder = UI[l].search;
+        renderFilters();
+        refreshDisplay();
+    }
+
     function renderFilters() {
-        const cats = { home: "🏠 Головна", all: "Усі", female: "Жіночі", male: "Чоловічі", uniseks: "Унісекс", set: "Набори" };
-        document.getElementById('filterBar').innerHTML = Object.keys(cats).map(key => `
-            <button class="filter-btn ${curCat === key ? 'active' : ''}" onclick="setCategory('${key}')">${cats[key]}</button>
+        document.getElementById('filterBar').innerHTML = Object.keys(UI[curLang].cats).map(key => `
+            <button class="filter-btn ${curCat === key ? 'active' : ''}" onclick="setCategory('${key}')">${UI[curLang].cats[key]}</button>
         `).join('');
     }
 
     function setCategory(c) {
         curCat = c;
         renderFilters();
-        if (c === 'home') renderHome();
-        else filterProducts();
+        refreshDisplay();
         window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    function refreshDisplay() {
+        if (curCat === 'home') renderHome(); else filterProducts();
     }
 
     function renderHome() {
         const hits = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes');
         const news = allProducts.filter(p => p.isNew?.toLowerCase() === 'yes');
         let html = '';
-        if(hits.length) html += `<div class="section-header"><h2 class="section-title">Хіти продажу</h2></div><div class="carousel">${hits.map(p => getCardHTML(p)).join('')}</div>`;
-        if(news.length) html += `<div class="section-header"><h2 class="section-title">Новинки</h2></div><div class="carousel">${news.map(p => getCardHTML(p)).join('')}</div>`;
-        const others = allProducts.filter(p => p.isBest?.toLowerCase() !== 'yes' && p.isNew?.toLowerCase() !== 'yes').slice(0, 10);
-        if(others.length) html += `<div class="section-header"><h2 class="section-title">Каталог</h2></div><div class="product-grid" style="padding:10px 15px">${others.map(p => getCardHTML(p)).join('')}</div>`;
-        document.getElementById('main-content').innerHTML = html || '<p style="text-align:center; padding:20px;">Заповніть товари в таблиці!</p>';
+        if(hits.length) html += `<div class="section-header"><h2 class="section-title">${UI[curLang].hits}</h2></div><div class="carousel">${hits.map(p => getCardHTML(p)).join('')}</div>`;
+        if(news.length) html += `<div class="section-header"><h2 class="section-title">${UI[curLang].news}</h2></div><div class="carousel">${news.map(p => getCardHTML(p)).join('')}</div>`;
+        html += `<div class="section-header"><h2 class="section-title">${UI[curLang].catalog}</h2></div><div class="product-grid" style="padding:10px 15px">${allProducts.map(p => getCardHTML(p)).join('')}</div>`;
+        document.getElementById('main-content').innerHTML = html;
     }
 
     function filterProducts() {
         const q = document.getElementById('searchInput').value.toLowerCase();
         const filtered = allProducts.filter(p => {
             const brand = (p.brand || "").toLowerCase();
-            const name = (p.nameUK || "").toLowerCase();
+            const name = (curLang === 'uk' ? p.nameUK : p.namePL).toLowerCase();
             const matchSearch = brand.includes(q) || name.includes(q);
             const matchCat = (curCat === 'all' || p.category === curCat);
             return matchSearch && matchCat;
@@ -149,32 +177,34 @@
 
     function getCardHTML(p) {
         const imgPath = p.photo.includes('http') ? p.photo : 'img/' + p.photo;
-        let st = "В наявності";
-        if(p.status === 'out') st = "Немає";
-        if(p.status === 'order') st = "Замовлення";
+        let st = UI[curLang].in;
+        if(p.status === 'out') st = UI[curLang].out;
+        if(p.status === 'order') st = UI[curLang].order_st;
+        const name = curLang === 'uk' ? p.nameUK : p.namePL;
         return `
             <div class="card" onclick='openModal(${JSON.stringify(p)})'>
-                <div class="status-badge">${st}</div>
-                <div class="card-img"><img src="${imgPath}" onerror="this.src='https://via.placeholder.com/150?text=Logo'"></div>
+                <div class="status-badge" style="color:${p.status==='out'?'#999':''}; border-color:${p.status==='out'?'#eee':''}">${st}</div>
+                <div class="card-img"><img src="${imgPath}" onerror="this.src='https://via.placeholder.com/150?text=Perfume'"></div>
                 <div class="brand">${p.brand}</div>
-                <div class="title">${p.nameUK}</div>
-                <div class="price">від ${p.price2ml || p.price10ml} zł</div>
+                <div class="title">${name}</div>
+                <div class="price">${UI[curLang].from} ${p.price2ml || p.price10ml} zł</div>
             </div>`;
     }
 
     function openModal(p) {
         const imgPath = p.photo.includes('http') ? p.photo : 'img/' + p.photo;
+        const name = curLang === 'uk' ? p.nameUK : p.namePL;
         document.getElementById('m-img').src = imgPath;
         document.getElementById('m-brand').innerText = p.brand;
-        document.getElementById('m-title').innerText = p.nameUK;
-        document.getElementById('m-desc').innerText = p.descUK;
+        document.getElementById('m-title').innerText = name;
+        document.getElementById('m-desc').innerText = curLang === 'uk' ? p.descUK : p.descPL;
         let pr = '';
-        if(p.price2ml > 0) pr += `<div class="price-row"><span>2 ml</span><b>${p.price2ml} zł</b></div>`;
-        if(p.price5ml > 0) pr += `<div class="price-row"><span>5 ml</span><b>${p.price5ml} zł</b></div>`;
-        if(p.price10ml > 0) pr += `<div class="price-row"><span>10 ml</span><b>${p.price10ml} zł</b></div>`;
-        if(p.fullPrice > 0) pr += `<div class="price-row" style="border-top:1px solid #eee; margin-top:5px; padding-top:5px;"><span>Флакон (${p.fullVol})</span><b>${p.fullPrice} zł</b></div>`;
+        if(parseFloat(p.price2ml) > 0) pr += `<div class="price-row"><span>2 ml</span><b>${p.price2ml} zł</b></div>`;
+        if(parseFloat(p.price5ml) > 0) pr += `<div class="price-row"><span>5 ml</span><b>${p.price5ml} zł</b></div>`;
+        if(parseFloat(p.price10ml) > 0) pr += `<div class="price-row"><span>10 ml</span><b>${p.price10ml} zł</b></div>`;
+        if(parseFloat(p.fullPrice) > 0) pr += `<div class="price-row" style="border-top:1px solid #eee; margin-top:5px; padding-top:5px;"><span>Флакон (${p.fullVol})</span><b>${p.fullPrice} zł</b></div>`;
         document.getElementById('m-prices').innerHTML = pr;
-        document.getElementById('m-tg').href = `https://t.me/${TG_NICK}?text=Хочу замовити ${p.brand} ${p.nameUK}`;
+        document.getElementById('m-tg').href = `https://t.me/${TG_NICK}?text=Привіт! Хочу замовити ${p.brand} ${name}`;
         document.getElementById('m-inst').href = INSTA_URL;
         document.getElementById('pModal').style.display = "block";
     }
