@@ -9,7 +9,7 @@
             --bg: #0a0a0a; --card-bg: #161616; --text: #ffffff; --sub-text: #666; --border: #222;
             --gold-gradient: linear-gradient(135deg, #fdfc47 0%, #bf9b30 50%, #fdfc47 100%);
             --gold-shine: linear-gradient(to right, #bf9b30 20%, #fdfc47 40%, #fdfc47 60%, #bf9b30 80%);
-            --gold-text: #d4af37; --sale-red: #ff0000; --stock-green: #2ecc71;
+            --gold-text: #d4af37; --sale-red: #ff0000; --stock-green: #2ecc71; --out-red: #888;
         }
         body.light-theme { --bg: #ffffff; --card-bg: #f9f9f9; --text: #1a1a1a; --sub-text: #999; --border: #eee; }
         body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); color: var(--text); transition: 0.3s; -webkit-tap-highlight-color: transparent; }
@@ -22,7 +22,7 @@
         .logo { font-size: 2.6em; font-weight: 900; letter-spacing: -2px; margin: 0; text-transform: lowercase; background: var(--gold-shine); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 3s linear infinite; }
         @keyframes shine { to { background-position: 200% center; } }
         
-        .subtitle { font-size: 11px; color: var(--sub-text); text-transform: uppercase; letter-spacing: 2px; margin: 8px 0 25px; }
+        .subtitle { font-size: 11px; color: var(--sub-text); text-transform: uppercase; letter-spacing: 1px; margin: 8px auto 25px; max-width: 80%; line-height: 1.5; }
         .controls { padding: 0 15px; max-width: 600px; margin: 0 auto; position: sticky; top: 15px; z-index: 100; }
         #searchInput { width: 100%; padding: 16px 25px; border-radius: 35px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; box-sizing: border-box; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
         
@@ -42,9 +42,12 @@
 
         .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; padding-bottom: 100px; }
         
-        .card { background: var(--card-bg); border-radius: 25px; padding: 15px; text-align: center; border: 1px solid var(--border); display: flex; flex-direction: column; min-height: 300px; position: relative; transition: 0.3s; cursor: pointer; }
-        .sale-badge { position: absolute; top: 12px; left: 12px; background: var(--sale-red); color: white; padding: 5px 12px; border-radius: 12px; font-size: 10px; font-weight: 900; text-transform: uppercase; }
-        .stock-badge { font-size: 10px; font-weight: 800; color: var(--stock-green); margin-bottom: 8px; }
+        .card { background: var(--card-bg); border-radius: 25px; padding: 15px; text-align: center; border: 1px solid var(--border); display: flex; flex-direction: column; min-height: 310px; position: relative; transition: 0.3s; cursor: pointer; }
+        .sale-badge { position: absolute; top: 12px; left: 12px; background: var(--sale-red); color: white; padding: 5px 12px; border-radius: 12px; font-size: 10px; font-weight: 900; }
+        
+        .stock-badge { font-size: 10px; font-weight: 800; margin-bottom: 8px; }
+        .stock-in { color: var(--stock-green); }
+        .stock-out { color: #ff4d4d; }
         
         .card-img { height: 130px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
         .card img { max-width: 90%; max-height: 90%; object-fit: contain; }
@@ -53,13 +56,12 @@
         .title { font-size: 14px; font-weight: 700; margin: 6px 0; height: 2.8em; overflow: hidden; }
         .price { font-weight: 900; font-size: 17px; color: var(--gold-text); }
         
-        /* Модалка */
         .modal { display: none; position: fixed; z-index: 3000; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); }
         .modal-content { background: var(--bg); width: 92%; max-width: 400px; margin: auto; position: relative; top: 50%; transform: translateY(-50%); border-radius: 35px; padding: 30px; border: 1px solid var(--border); text-align: center; }
         #m-img { max-height: 180px; margin-bottom: 20px; }
         .price-list { background: var(--card-bg); padding: 18px; border-radius: 20px; margin: 20px 0; text-align: left; border: 1px solid var(--border); }
         .old-p { text-decoration: line-through; color: var(--sub-text); font-size: 12px; margin-right: 8px; }
-        .sale-price { color: var(--sale-red) !important; font-weight: 900 !important; font-size: 1.2em; }
+        .sale-price { color: var(--sale-red) !important; font-weight: 900 !important; }
         
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         .btn { padding: 16px; border-radius: 20px; text-decoration: none; font-weight: 800; font-size: 13px; text-align: center; }
@@ -109,6 +111,7 @@
 </div>
 
 <script>
+    // ИСПОЛЬЗУЕМ ВЕРНЫЙ URL ДЛЯ CSV
     const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
     const INSTA_URL = 'https://www.instagram.com/perfume.shoppee';
     const TG_NICK = "elenafragrance";
@@ -118,8 +121,8 @@
     let curCat = 'all';
 
     const UI = {
-        uk: { sub: "Оригінальна парфумерія • Luxury Collection", search: "Пошук бренду...", from: "від", hits: "Хіти продажу", news: "Новинки", sales: "Знижки %", catalog: "Каталог", filter: "Фільтри ↓", sale_tag: "ЗНИЖКА", stock: "✓ В наявності", cats: {all: "Усі", female: "Жіночі", male: "Чоловічі", uniseks: "Унісекс", set: "Набори"} },
-        pl: { sub: "Oryginalne perfumy • Luxury Collection", search: "Szukaj...", from: "od", hits: "Hity sprzedaży", news: "Nowości", sales: "Zniżki %", catalog: "Katalog", filter: "Filtry ↓", sale_tag: "ZNIŻKA", stock: "✓ Dostępny", cats: {all: "Wszystkie", female: "Damskie", male: "Męskie", uniseks: "Unisex", set: "Zestawy"} }
+        uk: { sub: "Твоя колекція ароматів починається тут. Працюємо виключно з оригінальною продукцією.", search: "Пошук бренду...", from: "від", hits: "Хіти продажу", news: "Новинки", sales: "Знижки %", catalog: "Каталог", filter: "Фільтри ↓", sale_tag: "ЗНИЖКА", stock_in: "✓ В наявності", stock_out: "✕ Немає в наявності", cats: {all: "Усі", female: "Жіночі", male: "Чоловічі", uniseks: "Унісекс", set: "Набори"} },
+        pl: { sub: "Twoja kolekcja zapachów zaczyna się tutaj. Pracujemy wyłącznie z oryginalnymi produktami.", search: "Szukaj...", from: "od", hits: "Hity sprzedaży", news: "Nowości", sales: "Zniżki %", catalog: "Katalog", filter: "Filtry ↓", sale_tag: "ZNIŻKA", stock_in: "✓ Dostępny", stock_out: "✕ Brak w magazynie", cats: {all: "Wszystkie", female: "Damskie", male: "Męskie", uniseks: "Unisex", set: "Zestawy"} }
     };
 
     function toggleTheme() {
@@ -130,10 +133,12 @@
     function toggleFilterMenu() { document.getElementById('filterMenu').classList.toggle('active'); }
 
     async function init() {
-        const resp = await fetch(SPREADSHEET_URL);
-        const text = await resp.text();
-        allProducts = parseCSV(text);
-        setLang('uk');
+        try {
+            const resp = await fetch(SPREADSHEET_URL);
+            const text = await resp.text();
+            allProducts = parseCSV(text);
+            setLang('uk');
+        } catch(e) { console.error("CSV Load Error"); }
     }
 
     function parseCSV(csv) {
@@ -202,10 +207,11 @@
 
     function getCard(p) {
         const hasSale = (p.old2ml || p.old5ml || p.old10ml || p.oldFull);
+        const inStock = p.status?.toLowerCase() !== 'out';
         return `<div class="card" onclick='openModal(${JSON.stringify(p)})'>
             ${hasSale ? `<div class="sale-badge">${UI[curLang].sale_tag}</div>` : ''}
             <div class="card-img"><img src="${p.photo}"></div>
-            <div class="stock-badge">${UI[curLang].stock}</div>
+            <div class="stock-badge ${inStock ? 'stock-in' : 'stock-out'}">${inStock ? UI[curLang].stock_in : UI[curLang].stock_out}</div>
             <div class="brand">${p.brand}</div>
             <div class="title">${curLang==='uk'?p.nameUK:p.namePL}</div>
             <div class="price">${UI[curLang].from} ${p.price2ml || p.price10ml} zł</div>
@@ -214,11 +220,14 @@
 
     function openModal(p) {
         const n = curLang==='uk'?p.nameUK:p.namePL;
+        const inStock = p.status?.toLowerCase() !== 'out';
         document.getElementById('m-img').src = p.photo;
         document.getElementById('m-brand').innerText = p.brand;
         document.getElementById('m-title').innerText = n;
-        document.getElementById('m-stock').innerText = UI[curLang].stock;
+        document.getElementById('m-stock').innerText = inStock ? UI[curLang].stock_in : UI[curLang].stock_out;
+        document.getElementById('m-stock').className = `stock-badge ${inStock ? 'stock-in' : 'stock-out'}`;
         document.getElementById('m-desc').innerText = curLang==='uk'?p.descUK:p.descPL;
+        
         let pr = '';
         [{l:'2ml',v:p.price2ml,o:p.old2ml},{l:'5ml',v:p.price5ml,o:p.old5ml},{l:'10ml',v:p.price10ml,o:p.old10ml},{l:'Bottle',v:p.fullPrice,o:p.oldFull}].forEach(s => {
             if(s.v && parseFloat(s.v)>0) pr += `<div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span>${s.l}</span><div>${s.o?`<span class="old-p">${s.o} zł</span>`:''}<span class="${s.o?'sale-price':'price'}" style="font-weight:900;">${s.v} zł</span></div></div>`;
