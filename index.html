@@ -199,11 +199,16 @@
 
     function refresh() {
         const q = document.getElementById('searchInput').value.toLowerCase();
-        const filtered = allProducts.filter(p => {
+        
+        // Фільтруємо товари
+        let filtered = allProducts.filter(p => {
             const mS = (p.brand + (curLang==='uk'?p.nameUK:p.namePL)).toLowerCase().includes(q);
             const mC = curCat === 'all' || p.category === curCat;
             return mS && mC;
         });
+
+        // СОРТУВАННЯ ПО БРЕНДУ (А-Я / A-Z)
+        filtered.sort((a, b) => a.brand.localeCompare(b.brand));
 
         let content = '';
         if(curCat === 'all' && !q) {
