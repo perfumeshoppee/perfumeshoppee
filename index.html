@@ -135,143 +135,142 @@
 </div>
 
 <script>
-    const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
-    const INSTA_URL = 'https://www.instagram.com/perfume.shoppee';
-    const TG_NICK = "elenafragrance";
+const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
+const INSTA_URL = 'https://www.instagram.com/perfume.shoppee';
+const TG_NICK = "elenafragrance";
 
-    let allProducts = [];
-    let curLang = 'uk';
-    let curCat = 'all';
+let allProducts = [];
+let curLang = 'uk';
+let curCat = 'all';
 
-    const UI = {
-        uk: { sub: "Твоя колекція ароматів починається тут. Працюємо виключно з оригінальною продукцією.", search: "Пошук бренду...", from: "від", hits: "Хіти продажу", news: "Новинки", sales: "Знижки %", catalog: "Каталог", filter: "Фільтри ↓", sale_tag: "ЗНИЖКА", stock_in: "✓ В наявності", stock_out: "✕ Немає в наявності", cats: {all: "Усі", female: "Жіночі", male: "Чоловічі", uniseks: "Унісекс", set: "Набори"} },
-        pl: { sub: "Twoja kolekcja zapachów zaczyna się tutaj. Pracujemy wyłącznie z oryginalnymi produktami.", search: "Szukaj...", from: "od", hits: "Hity sprzedaży", news: "Nowości", sales: "Zniżki %", catalog: "Katalog", filter: "Filtry ↓", sale_tag: "ZNIŻKA", stock_in: "✓ Dostępny", stock_out: "✕ Brak w magazynie", cats: {all: "Wszystkie", female: "Damskie", male: "Męskie", uniseks: "Unisex", set: "Zestawy"} }
-    };
+const UI = {
+    uk: { sub: "Твоя колекція ароматів починається тут.", search: "Пошук...", from: "від", hits: "Хіти", news: "Новинки", sales: "Знижки", catalog: "Каталог", filter: "Фільтри ↓", sale_tag: "ЗНИЖКА", stock_in: "✓ В наявності", stock_out: "✕ Немає", cats: {all: "Усі", female: "Жіночі", male: "Чоловічі", uniseks: "Унісекс", set: "Набори"} },
+    pl: { sub: "Twoja kolekcja zaczyna się tutaj.", search: "Szukaj...", from: "od", hits: "Hity", news: "Nowości", sales: "Zniżki", catalog: "Katalog", filter: "Filtry ↓", sale_tag: "ZNIŻKA", stock_in: "✓ Dostępny", stock_out: "✕ Brak", cats: {all: "Wszystkie", female: "Damskie", male: "Męskie", uniseks: "Unisex", set: "Zestawy"} }
+};
 
-    function toggleTheme() {
-        document.body.classList.toggle('dark-theme');
-        document.getElementById('themeBtn').innerText = document.body.classList.contains('dark-theme') ? '☀️' : '🌙';
-    }
+function toggleTheme() {
+    document.body.classList.toggle('dark-theme');
+    document.getElementById('themeBtn').innerText = document.body.classList.contains('dark-theme') ? '☀️' : '🌙';
+}
 
-    function toggleFilterMenu() { document.getElementById('filterMenu').classList.toggle('active'); }
+function toggleFilterMenu() { document.getElementById('filterMenu').classList.toggle('active'); }
 
-    async function init() {
-        try {
-            const resp = await fetch(SPREADSHEET_URL);
-            const text = await resp.text();
-            allProducts = parseCSV(text);
-            setLang('uk');
-        } catch(e) { console.error("CSV Load Error"); }
-    }
+async function init() {
+    const resp = await fetch(SPREADSHEET_URL);
+    const text = await resp.text();
+    allProducts = parseCSV(text);
+    setLang('uk');
 
-    function parseCSV(csv) {
-        const rows = []; let cur = '', inQ = false, row = [];
-        for (let i = 0; i < csv.length; i++) {
-            let c = csv[i], n = csv[i+1];
-            if (c === '"' && inQ && n === '"') { cur += '"'; i++; }
-            else if (c === '"') inQ = !inQ;
-            else if (c === ',' && !inQ) { row.push(cur); cur = ''; }
-            else if ((c === '\n' || c === '\r') && !inQ) { 
-                row.push(cur); rows.push(row); cur = ''; row = []; if(c==='\r' && n==='\n') i++;
-            } else cur += c;
-        }
-        if(cur || row.length) { row.push(cur); rows.push(row); }
-        const h = rows[0].map(v => v.trim());
-        return rows.slice(1).map(r => {
-            let o = {}; h.forEach((k, idx) => o[k] = r[idx]?.trim() || ''); return o;
+    // 👉 открытие по ссылке
+    setTimeout(() => {
+        const hash = window.location.hash.slice(1);
+        if (!hash) return;
+
+        const found = allProducts.find(p => {
+            const slug = (p.brand + "-" + (curLang==='uk'?p.nameUK:p.namePL))
+                .toLowerCase()
+                .replace(/\s+/g, '-')
+                .replace(/[^\w-]+/g, '');
+            return slug === hash;
         });
-    }
 
-    function setLang(l) {
-        curLang = l;
-        document.querySelectorAll('.lang-switch button').forEach(b => b.classList.toggle('active', b.id === 'btn-'+l));
-        document.getElementById('h-sub').innerText = UI[l].sub;
-        document.getElementById('searchInput').placeholder = UI[l].search;
-        document.getElementById('f-label').innerText = UI[l].filter;
-        renderFilters();
-        refresh();
-    }
+        if (found) openModal(found);
+    }, 300);
+}
 
-    function renderFilters() {
-        document.getElementById('filterMenu').innerHTML = Object.keys(UI[curLang].cats).map(k => `
-            <button class="f-btn ${curCat===k?'active':''}" onclick="setCategory('${k}')">${UI[curLang].cats[k]}</button>
-        `).join('');
-    }
+function parseCSV(csv) {
+    const rows = csv.split('\n').map(r => r.split(','));
+    const h = rows[0];
+    return rows.slice(1).map(r => {
+        let o = {}; h.forEach((k,i)=>o[k]=r[i]||''); return o;
+    });
+}
 
-    function setCategory(k) {
-        curCat = k;
-        renderFilters();
-        refresh();
-        if(document.getElementById('filterMenu').classList.contains('active')) toggleFilterMenu();
-    }
+function setLang(l) {
+    curLang = l;
+    document.getElementById('h-sub').innerText = UI[l].sub;
+    document.getElementById('searchInput').placeholder = UI[l].search;
+    renderFilters();
+    refresh();
+}
 
-    function refresh() {
-        const q = document.getElementById('searchInput').value.toLowerCase();
-        let filtered = allProducts.filter(p => {
-            const mS = (p.brand + (curLang==='uk'?p.nameUK:p.namePL)).toLowerCase().includes(q);
-            const mC = curCat === 'all' || p.category === curCat;
-            return mS && mC;
-        });
-        filtered.sort((a, b) => a.brand.localeCompare(b.brand));
+function renderFilters() {
+    document.getElementById('filterMenu').innerHTML = Object.keys(UI[curLang].cats).map(k => `
+        <button class="f-btn ${curCat===k?'active':''}" onclick="setCategory('${k}')">${UI[curLang].cats[k]}</button>
+    `).join('');
+}
 
-        let content = '';
-        if(curCat === 'all' && !q) {
-            const hits = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes');
-            const news = allProducts.filter(p => p.isNew?.toLowerCase() === 'yes');
-            const sales = allProducts.filter(p => p.old2ml || p.old5ml || p.old10ml || p.oldFull);
+function setCategory(k) {
+    curCat = k;
+    renderFilters();
+    refresh();
+}
 
-            if(hits.length) content += `<div class="section-header"><h2 class="section-title">${UI[curLang].hits}</h2></div><div class="carousel">${hits.map(p => getCard(p)).join('')}</div>`;
-            if(news.length) content += `<div class="section-header"><h2 class="section-title">${UI[curLang].news}</h2></div><div class="carousel">${news.map(p => getCard(p)).join('')}</div>`;
-            if(sales.length) content += `<div class="section-header"><h2 class="section-title" style="color:var(--sale-red); font-weight:900;">${UI[curLang].sales}</h2></div><div class="carousel">${sales.map(p => getCard(p)).join('')}</div>`;
-            
-            content += `<div class="section-header"><h2 class="section-title">${UI[curLang].catalog}</h2></div>`;
-        }
-        
-        document.getElementById('dynamic-content').innerHTML = content;
-        document.getElementById('catalog-area').innerHTML = `<div class="product-grid">${filtered.map(p => getCard(p)).join('')}</div>`;
-    }
+function refresh() {
+    const q = document.getElementById('searchInput').value.toLowerCase();
+    let filtered = allProducts.filter(p => (p.brand + p.nameUK).toLowerCase().includes(q));
 
-    function getCard(p) {
-        const hasSale = (p.old2ml || p.old5ml || p.old10ml || p.oldFull);
-        const inStock = p.status?.toLowerCase() !== 'out';
-        return `<div class="card" onclick='openModal(${JSON.stringify(p)})'>
-            ${hasSale ? `<div class="sale-badge">${UI[curLang].sale_tag}</div>` : ''}
-            <div class="card-img"><img src="${p.photo}"></div>
-            <div class="stock-badge ${inStock ? 'stock-in' : 'stock-out'}">${inStock ? UI[curLang].stock_in : UI[curLang].stock_out}</div>
-            <div class="brand">${p.brand}</div>
-            <div class="title">${curLang==='uk'?p.nameUK:p.namePL}</div>
-            <div class="price">${UI[curLang].from} ${p.price2ml || p.price10ml} zł</div>
-        </div>`;
-    }
+    document.getElementById('catalog-area').innerHTML =
+        `<div class="product-grid">${filtered.map(p => getCard(p)).join('')}</div>`;
+}
 
-    function openModal(p) {
-        const n = curLang==='uk'?p.nameUK:p.namePL;
-        const inStock = p.status?.toLowerCase() !== 'out';
-        document.getElementById('m-img').src = p.photo;
-        document.getElementById('m-brand').innerText = p.brand;
-        document.getElementById('m-title').innerText = n;
-        document.getElementById('m-stock').innerText = inStock ? UI[curLang].stock_in : UI[curLang].stock_out;
-        document.getElementById('m-stock').className = `stock-badge ${inStock ? 'stock-in' : 'stock-out'}`;
-        document.getElementById('m-desc').innerText = curLang==='uk'?p.descUK:p.descPL;
-        
-        let pr = '';
-        [{l:'2ml',v:p.price2ml,o:p.old2ml},{l:'5ml',v:p.price5ml,o:p.old5ml},{l:'10ml',v:p.price10ml,o:p.old10ml},{l:'Bottle',v:p.fullPrice,o:p.oldFull}].forEach(s => {
-            if(s.v && parseFloat(s.v)>0) pr += `<div style="display:flex;justify-content:space-between;margin-bottom:10px;"><span>${s.l}</span><div>${s.o?`<span class="old-p">${s.o} zł</span>`:''}<span class="${s.o?'sale-price':'price'}" style="font-weight:900;">${s.v} zł</span></div></div>`;
-        });
-        document.getElementById('m-prices').innerHTML = pr;
-        document.getElementById('m-tg').href = `https://t.me/${TG_NICK}?text=Замовлення: ${p.brand} ${n}`;
-        document.getElementById('m-inst').href = INSTA_URL;
-        
-        // Відображаємо модалку та блокуємо скрол сайту
-        document.getElementById('pModal').style.display = 'flex';
-        document.body.classList.add('modal-open');
-    }
+function getCard(p) {
+    return `<div class="card" onclick='openModal(${JSON.stringify(p)})'>
+        <div class="card-img"><img src="${p.photo}"></div>
+        <div class="brand">${p.brand}</div>
+        <div class="title">${p.nameUK}</div>
+        <div class="price">${p.price2ml} zł</div>
+    </div>`;
+}
 
-    function closeModal() { 
-        document.getElementById('pModal').style.display = 'none'; 
+//////////////////////////////////////////////////
+// 🚀 SPA ЛОГИКА
+//////////////////////////////////////////////////
+
+function openModal(p) {
+    const slug = (p.brand + "-" + (curLang==='uk'?p.nameUK:p.namePL))
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w-]+/g, '');
+
+    history.pushState({product: p}, '', '#' + slug);
+    showModal(p);
+}
+
+function showModal(p) {
+    const n = curLang==='uk'?p.nameUK:p.namePL;
+
+    document.getElementById('m-img').src = p.photo;
+    document.getElementById('m-brand').innerText = p.brand;
+    document.getElementById('m-title').innerText = n;
+
+    document.getElementById('m-desc').innerText = p.descUK || '';
+
+    document.getElementById('m-tg').href =
+        `https://t.me/${TG_NICK}?text=Замовлення: ${p.brand} ${n}`;
+
+    document.getElementById('m-inst').href = INSTA_URL;
+
+    document.getElementById('pModal').style.display = 'flex';
+    document.body.classList.add('modal-open');
+}
+
+function closeModal() {
+    history.back();
+}
+
+window.onpopstate = function(event) {
+    if (event.state && event.state.product) {
+        showModal(event.state.product);
+    } else {
+        document.getElementById('pModal').style.display = 'none';
         document.body.classList.remove('modal-open');
     }
-    init();
+};
+
+//////////////////////////////////////////////////
+
+init();
 </script>
 </body>
 </html>
