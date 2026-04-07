@@ -30,41 +30,16 @@
         }
         body.modal-open { overflow: hidden; }
 
-        /* === НОВИЙ ГЕРОЙ === */
         .hero {
             height: 520px;
-            background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.55)), 
-                        url('https://picsum.photos/id/1015/2000/1200') center/cover no-repeat; /* можна замінити на іншу картинку */
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            text-align: center; 
-            color: white; 
-            position: relative;
-        }
-        .hero::after {
-            content: ''; 
-            position: absolute; 
-            bottom: 0; left: 0; right: 0; 
-            height: 140px; 
-            background: linear-gradient(transparent, var(--bg));
+            background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.55)), url('https://picsum.photos/id/1015/2000/1200') center/cover;
+            display: flex; align-items: center; justify-content: center; text-align: center; color: white; position: relative;
         }
         .hero-content h1 {
-            font-size: 4.2rem; 
-            font-weight: 900; 
-            letter-spacing: -4px; 
-            margin: 0; 
-            background: var(--gold-shine); 
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 4px 20px rgba(0,0,0,0.6);
+            font-size: 4.2rem; font-weight: 900; letter-spacing: -4px; margin: 0;
+            background: var(--gold-shine); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .hero-content p {
-            font-size: 1.25rem; 
-            max-width: 520px; 
-            margin: 20px auto 0; 
-            opacity: 0.95;
-        }
+        .hero-content p { font-size: 1.25rem; max-width: 520px; margin: 20px auto 0; }
 
         header { padding: 20px 20px 10px; text-align: center; position: relative; }
         .top-bar { display: flex; justify-content: center; gap: 15px; margin-bottom: 8px; }
@@ -75,8 +50,6 @@
         @keyframes shine { to { background-position: 200% center; } }
 
         .subtitle { font-size: 12.5px; color: var(--sub-text); text-transform: uppercase; letter-spacing: 2px; margin: 10px auto 30px; }
-
-        /* решта стилів (картки, модалка, кошик) — без змін, тільки hero і footer оновлені */
 
         .section-header { padding: 40px 20px 12px; text-align: center; }
         .section-title { font-size: 19px; font-weight: 900; text-transform: uppercase; letter-spacing: 2.5px; color: var(--sub-text); }
@@ -116,42 +89,25 @@
             font-size: 15px; font-weight: 900; cursor: pointer;
         }
 
-        /* Модалка і кошик — оптимізовані як раніше */
         .modal { display: none; position: fixed; z-index: 3000; inset: 0; background: rgba(0,0,0,0.88); backdrop-filter: blur(12px); align-items: flex-end; justify-content: center; padding: 0; }
-        .modal-content { background: var(--bg); width: 100%; max-width: 460px; border-radius: 28px 28px 0 0; padding: 25px 20px 30px; border: 1px solid var(--border); position: relative; max-height: 92vh; overflow-y: auto; box-shadow: 0 -10px 40px rgba(0,0,0,0.3); }
+        .modal-content { background: var(--bg); width: 100%; max-width: 460px; border-radius: 28px 28px 0 0; padding: 25px 20px 30px; border: 1px solid var(--border); position: relative; max-height: 92vh; overflow-y: auto; }
         @media (min-width: 480px) { .modal { align-items: center; padding: 20px; } .modal-content { border-radius: 32px; } }
 
         .close-modal { position: absolute; top: 16px; right: 16px; width: 48px; height: 48px; background: var(--card-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; cursor: pointer; border: 1px solid var(--border); }
 
-        /* Підвал як у офіційних сайтів */
-        footer {
-            background: #111; 
-            color: #aaa; 
-            padding: 70px 20px 40px; 
-            text-align: center;
-        }
-        .footer-links {
-            display: flex; 
-            justify-content: center; 
-            flex-wrap: wrap; 
-            gap: 25px; 
-            margin: 30px 0 40px;
-        }
-        .footer-links a {
-            color: #ccc; 
-            text-decoration: none; 
-            font-size: 14.5px;
-        }
-        .footer-links a:hover { color: var(--gold-text); }
+        .cart-modal { display: none; position: fixed; z-index: 4000; inset: 0; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 20px; }
+        .cart-content { background: var(--bg); width: 100%; max-width: 460px; border-radius: 28px; max-height: 85vh; overflow-y: auto; padding: 25px; }
+        .cart-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+        .cart-item img { width: 60px; height: 60px; object-fit: contain; }
+        .cart-total { margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--border); display: flex; justify-content: space-between; font-weight: 900; font-size: 18px; }
     </style>
 </head>
 <body>
 
-<!-- НОВИЙ ГЕРОЙ -->
 <div class="hero">
     <div class="hero-content">
         <h1>perfume.shoppee</h1>
-        <p>Люксова колекція ароматів • Тільки оригінальна продукція</p>
+        <p>Люксова колекція ароматів • Тільки оригінал</p>
     </div>
 </div>
 
@@ -170,8 +126,6 @@
     </div>
 </header>
 
-<!-- секції хітів, новинок, знижок і каталог — без змін -->
-
 <div id="hits-section"></div>
 <div id="news-section"></div>
 <div id="sales-section"></div>
@@ -185,11 +139,40 @@
     <div id="full-grid" class="product-grid"></div>
 </div>
 
-<!-- модалка і кошик (залишаються як у попередній версії) -->
+<!-- Модалка товару -->
+<div id="pModal" class="modal" onclick="if(event.target === this) Modal.close()">
+    <div class="modal-content" onclick="event.stopImmediatePropagation()">
+        <div class="close-modal" onclick="Modal.close()">✕</div>
+        <img id="m-img" class="modal-img" src="">
+        <div id="m-brand" class="modal-brand"></div>
+        <h2 id="m-title" class="modal-title"></h2>
+        <div id="m-stock" class="modal-stock"></div>
+        <p id="m-desc" style="font-size:13.8px;color:var(--sub-text);margin:18px 0 22px;line-height:1.45;"></p>
+        <div id="m-prices" class="price-list"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+            <a href="#" id="m-tg" style="padding:16px;background:#229ED9;color:white;border-radius:26px;text-decoration:none;font-weight:900;">Telegram</a>
+            <a href="#" id="m-inst" target="_blank" style="padding:16px;background:var(--gold-gradient);color:#000;border-radius:26px;text-decoration:none;font-weight:900;">Instagram</a>
+        </div>
+    </div>
+</div>
+
+<!-- Кошик -->
+<div id="cartModal" class="cart-modal" onclick="if(event.target === this) Cart.hide()">
+    <div class="cart-content">
+        <h2 style="margin:0 0 20px 0;text-align:center;">Ваш кошик (<span id="cart-items-count">0</span>)</h2>
+        <div id="cart-items"></div>
+        <div class="cart-total">
+            <span>Разом:</span>
+            <span id="cart-total">0 zł</span>
+        </div>
+        <button onclick="alert('Оформлення замовлення — скоро буде! ❤️')" style="width:100%;margin-top:20px;padding:16px;background:var(--gold-gradient);color:#000;border:none;border-radius:25px;font-weight:900;font-size:15px;">Оформити замовлення</button>
+        <button onclick="Cart.hide()" style="width:100%;margin-top:10px;padding:14px;background:transparent;border:2px solid var(--border);color:var(--text);border-radius:25px;font-weight:700;">Продовжити покупки</button>
+    </div>
+</div>
 
 <footer>
     <p style="font-size:19px;color:#ddd;font-weight:700;margin-bottom:10px;">perfume.shoppee • Luxury Edition</p>
-    <div class="footer-links">
+    <div class="footer-links" style="display:flex;justify-content:center;flex-wrap:wrap;gap:25px;margin:30px 0 40px;">
         <a href="#">Про нас</a>
         <a href="#">Доставка та оплата</a>
         <a href="#">Контакти</a>
@@ -197,14 +180,164 @@
         <a href="https://www.instagram.com/perfume.shoppee" target="_blank">Instagram</a>
         <a href="https://t.me/elenafragrance" target="_blank">Telegram</a>
     </div>
-    <p style="font-size:13px;opacity:0.7;">© 2026 perfume.shoppee. Усі права захищені. Тільки оригінальна продукція.</p>
+    <p style="font-size:13px;opacity:0.7;">© 2026 perfume.shoppee. Усі права захищені.</p>
 </footer>
 
 <script>
-    // Тут весь твій скрипт з Cart, Modal, init тощо — копіюй з попередньої версії, яку я тобі давав
-    // (щоб не дублювати, просто встав сюди свій останній скрипт)
+    const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
+    const INSTA_URL = 'https://www.instagram.com/perfume.shoppee';
+    const TG_NICK = "elenafragrance";
 
-    // Якщо потрібно — скажи, я пришлю повний файл з скриптом теж.
+    let allProducts = [];
+    let curLang = 'uk';
+    let cart = JSON.parse(localStorage.getItem('perfumeCart')) || [];
+
+    const UI = {
+        uk: { sub: "Твоя колекція ароматів починається тут • Тільки оригінал", hits: "Хіти продажу", news: "Новинки", sales: "Знижки", catalog: "Весь каталог", from: "від", sale_tag: "ЗНИЖКА", stock_in: "✓ В наявності", stock_out: "✕ Немає" },
+        pl: { sub: "Twoja kolekcja zapachów zaczyna się tutaj • Tylko oryginały", hits: "Hity sprzedaży", news: "Nowości", sales: "Promocje", catalog: "Cały katalog", from: "od", sale_tag: "PROMOCJA", stock_in: "✓ Dostępny", stock_out: "✕ Brak" }
+    };
+
+    // ========== КОШИК ==========
+    const Cart = {
+        items: cart,
+        save() { localStorage.setItem('perfumeCart', JSON.stringify(this.items)); this.updateCount(); },
+        updateCount() { document.getElementById('cart-count').innerText = this.items.length; },
+        add(p) {
+            const n = curLang === 'uk' ? p.nameUK : p.namePL;
+            this.items.push({id: Date.now(), brand: p.brand, name: n, price: parseFloat(p.price2ml || p.price10ml || 0), photo: p.photo});
+            this.save();
+            const notif = document.createElement('div');
+            notif.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--gold-gradient);color:#000;padding:12px 26px;border-radius:25px;font-weight:900;z-index:5000;';
+            notif.textContent = '✓ Додано в кошик!';
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 1600);
+        },
+        remove(i) { this.items.splice(i, 1); this.save(); this.show(); },
+        show() {
+            const cont = document.getElementById('cart-items');
+            cont.innerHTML = this.items.length ? '' : '<p style="text-align:center;padding:50px;color:var(--sub-text);">Кошик порожній 😔</p>';
+            this.items.forEach((item, i) => {
+                const d = document.createElement('div');
+                d.className = 'cart-item';
+                d.innerHTML = `<img src="${item.photo}"><div style="flex:1;"><div style="font-weight:700;">${item.brand}</div><div style="font-size:13.5px;color:var(--sub-text);">${item.name}</div><div style="margin-top:6px;font-weight:900;color:var(--gold-text);">${item.price} zł</div></div><div onclick="Cart.remove(${i});event.stopImmediatePropagation()" style="color:#c8102e;font-weight:bold;cursor:pointer;">✕</div>`;
+                cont.appendChild(d);
+            });
+            document.getElementById('cart-items-count').innerText = this.items.length;
+            document.getElementById('cart-total').innerText = this.items.reduce((s, it) => s + it.price, 0) + ' zł';
+            document.getElementById('cartModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
+        },
+        hide() { document.getElementById('cartModal').style.display = 'none'; document.body.classList.remove('modal-open'); }
+    };
+
+    // ========== МОДАЛКА ==========
+    const Modal = {
+        open(p) {
+            const n = curLang === 'uk' ? p.nameUK : p.namePL;
+            const inStock = p.status?.toLowerCase() !== 'out';
+            document.getElementById('m-img').src = p.photo;
+            document.getElementById('m-brand').innerText = p.brand;
+            document.getElementById('m-title').innerText = n;
+            document.getElementById('m-stock').innerHTML = inStock ? `<span style="color:var(--stock-green)">✓ В наявності</span>` : `<span style="color:#999">✕ Немає в наявності</span>`;
+            document.getElementById('m-desc').innerText = (curLang === 'uk' ? p.descUK : p.descPL) || 'Опис скоро з’явиться';
+
+            let html = '';
+            [{l:'2ml',v:p.price2ml,o:p.old2ml},{l:'5ml',v:p.price5ml,o:p.old5ml},{l:'10ml',v:p.price10ml,o:p.old10ml},{l:'Повний флакон',v:p.fullPrice,o:p.oldFull}].forEach(s => {
+                if (s.v && parseFloat(s.v) > 0) {
+                    html += `<div class="price-row"><span>${s.l}</span><span>${s.o ? `<span class="old-price">${s.o} zł</span>` : ''}<span style="font-weight:900;color:var(--gold-text);">${s.v} zł</span></span></div>`;
+                }
+            });
+            document.getElementById('m-prices').innerHTML = html || '<p style="color:var(--sub-text);text-align:center;">Ціни оновлюються</p>';
+
+            document.getElementById('m-tg').href = `https://t.me/${TG_NICK}?text=Хочу: ${p.brand} ${n}`;
+            document.getElementById('m-inst').href = INSTA_URL;
+
+            document.getElementById('pModal').style.display = 'flex';
+            document.body.classList.add('modal-open');
+        },
+        close() {
+            document.getElementById('pModal').style.display = 'none';
+            document.body.classList.remove('modal-open');
+        }
+    };
+
+    async function init() {
+        try {
+            const resp = await fetch(SPREADSHEET_URL);
+            const text = await resp.text();
+            allProducts = parseCSV(text);
+            if (allProducts.length === 0) console.warn("Таблиця порожня або не завантажилась");
+            Cart.updateCount();
+            setLang('uk');
+        } catch(e) {
+            console.error("Помилка завантаження таблиці", e);
+            alert("Не вдалося завантажити товари з таблиці. Перевір, чи таблиця опублікована як CSV.");
+        }
+    }
+
+    function parseCSV(csv) {
+        const rows = []; let cur = '', inQ = false, row = [];
+        for (let i = 0; i < csv.length; i++) {
+            let c = csv[i], n = csv[i+1];
+            if (c === '"' && inQ && n === '"') { cur += '"'; i++; }
+            else if (c === '"') inQ = !inQ;
+            else if (c === ',' && !inQ) { row.push(cur); cur = ''; }
+            else if ((c === '\n' || c === '\r') && !inQ) { 
+                row.push(cur); rows.push(row); cur = ''; row = []; if(c==='\r' && n==='\n') i++;
+            } else cur += c;
+        }
+        if(cur || row.length) { row.push(cur); rows.push(row); }
+        const h = rows[0].map(v => v.trim().toLowerCase());
+        return rows.slice(1).map(r => {
+            let o = {}; h.forEach((k, idx) => o[k] = r[idx]?.trim() || ''); return o;
+        });
+    }
+
+    function setLang(l) {
+        curLang = l;
+        document.querySelectorAll('.lang-switch button').forEach(b => b.classList.toggle('active', b.id === 'btn-'+l));
+        document.getElementById('h-sub').innerText = UI[l].sub;
+        renderHomeSections();
+    }
+
+    function getCard(p) {
+        const hasSale = (p.old2ml || p.old5ml || p.old10ml || p.oldfull);
+        const n = curLang === 'uk' ? p.nameuk || p.namepl : p.namepl || p.nameuk;
+        return `<div class="card" onclick="Modal.open(${JSON.stringify(p)})">
+            ${hasSale ? `<div class="sale-badge">${UI[curLang].sale_tag}</div>` : ''}
+            <div class="card-img"><img src="${p.photo || 'https://via.placeholder.com/150'}"></div>
+            <div class="brand">${p.brand || 'Без бренду'}</div>
+            <div class="title">${n || 'Без назви'}</div>
+            <div class="price">${UI[curLang].from} ${p.price2ml || p.price10ml || '—'} zł</div>
+            <button class="add-to-cart" onclick="event.stopImmediatePropagation(); Cart.add(${JSON.stringify(p)})">🛍️ ДО КОШИКА</button>
+        </div>`;
+    }
+
+    function renderHomeSections() {
+        const hits = allProducts.filter(p => (p.isbest || '').toLowerCase() === 'yes');
+        const news = allProducts.filter(p => (p.isnew || '').toLowerCase() === 'yes');
+        const sales = allProducts.filter(p => p.old2ml || p.old5ml || p.old10ml || p.oldfull);
+
+        let html = hits.length ? `<div class="section-header"><h2 class="section-title">${UI[curLang].hits}</h2></div><div class="product-grid">${hits.map(getCard).join('')}</div>` : '';
+        if (news.length) html += `<div class="section-header"><h2 class="section-title">${UI[curLang].news}</h2></div><div class="product-grid">${news.map(getCard).join('')}</div>`;
+        if (sales.length) html += `<div class="section-header"><h2 class="section-title">${UI[curLang].sales}</h2></div><div class="product-grid">${sales.map(getCard).join('')}</div>`;
+
+        document.getElementById('hits-section').innerHTML = html || '<p style="text-align:center;padding:40px;color:var(--sub-text);">Поки немає товарів у цих розділах</p>';
+    }
+
+    function showFullCatalog() {
+        document.getElementById('full-catalog').style.display = 'block';
+        document.querySelector('.show-all-btn').style.display = 'none';
+        document.getElementById('catalog-title').innerText = UI[curLang].catalog;
+        document.getElementById('full-grid').innerHTML = allProducts.map(getCard).join('');
+    }
+
+    function toggleTheme() {
+        document.body.classList.toggle('dark-theme');
+        document.getElementById('themeBtn').innerText = document.body.classList.contains('dark-theme') ? '☀️' : '🌙';
+    }
+
+    init();
 </script>
 </body>
 </html>
