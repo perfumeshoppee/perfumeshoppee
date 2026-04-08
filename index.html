@@ -3,89 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>perfume.shoppee</title>
+    <title>perfume.shoppee — Premium Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; }
+        body { font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
         .logo-font { font-family: Georgia, serif; letter-spacing: -1px; }
-        #sidebar { transform: translateX(-100%); transition: transform 0.3s ease-out; }
+        #sidebar { transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         #sidebar.open { transform: translateX(0); }
-        .overlay { display: none; background: rgba(0,0,0,0.5); position: fixed; inset: 0; z-index: 1001; }
+        .overlay { display: none; background: rgba(0,0,0,0.6); position: fixed; inset: 0; z-index: 1001; backdrop-filter: blur(4px); }
         .overlay.show { display: block; }
-        .active-lang { opacity: 1 !important; text-decoration: underline; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+        .card-anim { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .cart-badge { animation: bounce 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.4); } }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors">
+<body class="bg-[#F8F9FA] dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors">
 
 <div class="bg-white dark:bg-gray-900 border-b sticky top-0 z-50">
   <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-    <button onclick="toggleSidebar()" class="text-2xl"><i class="fas fa-bars"></i></button>
+    <button onclick="toggleSidebar()" class="text-2xl p-1"><i class="fas fa-bars"></i></button>
     <span onclick="goHome()" class="text-2xl font-bold logo-font cursor-pointer">perfume.shoppee</span>
-    <div class="w-8"></div>
+    <button onclick="toggleCart()" class="relative p-1">
+        <i class="fas fa-shopping-bag text-2xl"></i>
+        <span id="cart-count" class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
+    </button>
   </div>
 </div>
 
 <header id="main-header-bar" class="bg-black text-white p-4">
   <div class="max-w-7xl mx-auto">
-    <div class="relative mb-4">
+    <div class="relative mb-5">
         <input id="searchInput" type="text" onkeyup="refreshCatalog()" 
-               class="w-full bg-white text-black rounded-full py-3 px-6 pl-12 text-base focus:outline-none"
-               placeholder="Що ви шукаєте?">
+               class="w-full bg-white text-black rounded-2xl py-3.5 px-6 pl-12 text-base focus:ring-2 focus:ring-teal-500 outline-none"
+               placeholder="Пошук парфумів або брендів...">
         <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"></i>
     </div>
-    <div class="flex gap-2">
-      <button onclick="setCategory('female')" class="flex-1 py-3 bg-white/10 border border-white/20 rounded-xl text-sm font-medium">Для неї (<span id="count-female">0</span>)</button>
-      <button onclick="setCategory('male')" class="flex-1 py-3 bg-white/10 border border-white/20 rounded-xl text-sm font-medium">Для нього (<span id="count-male">0</span>)</button>
+    
+    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+      <button onclick="setCategory('all')" class="cat-btn px-5 py-2.5 bg-white/20 rounded-xl text-xs font-bold whitespace-nowrap active:bg-white active:text-black">УСІ</button>
+      <button onclick="setCategory('female')" class="cat-btn px-5 py-2.5 bg-white/10 rounded-xl text-xs font-bold whitespace-nowrap">ДЛЯ НЕЇ</button>
+      <button onclick="setCategory('male')" class="cat-btn px-5 py-2.5 bg-white/10 rounded-xl text-xs font-bold whitespace-nowrap">ДЛЯ НЬОГО</button>
+      <button onclick="setCategory('unisex')" class="cat-btn px-5 py-2.5 bg-white/10 rounded-xl text-xs font-bold whitespace-nowrap">УНІСЕКС</button>
+      <button onclick="setCategory('set')" class="cat-btn px-5 py-2.5 bg-white/10 rounded-xl text-xs font-bold whitespace-nowrap border border-teal-500/50">НАБОРИ 🎁</button>
     </div>
   </div>
 </header>
 
+<div id="sort-bar" class="max-w-7xl mx-auto px-4 py-3 flex justify-end gap-4 text-[11px] font-bold text-gray-500">
+    <button onclick="setSort('cheap')">СПОЧАТКУ ДЕШЕВШІ</button>
+    <button onclick="setSort('expensive')">СПОЧАТКУ ДОРОЖЧІ</button>
+</div>
+
 <div id="overlay" onclick="toggleSidebar()" class="overlay"></div>
 <div id="sidebar" class="fixed top-0 left-0 h-full w-[85%] max-w-[320px] bg-white dark:bg-gray-900 z-[1002] shadow-2xl flex flex-col">
-  <div class="bg-[#444] text-white p-4 flex justify-between items-center">
-    <div class="flex items-center gap-3"><i class="fas fa-user-circle text-xl"></i><span class="text-sm font-medium">Вхід</span></div>
+  <div class="bg-[#222] text-white p-5 flex justify-between items-center">
+    <div class="flex items-center gap-3"><i class="fas fa-circle-user text-2xl text-teal-400"></i><span class="font-bold">Мій кабінет</span></div>
     <div class="flex items-center gap-4">
-        <div class="flex gap-2 text-[11px] font-bold">
-            <button onclick="setLang('pl')" id="lang-pl" class="opacity-50">PL</button>
-            <span class="opacity-30">|</span>
-            <button onclick="setLang('uk')" id="lang-uk" class="active-lang">UA</button>
-        </div>
-        <button onclick="toggleTheme()" class="text-lg" id="themeBtnIn">🌙</button>
+        <button onclick="toggleTheme()" class="text-xl">🌙</button>
+        <button onclick="toggleSidebar()" class="text-xl">✕</button>
     </div>
   </div>
-  <div class="flex-1 py-4">
-    <div class="px-6 mb-4 flex items-center gap-2 text-[#008ca5] font-bold border-b pb-4"><i class="fas fa-th-large"></i><span>Каталог товарів</span></div>
-    <nav class="flex flex-col">
-      <a href="#" onclick="goHome(); toggleSidebar(); return false;" class="px-6 py-3 text-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-800">Головна</a>
-      <a href="#" onclick="showBrands(); toggleSidebar(); return false;" class="px-6 py-3 text-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-800">Бренди</a>
-      <a href="#" onclick="showSales(); toggleSidebar(); return false;" class="px-6 py-3 text-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 text-red-500">Акції %</a>
-      <a href="#" onclick="showNews(); toggleSidebar(); return false;" class="px-6 py-3 text-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-800">Новинки</a>
-    </nav>
+  <div class="flex-1 overflow-y-auto">
+    <div class="p-6">
+        <div class="flex gap-4 mb-8">
+            <button onclick="setLang('uk')" class="flex-1 py-2 rounded-lg border-2 border-teal-500 font-bold text-xs">UA</button>
+            <button onclick="setLang('pl')" class="flex-1 py-2 rounded-lg border-2 border-gray-200 font-bold text-xs text-gray-400">PL</button>
+        </div>
+        <nav class="space-y-1">
+            <a href="#" onclick="goHome(); toggleSidebar(); return false;" class="flex items-center gap-4 py-4 border-b border-gray-50 dark:border-gray-800 font-bold"><i class="fas fa-house text-teal-500"></i> Головна</a>
+            <a href="#" onclick="showBrands(); toggleSidebar(); return false;" class="flex items-center gap-4 py-4 border-b border-gray-50 dark:border-gray-800 font-bold"><i class="fas fa-tag text-teal-500"></i> Бренди</a>
+            <a href="#" onclick="showSales(); toggleSidebar(); return false;" class="flex items-center gap-4 py-4 border-b border-gray-50 dark:border-gray-800 font-bold text-red-500"><i class="fas fa-fire"></i> Акції та знижки</a>
+            <a href="#" onclick="showNews(); toggleSidebar(); return false;" class="flex items-center gap-4 py-4 border-b border-gray-50 dark:border-gray-800 font-bold"><i class="fas fa-star text-teal-500"></i> Новинки</a>
+        </nav>
+    </div>
+  </div>
+  <div class="p-6 bg-gray-50 dark:bg-gray-800">
+    <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Підтримка</p>
+    <a href="https://t.me/elenafragrance" class="text-lg font-black tracking-tight">@elenafragrance</a>
   </div>
 </div>
 
-<main class="max-w-7xl mx-auto pb-20">
-    <div id="page-title-area" class="px-4 py-6">
-        <h1 id="page-title" class="text-2xl font-bold">Оригінальні парфуми</h1>
+<main class="max-w-7xl mx-auto pb-24">
+    <div id="page-header" class="px-4 py-6">
+        <h1 id="page-title" class="text-2xl font-black">Каталог парфумів</h1>
+        <p id="page-subtitle" class="text-gray-400 text-xs mt-1">Знайдіть свій ідеальний аромат</p>
     </div>
     <div id="dynamic-content"></div>
-    <div id="catalog-area" class="px-4 grid grid-cols-2 gap-4"></div>
+    <div id="catalog-area" class="px-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
 </main>
 
-<div id="pModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999] p-4" onclick="closeModal()">
-  <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-[32px] p-6 relative max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
-    <button onclick="closeModal()" class="absolute top-4 right-4 text-2xl text-gray-400">✕</button>
-    <img id="m-img" class="w-full h-56 object-contain mb-4 rounded-2xl" src="">
-    <div id="m-brand" class="text-[10px] uppercase tracking-widest text-gray-400"></div>
-    <h2 id="m-title" class="text-2xl font-bold mb-2 leading-tight"></h2>
-    <div id="m-stock" class="mb-4"></div>
-    <p id="m-desc" class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed"></p>
-    <div id="m-prices" class="space-y-3 mb-8"></div>
-    <div class="flex gap-3">
-      <a id="m-tg" href="#" target="_blank" class="flex-1 bg-black text-white py-4 rounded-2xl text-center font-bold text-sm flex items-center justify-center gap-2"><i class="fab fa-telegram-plane"></i> Telegram</a>
-      <a href="https://www.instagram.com/perfume.shoppee" target="_blank" class="flex-1 bg-gradient-to-tr from-orange-500 via-pink-500 to-purple-600 text-white py-4 rounded-2xl text-center font-bold text-sm">Instagram</a>
+<div id="cart-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-gray-900 z-[10000] shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+    <div class="p-5 border-b flex justify-between items-center bg-gray-50 dark:bg-gray-800">
+        <h2 class="text-xl font-black uppercase">Мій кошик</h2>
+        <button onclick="toggleCart()" class="text-2xl">✕</button>
+    </div>
+    <div id="cart-items" class="flex-1 overflow-y-auto p-5 space-y-4"></div>
+    <div class="p-6 border-t dark:border-gray-800 bg-white dark:bg-gray-900">
+        <div class="flex justify-between items-center mb-6">
+            <span class="text-gray-400 font-bold">ЗАГАЛОМ:</span>
+            <span id="cart-total" class="text-2xl font-black text-teal-600">0 zł</span>
+        </div>
+        <button onclick="sendOrder()" class="w-full bg-black text-white py-5 rounded-2xl font-black text-lg shadow-xl active:scale-95 transition-transform flex items-center justify-center gap-3">
+            <i class="fab fa-telegram-plane text-xl"></i> ОФОРМИТИ ЗАМОВЛЕННЯ
+        </button>
+    </div>
+</div>
+
+<div id="pModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999] p-4 backdrop-blur-md" onclick="closeModal()">
+  <div class="bg-white dark:bg-gray-900 w-full max-w-lg rounded-[40px] p-8 relative max-h-[92vh] overflow-y-auto scrollbar-hide" onclick="event.stopPropagation()">
+    <button onclick="closeModal()" class="absolute top-6 right-6 text-2xl text-gray-300">✕</button>
+    <div class="flex flex-col md:flex-row gap-8">
+        <div class="md:w-1/2">
+            <img id="m-img" class="w-full aspect-square object-contain rounded-3xl bg-gray-50 p-4" src="">
+        </div>
+        <div class="md:w-1/2">
+            <div id="m-brand" class="text-xs uppercase font-black text-teal-500 tracking-widest mb-1"></div>
+            <h2 id="m-title" class="text-3xl font-black mb-4 leading-tight tracking-tighter"></h2>
+            <div id="m-stock" class="mb-6"></div>
+            <p id="m-desc" class="text-sm text-gray-500 leading-relaxed mb-8"></p>
+            
+            <div id="m-prices" class="space-y-4 mb-8"></div>
+            
+            <button id="add-to-cart-btn" class="w-full bg-teal-500 text-white py-5 rounded-2xl font-black text-sm shadow-lg shadow-teal-500/30 active:scale-95 transition-all">ДОДАТИ В КОШИК</button>
+        </div>
     </div>
   </div>
 </div>
@@ -95,10 +138,21 @@ const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6Brg
 const TG_NICK = 'elenafragrance';
 
 let allProducts = [];
+let cart = JSON.parse(localStorage.getItem('ps_cart')) || [];
 let curLang = 'uk';
 let curCat = 'all';
+let curSort = 'none';
 
-// ФУНКЦІЯ ПАРСИНГУ (ТЕПЕР ЧІТКА)
+async function init() {
+    try {
+        const res = await fetch(SPREADSHEET_URL);
+        const text = await res.text();
+        allProducts = parseCSV(text);
+        renderCart();
+        refreshCatalog();
+    } catch (e) { console.error("CSV Error"); }
+}
+
 function parseCSV(text) {
     const p = (csv) => {
         let rows = [], row = [], col = '', inQuotes = false;
@@ -116,159 +170,161 @@ function parseCSV(text) {
         return rows;
     };
     const data = p(text);
-    const headers = data[0];
+    const h = data[0];
     return data.slice(1).map(r => {
-        let obj = {};
-        headers.forEach((h, i) => obj[h] = r[i] || "");
-        return obj;
+        let o = {}; h.forEach((k, i) => o[k] = r[i] || "");
+        return o;
     });
-}
-
-async function init() {
-    try {
-        const res = await fetch(SPREADSHEET_URL);
-        const text = await res.text();
-        allProducts = parseCSV(text);
-        console.log("Завантажено товарів:", allProducts.length);
-        updateCounts();
-        refreshCatalog();
-    } catch (e) { console.error("Помилка:", e); }
-}
-
-function updateCounts() {
-    document.getElementById('count-female').innerText = allProducts.filter(p => p.category === 'female').length;
-    document.getElementById('count-male').innerText = allProducts.filter(p => p.category === 'male').length;
-}
-
-function setLang(l) {
-    curLang = l;
-    document.getElementById('lang-uk').className = l === 'uk' ? 'active-lang' : 'opacity-50';
-    document.getElementById('lang-pl').className = l === 'pl' ? 'active-lang' : 'opacity-50';
-    refreshCatalog();
-}
-
-function toggleTheme() {
-    const isDark = document.documentElement.classList.toggle('dark');
-    document.getElementById('themeBtnIn').innerText = isDark ? '☀️' : '🌙';
-}
-
-function toggleSidebar() {
-    document.getElementById('sidebar').classList.toggle('open');
-    document.getElementById('overlay').classList.toggle('show');
-}
-
-function goHome() {
-    curCat = 'all';
-    document.getElementById('main-header-bar').style.display = 'block';
-    document.getElementById('page-title').innerText = "Оригінальні парфуми";
-    document.getElementById('dynamic-content').innerHTML = '';
-    refreshCatalog();
-}
-
-function showBrands() {
-    document.getElementById('main-header-bar').style.display = 'none';
-    document.getElementById('page-title').innerText = "Бренди";
-    const brands = [...new Set(allProducts.map(p => p.brand).filter(Boolean))].sort();
-    let html = `<div class="px-4 space-y-2">`;
-    brands.forEach(b => {
-        html += `<div onclick="filterByBrand('${b.replace(/'/g, "\\'")}')" class="p-4 bg-white dark:bg-gray-900 rounded-2xl shadow-sm font-bold flex justify-between cursor-pointer"><span>${b}</span><i class="fas fa-chevron-right text-gray-300"></i></div>`;
-    });
-    document.getElementById('dynamic-content').innerHTML = html + `</div>`;
-    document.getElementById('catalog-area').innerHTML = '';
-}
-
-function filterByBrand(b) {
-    document.getElementById('page-title').innerText = b;
-    document.getElementById('dynamic-content').innerHTML = '';
-    const filtered = allProducts.filter(p => p.brand === b);
-    document.getElementById('catalog-area').innerHTML = filtered.map(p => renderCard(p)).join('');
-}
-
-function showSales() {
-    document.getElementById('main-header-bar').style.display = 'none';
-    document.getElementById('page-title').innerText = "Акції %";
-    const filtered = allProducts.filter(p => p.old2ml || p.old5ml || p.old10ml || p.oldFull);
-    document.getElementById('dynamic-content').innerHTML = '';
-    document.getElementById('catalog-area').innerHTML = filtered.map(p => renderCard(p)).join('');
-}
-
-function showNews() {
-    document.getElementById('main-header-bar').style.display = 'none';
-    document.getElementById('page-title').innerText = "Новинки";
-    const filtered = allProducts.filter(p => p.isNew?.toLowerCase() === 'yes');
-    document.getElementById('dynamic-content').innerHTML = '';
-    document.getElementById('catalog-area').innerHTML = filtered.map(p => renderCard(p)).join('');
 }
 
 function refreshCatalog() {
     const q = document.getElementById('searchInput').value.toLowerCase();
-    const filtered = allProducts.filter(p => {
+    let filtered = allProducts.filter(p => {
         const name = curLang === 'uk' ? (p.nameUK || p.name) : (p.namePL || p.name);
-        return (p.brand + ' ' + name).toLowerCase().includes(q) && (curCat === 'all' || p.category === curCat);
+        const matchSearch = (p.brand + ' ' + name).toLowerCase().includes(q);
+        const matchCat = curCat === 'all' || p.category === curCat;
+        return matchSearch && matchCat;
     });
-    document.getElementById('catalog-area').innerHTML = filtered.map(p => renderCard(p)).join('');
+
+    if (curSort === 'cheap') filtered.sort((a,b) => parseFloat(a.price2ml || a.fullPrice) - parseFloat(b.price2ml || b.fullPrice));
+    if (curSort === 'expensive') filtered.sort((a,b) => parseFloat(b.price2ml || b.fullPrice) - parseFloat(a.price2ml || a.fullPrice));
+
+    const container = document.getElementById('catalog-area');
+    container.innerHTML = filtered.map((p, index) => renderCard(p, index)).join('');
 }
 
-function renderCard(p) {
+function renderCard(p, i) {
     const name = curLang === 'uk' ? (p.nameUK || p.name) : (p.namePL || p.name);
-    const price = p.price2ml || p.price5ml || p.price10ml || p.fullPrice || '---';
-    const id = allProducts.indexOf(p); // Використовуємо індекс як унікальний ID
+    const price = p.price2ml || p.fullPrice || '---';
+    const hasSale = !!(p.old2ml || p.oldFull);
+    const isNew = p.isNew?.toLowerCase() === 'yes';
     
     return `
-    <div onclick="openModalById(${id})" class="bg-white dark:bg-gray-900 rounded-[24px] p-3 shadow-sm border border-transparent hover:border-teal-500 transition-all cursor-pointer">
-        <div class="aspect-square mb-2 bg-gray-50 dark:bg-gray-800 rounded-xl flex items-center justify-center p-2 overflow-hidden">
+    <div onclick="openModal(${allProducts.indexOf(p)})" class="card-anim bg-white dark:bg-gray-900 rounded-[30px] p-4 shadow-sm border border-transparent hover:border-teal-500 transition-all cursor-pointer relative group" style="animation-delay: ${i * 0.05}s">
+        ${hasSale ? `<div class="absolute top-3 left-3 bg-red-500 text-white text-[9px] font-black px-2.5 py-1 rounded-full z-10 shadow-lg">SALE</div>` : ''}
+        ${isNew ? `<div class="absolute top-3 right-3 bg-teal-500 text-white text-[9px] font-black px-2.5 py-1 rounded-full z-10 shadow-lg">NEW</div>` : ''}
+        <div class="aspect-[4/5] mb-4 bg-[#F3F4F6] dark:bg-gray-800 rounded-[24px] flex items-center justify-center p-4 overflow-hidden group-hover:scale-[1.02] transition-transform">
             <img src="${p.photo}" class="max-h-full object-contain" loading="lazy">
         </div>
-        <div class="text-[9px] text-gray-400 uppercase font-bold truncate">${p.brand}</div>
-        <div class="text-[11px] font-bold truncate mb-1">${name}</div>
-        <div class="text-teal-600 font-black text-sm">${price} zł</div>
+        <div class="text-[10px] text-teal-500 uppercase font-black tracking-widest mb-1">${p.brand}</div>
+        <div class="text-sm font-bold truncate dark:text-white">${name}</div>
+        <div class="mt-3 flex justify-between items-center">
+            <div class="text-lg font-black text-gray-900 dark:text-white">${price} <span class="text-xs font-normal">zł</span></div>
+            <div class="w-8 h-8 bg-black dark:bg-white dark:text-black text-white rounded-full flex items-center justify-center text-xs"><i class="fas fa-plus"></i></div>
+        </div>
     </div>`;
 }
 
-function openModalById(index) {
+// ЛОГІКА КОШИКА
+let selectedOption = null;
+
+function openModal(index) {
     const p = allProducts[index];
     const name = curLang === 'uk' ? (p.nameUK || p.name) : (p.namePL || p.name);
-    const desc = curLang === 'uk' ? (p.descUK || p.desc) : (p.descPL || p.desc);
-    const inStock = p.status?.toLowerCase() !== 'out';
+    selectedOption = null;
 
     document.getElementById('m-img').src = p.photo;
     document.getElementById('m-brand').innerText = p.brand;
     document.getElementById('m-title').innerText = name;
-    document.getElementById('m-desc').innerText = desc;
-    document.getElementById('m-stock').innerHTML = inStock 
-        ? `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-bold">✓ В наявності</span>`
-        : `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-[10px] font-bold">✕ Немає</span>`;
-
-    let pricesHtml = '';
-    const items = [
-        { l: '2ml', p: p.price2ml, o: p.old2ml },
-        { l: '5ml', p: p.price5ml, o: p.old5ml },
-        { l: '10ml', p: p.price10ml, o: p.old10ml },
-        { l: 'Флакон', p: p.fullPrice, o: p.oldFull }
+    document.getElementById('m-desc').innerText = curLang === 'uk' ? (p.descUK || p.desc) : (p.descPL || p.desc);
+    
+    let prHtml = '';
+    const options = [
+        { l: '2ml', p: p.price2ml }, { l: '5ml', p: p.price5ml }, 
+        { l: '10ml', p: p.price10ml }, { l: 'Флакон', p: p.fullPrice }
     ];
 
-    items.forEach(i => {
-        if (i.p) {
-            pricesHtml += `
-            <div class="flex justify-between items-center border-b dark:border-gray-800 pb-2">
-                <span class="text-sm font-medium">${i.l}</span>
-                <div class="text-right">
-                    ${i.o ? `<span class="line-through text-gray-400 text-xs mr-2">${i.o} zł</span>` : ''}
-                    <span class="font-bold text-teal-600">${i.p} zł</span>
-                </div>
+    options.forEach(opt => {
+        if (opt.p && opt.p !== '---') {
+            prHtml += `
+            <div onclick="selectPrice(this, '${opt.l}', '${opt.p}', '${p.brand}', '${name}', '${p.photo}')" class="price-opt flex justify-between p-4 border-2 border-gray-100 dark:border-gray-800 rounded-2xl cursor-pointer hover:border-teal-500 transition-all">
+                <span class="font-bold">${opt.l}</span>
+                <span class="font-black text-teal-600">${opt.p} zł</span>
             </div>`;
         }
     });
 
-    document.getElementById('m-prices').innerHTML = pricesHtml;
-    document.getElementById('m-tg').href = `https://t.me/${TG_NICK}?text=Хочу замовити: ${encodeURIComponent(p.brand + ' ' + name)}`;
-    
+    document.getElementById('m-prices').innerHTML = prHtml;
+    document.getElementById('add-to-cart-btn').onclick = () => addToCart();
     document.getElementById('pModal').classList.remove('hidden');
 }
 
-function closeModal() {
-    document.getElementById('pModal').classList.add('hidden');
+function selectPrice(el, size, price, brand, name, img) {
+    document.querySelectorAll('.price-opt').forEach(opt => opt.classList.remove('border-teal-500', 'bg-teal-50 dark:bg-teal-900/20'));
+    el.classList.add('border-teal-500', 'bg-teal-50 dark:bg-teal-900/20');
+    selectedOption = { size, price, brand, name, img, id: Date.now() };
 }
+
+function addToCart() {
+    if (!selectedOption) return alert("Оберіть об'єм!");
+    cart.push(selectedOption);
+    saveCart();
+    renderCart();
+    closeModal();
+    toggleCart(true);
+}
+
+function renderCart() {
+    const container = document.getElementById('cart-items');
+    const badge = document.getElementById('cart-count');
+    
+    badge.innerText = cart.length;
+    badge.classList.toggle('hidden', cart.length === 0);
+    badge.classList.add('cart-badge');
+    setTimeout(() => badge.classList.remove('cart-badge'), 300);
+
+    let total = 0;
+    container.innerHTML = cart.map((item, i) => {
+        total += parseFloat(item.price);
+        return `
+        <div class="flex gap-4 bg-gray-50 dark:bg-gray-800 p-4 rounded-3xl relative group">
+            <img src="${item.img}" class="w-20 h-20 object-contain bg-white rounded-xl p-2">
+            <div class="flex-1">
+                <div class="text-[10px] font-black text-teal-500 uppercase">${item.brand}</div>
+                <div class="text-sm font-bold leading-tight mb-1">${item.name}</div>
+                <div class="flex justify-between items-center">
+                    <span class="text-xs text-gray-400">Об'єм: ${item.size}</span>
+                    <span class="font-black">${item.price} zł</span>
+                </div>
+            </div>
+            <button onclick="removeFromCart(${i})" class="absolute -top-2 -right-2 bg-white dark:bg-gray-700 w-8 h-8 rounded-full shadow-md flex items-center justify-center text-xs">✕</button>
+        </div>`;
+    }).join('');
+    
+    document.getElementById('cart-total').innerText = total.toFixed(2) + ' zł';
+}
+
+function sendOrder() {
+    if (cart.length === 0) return alert("Кошик порожній!");
+    let text = "👋 Нове замовлення!\n\n";
+    let total = 0;
+    cart.forEach((item, i) => {
+        text += `${i+1}. ${item.brand} ${item.name}\n   Об'єм: ${item.size} — ${item.price} zł\n\n`;
+        total += parseFloat(item.price);
+    });
+    text += `💰 Разом: ${total.toFixed(2)} zł`;
+    window.open(`https://t.me/${TG_NICK}?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+// ІНШІ ФУНКЦІЇ
+function setCategory(cat) {
+    curCat = cat;
+    document.querySelectorAll('.cat-btn').forEach(b => b.classList.replace('bg-white', 'bg-white/10'));
+    refreshCatalog();
+}
+function setSort(s) { curSort = s; refreshCatalog(); }
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
+function toggleCart(open = null) {
+    const p = document.getElementById('cart-panel');
+    const isVisible = p.classList.contains('translate-x-0');
+    if (open === true || !isVisible) p.classList.replace('translate-x-full', 'translate-x-0');
+    else p.classList.replace('translate-x-0', 'translate-x-full');
+}
+function closeModal() { document.getElementById('pModal').classList.add('hidden'); }
+function removeFromCart(i) { cart.splice(i, 1); saveCart(); renderCart(); }
+function saveCart() { localStorage.setItem('ps_cart', JSON.stringify(cart)); }
+function goHome() { document.getElementById('searchInput').value = ''; curCat = 'all'; refreshCatalog(); }
+function toggleTheme() { document.documentElement.classList.toggle('dark'); }
 
 init();
 </script>
