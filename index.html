@@ -91,13 +91,13 @@
 
 <div id="cart-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-gray-900 z-[10000] shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
     <div class="p-5 border-b flex justify-between items-center bg-gray-50 dark:bg-gray-800">
-        <h2 id="cart-title" class="text-xl font-black uppercase tracking-tighter">Кошик</h2>
+        <h2 id="cart-title" class="text-xl font-black uppercase">Кошик</h2>
         <button onclick="toggleCart()" class="text-2xl">✕</button>
     </div>
     <div id="cart-items" class="flex-1 overflow-y-auto p-5 space-y-4"></div>
     <div class="p-6 border-t dark:border-gray-800">
         <div class="flex justify-between items-center mb-6">
-            <span id="cart-total-label" class="text-gray-400 font-bold">РАЗОМ:</span>
+            <span id="cart-total-label" class="text-gray-400 font-bold uppercase">Разом:</span>
             <span id="cart-total" class="text-2xl font-black text-teal-600">0 zł</span>
         </div>
         <button onclick="sendOrder()" id="cart-send-btn" class="w-full bg-black text-white py-5 rounded-2xl font-black flex items-center justify-center gap-3 uppercase">Замовити</button>
@@ -207,7 +207,6 @@ function filterBy(type, brandName = null) {
     if (brandName) curCat = brandName;
     document.getElementById('page-title').innerText = brandName || langData[curLang][type] || langData[curLang].catalog;
     
-    // ХОВАЄМО ПАНЕЛЬ КАТЕГОРІЙ ДЛЯ БРЕНДІВ І СПЕЦ-ФІЛЬТРІВ
     const catPanel = document.getElementById('category-panel');
     if(type === 'brand' || type === 'new' || type === 'hit' || type === 'sale') {
         catPanel.classList.add('hidden');
@@ -242,8 +241,9 @@ function refreshCatalog() {
         const catValue = p.category.toLowerCase().trim();
         
         let matchSpecial = true;
+        // ТУТ ВИПРАВЛЕНО НА isNew ТА isBest
         if (currentFilter === 'new') matchSpecial = p.isNew?.toLowerCase() === 'yes';
-        if (currentFilter === 'hit') matchSpecial = p.isHit?.toLowerCase() === 'yes';
+        if (currentFilter === 'hit') matchSpecial = p.isBest?.toLowerCase() === 'yes';
         if (currentFilter === 'sale') matchSpecial = !!(p.old2ml || p.oldFull || p.old5ml || p.old10ml);
         if (currentFilter === 'brand') matchSpecial = p.brand === curCat;
 
