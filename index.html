@@ -6,110 +6,76 @@
     <title>perfume.shoppee • Luxury Edition</title>
     <style>
         :root { 
-            --bg: #ffffff; 
-            --card-bg: #f9f9f9; 
-            --text: #1a1a1a; 
-            --sub-text: #777; 
-            --border: #eee;
+            --bg: #ffffff; --card-bg: #f9f9f9; --text: #1a1a1a; --sub-text: #999; --border: #eee;
             --gold-gradient: linear-gradient(135deg, #fdfc47 0%, #bf9b30 50%, #fdfc47 100%);
             --gold-shine: linear-gradient(to right, #bf9b30 20%, #fdfc47 40%, #fdfc47 60%, #bf9b30 80%);
-            --gold-text: #d4af37; --sale-red: #c8102e; --stock-green: #2ecc71;
+            --gold-text: #d4af37; --sale-red: #ff0000; --stock-green: #2ecc71; --stock-out-color: #666;
         }
 
-        body.dark-theme { 
-            --bg: #0a0a0a; 
-            --card-bg: #161616; 
-            --text: #ffffff; 
-            --sub-text: #888; 
-            --border: #222; 
-        }
+        body.dark-theme { --bg: #0a0a0a; --card-bg: #161616; --text: #ffffff; --sub-text: #666; --border: #222; }
         
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Playfair Display', serif; 
-            margin: 0; background: var(--bg); color: var(--text); transition: background 0.4s;
-        }
+        body { font-family: -apple-system, sans-serif; margin: 0; background: var(--bg); color: var(--text); transition: 0.3s; -webkit-tap-highlight-color: transparent; }
         body.modal-open { overflow: hidden; }
-
-        .hero {
-            height: 520px;
-            background: linear-gradient(rgba(0,0,0,0.45), rgba(0,0,0,0.55)), url('https://picsum.photos/id/1015/2000/1200') center/cover;
-            display: flex; align-items: center; justify-content: center; text-align: center; color: white; position: relative;
-        }
-        .hero-content h1 {
-            font-size: 4.2rem; font-weight: 900; letter-spacing: -4px; margin: 0;
-            background: var(--gold-shine); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .hero-content p { font-size: 1.25rem; max-width: 520px; margin: 20px auto 0; }
-
-        header { padding: 20px 20px 10px; text-align: center; position: relative; }
-        .top-bar { display: flex; justify-content: center; gap: 15px; margin-bottom: 8px; }
-        .lang-switch button, .theme-toggle { background: var(--card-bg); border: 1px solid var(--border); padding: 10px 18px; border-radius: 30px; font-size: 11.5px; font-weight: 800; color: var(--sub-text); cursor: pointer; }
+        
+        header { padding: 40px 20px 10px; text-align: center; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 0 20px; margin-bottom: 25px; }
+        .lang-switch button, .theme-toggle, .cart-btn { background: var(--card-bg); border: 1px solid var(--border); padding: 10px 15px; border-radius: 20px; font-size: 11px; font-weight: 800; color: var(--text); cursor: pointer; }
         .lang-switch button.active { background: var(--gold-gradient); color: #000; border: none; }
-
-        .logo { font-size: 2.7em; font-weight: 900; letter-spacing: -2.8px; margin: 0; text-transform: lowercase; background: var(--gold-shine); background-size: 200%; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 5s linear infinite; }
+        
+        .logo { font-size: 2.6em; font-weight: 900; letter-spacing: -2px; margin: 0; text-transform: lowercase; background: var(--gold-shine); background-size: 200% auto; -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: shine 3s linear infinite; }
         @keyframes shine { to { background-position: 200% center; } }
-
-        .subtitle { font-size: 12.5px; color: var(--sub-text); text-transform: uppercase; letter-spacing: 2px; margin: 10px auto 30px; }
-
-        .section-header { padding: 40px 20px 12px; text-align: center; }
-        .section-title { font-size: 19px; font-weight: 900; text-transform: uppercase; letter-spacing: 2.5px; color: var(--sub-text); }
-
-        .product-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(148px, 1fr)); 
-            gap: 14px; 
-            padding: 15px 20px; 
-        }
         
-        .card { 
-            background: var(--card-bg); border-radius: 24px; padding: 12px; text-align: center; 
-            border: 1px solid var(--border); display: flex; flex-direction: column; min-height: 295px; 
-            position: relative; transition: all 0.4s; cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-        }
-        .card:hover { transform: translateY(-6px); box-shadow: 0 18px 35px rgba(191,155,48,0.25); }
-
-        .sale-badge { position: absolute; top: 10px; left: 10px; background: var(--sale-red); color: white; padding: 4px 11px; border-radius: 14px; font-size: 9.5px; font-weight: 900; }
+        .subtitle { font-size: 11px; color: var(--sub-text); text-transform: uppercase; letter-spacing: 1px; margin: 8px auto 25px; max-width: 80%; line-height: 1.5; }
         
-        .card-img { height: 125px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
-        .card img { max-width: 88%; max-height: 88%; object-fit: contain; transition: 0.5s; }
-        .card:hover img { transform: scale(1.07); }
+        .controls { padding: 0 15px; max-width: 600px; margin: 20px auto; position: sticky; top: 15px; z-index: 100; }
+        #searchInput { width: 100%; padding: 16px 25px; border-radius: 35px; border: 1px solid var(--border); background: var(--bg); color: var(--text); outline: none; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        
+        .filter-section { padding: 10px 20px; text-align: center; }
+        .filter-toggle-btn { background: var(--gold-gradient); color: #000; border: none; padding: 12px 30px; border-radius: 25px; font-weight: 800; cursor: pointer; }
+        .filter-menu { display: none; padding: 15px; flex-wrap: wrap; gap: 8px; justify-content: center; }
+        .filter-menu.active { display: flex; }
+        .f-btn { background: var(--card-bg); border: 1px solid var(--border); padding: 10px 18px; border-radius: 18px; color: var(--sub-text); font-size: 12px; font-weight: 700; cursor: pointer; }
+        .f-btn.active { background: var(--gold-gradient); color: #000; border: none; }
 
+        .section-header { padding: 25px 20px 5px; }
+        .section-title { font-size: 14px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; color: var(--sub-text); border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        
+        .carousel { display: flex; overflow-x: auto; gap: 15px; padding: 15px 20px; scrollbar-width: none; }
+        .carousel::-webkit-scrollbar { display: none; }
+        .carousel .card { min-width: 160px; flex: 0 0 160px; }
+
+        .product-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 15px; padding-bottom: 100px; }
+        
+        .card { background: var(--card-bg); border-radius: 25px; padding: 15px; text-align: center; border: 1px solid var(--border); position: relative; transition: 0.3s; cursor: pointer; }
+        .sale-badge { position: absolute; top: 12px; left: 12px; background: var(--sale-red); color: white; padding: 5px 10px; border-radius: 10px; font-size: 9px; font-weight: 900; z-index: 2; }
+        
+        .card-img { height: 120px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+        .card img { max-width: 100%; max-height: 100%; object-fit: contain; transition: 0.3s; }
+        
         .brand { font-size: 10px; text-transform: uppercase; color: var(--sub-text); font-weight: 800; }
-        .title { font-size: 14px; font-weight: 700; margin: 7px 0 5px; line-height: 1.25; height: 2.5em; overflow: hidden; }
-        .price { font-weight: 900; font-size: 16.5px; color: var(--gold-text); margin-top: auto; }
+        .title { font-size: 13px; font-weight: 700; margin: 5px 0; height: 2.6em; overflow: hidden; line-height: 1.3; }
+        .price { font-weight: 900; font-size: 15px; color: var(--gold-text); }
+        
+        /* MODAL */
+        .modal { display: none; position: fixed; z-index: 3000; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: var(--bg); width: 100%; max-width: 400px; max-height: 85vh; border-radius: 30px; padding: 30px 20px; border: 1px solid var(--border); text-align: center; position: relative; overflow-y: auto; }
+        .close-modal { position: absolute; top: 15px; right: 15px; font-size: 24px; color: var(--text); cursor: pointer; width: 30px; height: 30px; line-height: 30px; }
 
-        .add-to-cart { 
-            margin-top: 8px; padding: 10px; background: var(--gold-gradient); color: #000; border: none; 
-            border-radius: 22px; font-weight: 900; font-size: 12.5px; cursor: pointer;
-        }
+        #m-img { max-height: 180px; margin-bottom: 15px; }
+        .price-row { display: flex; justify-content: space-between; padding: 12px; background: var(--card-bg); border-radius: 15px; margin-bottom: 8px; font-size: 14px; }
+        .old-p { text-decoration: line-through; color: var(--sub-text); font-size: 11px; margin-right: 5px; }
+        
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        .btn { padding: 15px; border-radius: 15px; font-weight: 800; font-size: 12px; text-decoration: none; text-align: center; }
+        .btn-tg { background: var(--border); color: var(--text); }
+        .btn-inst { background: var(--gold-gradient); color: #000; }
 
-        .show-all-btn {
-            display: block; margin: 40px auto 60px; padding: 15px 42px;
-            background: var(--gold-gradient); color: #000; border: none; border-radius: 50px;
-            font-size: 15px; font-weight: 900; cursor: pointer;
-        }
-
-        .modal { display: none; position: fixed; z-index: 3000; inset: 0; background: rgba(0,0,0,0.88); backdrop-filter: blur(12px); align-items: flex-end; justify-content: center; padding: 0; }
-        .modal-content { background: var(--bg); width: 100%; max-width: 460px; border-radius: 28px 28px 0 0; padding: 25px 20px 30px; border: 1px solid var(--border); position: relative; max-height: 92vh; overflow-y: auto; }
-        @media (min-width: 480px) { .modal { align-items: center; padding: 20px; } .modal-content { border-radius: 32px; } }
-
-        .close-modal { position: absolute; top: 16px; right: 16px; width: 48px; height: 48px; background: var(--card-bg); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; cursor: pointer; border: 1px solid var(--border); }
-
-        .cart-modal { display: none; position: fixed; z-index: 4000; inset: 0; background: rgba(0,0,0,0.85); align-items: center; justify-content: center; padding: 20px; }
-        .cart-content { background: var(--bg); width: 100%; max-width: 460px; border-radius: 28px; max-height: 85vh; overflow-y: auto; padding: 25px; }
-        .cart-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
-        .cart-item img { width: 60px; height: 60px; object-fit: contain; }
-        .cart-total { margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--border); display: flex; justify-content: space-between; font-weight: 900; font-size: 18px; }
+        footer { padding: 40px 20px; text-align: center; border-top: 1px solid var(--border); font-size: 12px; color: var(--sub-text); }
+        .footer-links { margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+        .footer-links a { color: var(--text); text-decoration: none; font-weight: 600; }
     </style>
 </head>
-<body>
-
-<div class="hero">
-    <div class="hero-content">
-        <h1>perfume.shoppee</h1>
-        <p id="hero-subtitle">Люксова колекція ароматів • Тільки оригінал</p>
-    </div>
-</div>
+<body class="light-theme">
 
 <header>
     <div class="top-bar">
@@ -117,71 +83,52 @@
             <button id="btn-pl" onclick="setLang('pl')">PL</button>
             <button id="btn-uk" onclick="setLang('uk')" class="active">UA</button>
         </div>
-        <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
+        <div style="display: flex; gap: 10px;">
+            <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
+            <button class="cart-btn">🛍️ <span id="cart-count">0</span></button>
+        </div>
     </div>
     <h1 class="logo">perfume.shoppee</h1>
     <p class="subtitle" id="h-sub"></p>
-    <div onclick="Cart.show()" style="position:absolute;top:25px;right:22px;font-size:26px;cursor:pointer;">
-        🛍️ <span id="cart-count" style="position:absolute;top:-6px;right:-8px;background:#c8102e;color:white;font-size:10px;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;">0</span>
-    </div>
 </header>
 
-<div id="hits-section"></div>
-<div id="news-section"></div>
-<div id="sales-section"></div>
-
-<div style="text-align:center;">
-    <button onclick="showFullCatalog()" class="show-all-btn" id="show-all-btn">ПЕРЕГЛЯНУТИ ВЕСЬ КАТАЛОГ →</button>
+<div class="controls">
+    <input type="text" id="searchInput" onkeyup="refresh()" placeholder="...">
 </div>
 
-<div id="full-catalog" style="display:none;">
-    <div class="section-header"><h2 class="section-title" id="catalog-title"></h2></div>
-    <div id="full-grid" class="product-grid"></div>
+<div id="dynamic-content"></div>
+
+<div class="filter-section">
+    <button class="filter-toggle-btn" onclick="toggleFilterMenu()" id="f-label">Фільтри ↓</button>
+    <div class="filter-menu" id="filterMenu"></div>
 </div>
 
-<!-- Модалка товару -->
-<div id="pModal" class="modal" onclick="if(event.target === this) Modal.close()">
-    <div class="modal-content" onclick="event.stopImmediatePropagation()">
-        <div class="close-modal" onclick="Modal.close()">✕</div>
-        <img id="m-img" class="modal-img" src="">
-        <div id="m-brand" class="modal-brand"></div>
-        <h2 id="m-title" class="modal-title"></h2>
-        <div id="m-stock" class="modal-stock"></div>
-        <p id="m-desc" style="font-size:13.8px;color:var(--sub-text);margin:18px 0 22px;line-height:1.45;"></p>
-        <div id="m-prices" class="price-list"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-            <a href="#" id="m-tg" style="padding:16px;background:#229ED9;color:white;border-radius:26px;text-decoration:none;font-weight:900;">Telegram</a>
-            <a href="#" id="m-inst" target="_blank" style="padding:16px;background:var(--gold-gradient);color:#000;border-radius:26px;text-decoration:none;font-weight:900;">Instagram</a>
-        </div>
-    </div>
-</div>
-
-<!-- Кошик -->
-<div id="cartModal" class="cart-modal" onclick="if(event.target === this) Cart.hide()">
-    <div class="cart-content">
-        <h2 style="margin:0 0 20px 0;text-align:center;">Ваш кошик (<span id="cart-items-count">0</span>)</h2>
-        <div id="cart-items"></div>
-        <div class="cart-total">
-            <span>Разом:</span>
-            <span id="cart-total">0 zł</span>
-        </div>
-        <button onclick="alert('Оформлення замовлення — скоро буде! ❤️')" style="width:100%;margin-top:20px;padding:16px;background:var(--gold-gradient);color:#000;border:none;border-radius:25px;font-weight:900;font-size:15px;">Оформити замовлення</button>
-        <button onclick="Cart.hide()" style="width:100%;margin-top:10px;padding:14px;background:transparent;border:2px solid var(--border);color:var(--text);border-radius:25px;font-weight:700;">Продовжити покупки</button>
-    </div>
-</div>
+<div id="catalog-area"></div>
 
 <footer>
-    <p style="font-size:19px;color:#ddd;font-weight:700;margin-bottom:10px;">perfume.shoppee • Luxury Edition</p>
-    <div class="footer-links" style="display:flex;justify-content:center;flex-wrap:wrap;gap:25px;margin:30px 0 40px;">
+    <div class="footer-links">
         <a href="#">Про нас</a>
-        <a href="#">Доставка та оплата</a>
+        <a href="#">Доставка</a>
         <a href="#">Контакти</a>
-        <a href="#">Повернення</a>
-        <a href="https://www.instagram.com/perfume.shoppee" target="_blank">Instagram</a>
-        <a href="https://t.me/elenafragrance" target="_blank">Telegram</a>
+        <a href="https://t.me/elenafragrance">Telegram</a>
     </div>
-    <p style="font-size:13px;opacity:0.7;">© 2026 perfume.shoppee. Усі права захищені.</p>
+    <div id="footer-copy">© 2026 perfume.shoppee. Luxury Edition</div>
 </footer>
+
+<div id="pModal" class="modal" onclick="if(event.target == this) closeModal()">
+    <div class="modal-content">
+        <div class="close-modal" onclick="closeModal()">✕</div>
+        <img id="m-img" src="">
+        <div id="m-brand" class="brand"></div>
+        <h2 id="m-title" style="margin: 10px 0;"></h2>
+        <p id="m-desc" style="font-size: 13px; color: var(--sub-text); line-height: 1.4;"></p>
+        <div id="m-prices" style="margin-top: 20px;"></div>
+        <div class="btn-group">
+            <a href="#" id="m-tg" class="btn btn-tg">Telegram</a>
+            <a href="#" id="m-inst" target="_blank" class="btn btn-inst">Instagram</a>
+        </div>
+    </div>
+</div>
 
 <script>
     const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
@@ -189,195 +136,147 @@
     const TG_NICK = "elenafragrance";
 
     let allProducts = [];
-    let curLang = 'uk';
+    let curLang = localStorage.getItem('lang') || 'uk';
+    let curCat = 'all';
 
     const UI = {
-        uk: {
-            sub: "Твоя колекція ароматів починається тут • Тільки оригінал",
-            hero: "Люксова колекція ароматів • Тільки оригінал",
-            hits: "Хіти продажу",
-            news: "Новинки",
-            sales: "Знижки",
-            catalog: "Весь каталог",
-            from: "від",
-            sale_tag: "ЗНИЖКА",
-            stock_in: "✓ В наявності",
-            stock_out: "✕ Немає в наявності",
-            showAll: "ПЕРЕГЛЯНУТИ ВЕСЬ КАТАЛОГ →"
-        },
-        pl: {
-            sub: "Twoja kolekcja zapachów zaczyna się tutaj • Tylko oryginały",
-            hero: "Luksusowa kolekcja zapachów • Tylko oryginały",
-            hits: "Hity sprzedaży",
-            news: "Nowości",
-            sales: "Promocje",
-            catalog: "Cały katalog",
-            from: "od",
-            sale_tag: "PROMOCJA",
-            stock_in: "✓ Dostępny",
-            stock_out: "✕ Brak",
-            showAll: "PRZEGLĄDAJ CAŁY KATALOG →"
-        }
+        uk: { sub: "Тільки оригінальна продукція • Luxury Edition", search: "Пошук бренду...", from: "від", hits: "Хіти", news: "Новинки", sales: "Знижки %", catalog: "Каталог", sale_tag: "SALE", cats: {all: "Усі", female: "Жіночі", male: "Чоловічі", uniseks: "Унісекс", set: "Набори"} },
+        pl: { sub: "Wyłącznie oryginalne produkty • Luxury Edition", search: "Szukaj marki...", from: "od", hits: "Hity", news: "Nowości", sales: "Promocje %", catalog: "Katalog", sale_tag: "SALE", cats: {all: "Wszystkie", female: "Damskie", male: "Męskie", uniseks: "Unisex", set: "Zestawy"} }
     };
 
-    // ========== КОШИК ==========
-    let cart = JSON.parse(localStorage.getItem('perfumeCart')) || [];
+    function toggleTheme() {
+        const isDark = document.body.classList.toggle('dark-theme');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        document.getElementById('themeBtn').innerText = isDark ? '☀️' : '🌙';
+    }
 
-    const Cart = {
-        save() { localStorage.setItem('perfumeCart', JSON.stringify(cart)); this.updateCount(); },
-        updateCount() { document.getElementById('cart-count').innerText = cart.length; },
-        add(p) {
-            const n = curLang === 'uk' ? p.nameuk || p.namepl : p.namepl || p.nameuk;
-            cart.push({id: Date.now(), brand: p.brand, name: n, price: parseFloat(p.price2ml || p.price10ml || 0), photo: p.photo});
-            this.save();
-            const notif = document.createElement('div');
-            notif.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--gold-gradient);color:#000;padding:12px 26px;border-radius:25px;font-weight:900;z-index:5000;';
-            notif.textContent = '✓ Додано в кошик!';
-            document.body.appendChild(notif);
-            setTimeout(() => notif.remove(), 1600);
-        },
-        remove(i) { cart.splice(i, 1); this.save(); this.show(); },
-        show() {
-            const cont = document.getElementById('cart-items');
-            cont.innerHTML = cart.length ? '' : '<p style="text-align:center;padding:50px;color:var(--sub-text);">Кошик порожній 😔</p>';
-            cart.forEach((item, i) => {
-                const d = document.createElement('div');
-                d.className = 'cart-item';
-                d.innerHTML = `<img src="${item.photo}"><div style="flex:1;"><div style="font-weight:700;">${item.brand}</div><div style="font-size:13.5px;color:var(--sub-text);">${item.name}</div><div style="margin-top:6px;font-weight:900;color:var(--gold-text);">${item.price} zł</div></div><div onclick="Cart.remove(${i});event.stopImmediatePropagation()" style="color:#c8102e;font-weight:bold;cursor:pointer;">✕</div>`;
-                cont.appendChild(d);
-            });
-            document.getElementById('cart-items-count').innerText = cart.length;
-            document.getElementById('cart-total').innerText = cart.reduce((s, it) => s + it.price, 0) + ' zł';
-            document.getElementById('cartModal').style.display = 'flex';
-            document.body.classList.add('modal-open');
-        },
-        hide() { document.getElementById('cartModal').style.display = 'none'; document.body.classList.remove('modal-open'); }
-    };
+    // Ініціалізація теми
+    if(localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-theme');
+        document.getElementById('themeBtn').innerText = '☀️';
+    }
 
-    // ========== МОДАЛКА ==========
-    const Modal = {
-        open(p) {
-            const n = curLang === 'uk' ? (p.nameuk || p.namepl) : (p.namepl || p.nameuk);
-            const inStock = (p.status || '').toLowerCase() !== 'out';
-
-            document.getElementById('m-img').src = p.photo || '';
-            document.getElementById('m-brand').innerText = p.brand || '';
-            document.getElementById('m-title').innerText = n || 'Без назви';
-            document.getElementById('m-stock').innerHTML = inStock ? `<span style="color:var(--stock-green)">${UI[curLang].stock_in}</span>` : `<span style="color:#999">${UI[curLang].stock_out}</span>`;
-            document.getElementById('m-desc').innerText = (curLang === 'uk' ? p.descuk : p.descpl) || 'Опис скоро з’явиться';
-
-            let html = '';
-            const variants = [
-                {l:'2ml', v:p.price2ml, o:p.old2ml},
-                {l:'5ml', v:p.price5ml, o:p.old5ml},
-                {l:'10ml', v:p.price10ml, o:p.old10ml},
-                {l:'Повний флакон', v:p.fullprice, o:p.oldfull}
-            ];
-            variants.forEach(s => {
-                if (s.v && parseFloat(s.v) > 0) {
-                    html += `<div class="price-row"><span>${s.l}</span><span>${s.o ? `<span class="old-price">${s.o} zł</span>` : ''}<span style="font-weight:900;color:var(--gold-text);">${s.v} zł</span></span></div>`;
-                }
-            });
-            document.getElementById('m-prices').innerHTML = html || '<p style="color:var(--sub-text);text-align:center;">Ціни оновлюються</p>';
-
-            document.getElementById('m-tg').href = `https://t.me/${TG_NICK}?text=Хочу замовити: ${p.brand} ${n}`;
-            document.getElementById('m-inst').href = INSTA_URL;
-
-            document.getElementById('pModal').style.display = 'flex';
-            document.body.classList.add('modal-open');
-        },
-        close() {
-            document.getElementById('pModal').style.display = 'none';
-            document.body.classList.remove('modal-open');
-        }
-    };
+    function toggleFilterMenu() { document.getElementById('filterMenu').classList.toggle('active'); }
 
     async function init() {
         try {
             const resp = await fetch(SPREADSHEET_URL);
             const text = await resp.text();
             allProducts = parseCSV(text);
-            Cart.updateCount();
-            setLang('uk');
-        } catch(e) {
-            console.error(e);
-            alert("Не вдалося завантажити товари. Перевір, чи таблиця опублікована як CSV.");
-        }
+            setLang(curLang);
+        } catch(e) { console.error("Data error"); }
     }
 
     function parseCSV(csv) {
-        const rows = []; let cur = '', inQ = false, row = [];
-        for (let i = 0; i < csv.length; i++) {
-            let c = csv[i], n = csv[i+1];
-            if (c === '"' && inQ && n === '"') { cur += '"'; i++; }
-            else if (c === '"') inQ = !inQ;
-            else if (c === ',' && !inQ) { row.push(cur); cur = ''; }
-            else if ((c === '\n' || c === '\r') && !inQ) { 
-                row.push(cur); rows.push(row); cur = ''; row = []; if(c==='\r' && n==='\n') i++;
-            } else cur += c;
-        }
-        if(cur || row.length) { row.push(cur); rows.push(row); }
-        const h = rows[0].map(v => v.trim().toLowerCase().replace(/\s+/g, ''));
-        return rows.slice(1).map(r => {
-            let o = {}; h.forEach((k, idx) => o[k] = r[idx]?.trim() || ''); return o;
+        const lines = csv.split(/\r?\n/);
+        const headers = lines[0].split(',').map(h => h.trim());
+        return lines.slice(1).filter(l => l).map(line => {
+            const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/^"|"$/g, '').trim());
+            let obj = {};
+            headers.forEach((h, i) => obj[h] = values[i] || "");
+            return obj;
         });
     }
 
     function setLang(l) {
         curLang = l;
+        localStorage.setItem('lang', l);
         document.querySelectorAll('.lang-switch button').forEach(b => b.classList.toggle('active', b.id === 'btn-'+l));
         document.getElementById('h-sub').innerText = UI[l].sub;
-        document.getElementById('hero-subtitle').innerText = UI[l].hero;
-        document.getElementById('show-all-btn').innerText = UI[l].showAll;
-        document.getElementById('catalog-title').innerText = UI[l].catalog;
-        renderHomeSections();
+        document.getElementById('searchInput').placeholder = UI[l].search;
+        renderFilters();
+        refresh();
+    }
+
+    function renderFilters() {
+        document.getElementById('filterMenu').innerHTML = Object.keys(UI[curLang].cats).map(k => `
+            <button class="f-btn ${curCat===k?'active':''}" onclick="setCategory('${k}')">${UI[curLang].cats[k]}</button>
+        `).join('');
+    }
+
+    function setCategory(k) {
+        curCat = k;
+        renderFilters();
+        refresh();
+        document.getElementById('filterMenu').classList.remove('active');
+    }
+
+    function refresh() {
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        let filtered = allProducts.filter(p => {
+            const matchSearch = (p.brand + (curLang==='uk'?p.nameUK:p.namePL)).toLowerCase().includes(q);
+            const matchCat = curCat === 'all' || p.category === curCat;
+            return matchSearch && matchCat;
+        });
+
+        let content = '';
+        if(curCat === 'all' && !q) {
+            const hits = allProducts.filter(p => p.isBest === 'yes');
+            const sales = allProducts.filter(p => p.old2ml || p.old10ml);
+            if(hits.length) content += `<div class="section-header"><h2 class="section-title">${UI[curLang].hits} 🔥</h2></div><div class="carousel">${hits.map((p, i) => getCard(p)).join('')}</div>`;
+            if(sales.length) content += `<div class="section-header"><h2 class="section-title" style="color:red">${UI[curLang].sales}</h2></div><div class="carousel">${sales.map((p, i) => getCard(p)).join('')}</div>`;
+            content += `<div class="section-header"><h2 class="section-title">${UI[curLang].catalog}</h2></div>`;
+        }
+        
+        document.getElementById('dynamic-content').innerHTML = content;
+        document.getElementById('catalog-area').innerHTML = `<div class="product-grid">${filtered.map(p => getCard(p)).join('')}</div>`;
     }
 
     function getCard(p) {
-        const hasSale = (p.old2ml || p.old5ml || p.old10ml || p.oldfull);
-        const n = curLang === 'uk' ? (p.nameuk || p.namepl) : (p.namepl || p.nameuk);
-        return `<div class="card" onclick="Modal.open(${JSON.stringify(p)})">
+        const hasSale = p.old2ml || p.old5ml || p.old10ml || p.oldFull;
+        const name = curLang === 'uk' ? p.nameUK : p.namePL;
+        // Використовуємо brand + name як унікальний ключ для пошуку в масиві при кліку
+        return `
+        <div class="card" onclick="openModalByName('${p.brand}', '${name}')">
             ${hasSale ? `<div class="sale-badge">${UI[curLang].sale_tag}</div>` : ''}
-            <div class="card-img"><img src="${p.photo || ''}"></div>
-            <div class="brand">${p.brand || ''}</div>
-            <div class="title">${n || 'Без назви'}</div>
-            <div class="price">${UI[curLang].from} ${p.price2ml || p.price10ml || '—'} zł</div>
-            <button class="add-to-cart" onclick="event.stopImmediatePropagation(); Cart.add(${JSON.stringify(p)})">🛍️ ДО КОШИКА</button>
+            <div class="card-img"><img src="${p.photo}" loading="lazy"></div>
+            <div class="brand">${p.brand}</div>
+            <div class="title">${name}</div>
+            <div class="price">${UI[curLang].from} ${p.price2ml || p.price10ml} zł</div>
         </div>`;
     }
 
-    function renderHomeSections() {
-        const hits = allProducts.filter(p => String(p.isbest || '').toLowerCase() === 'yes');
-        const news = allProducts.filter(p => String(p.isnew || '').toLowerCase() === 'yes');
-        const sales = allProducts.filter(p => p.old2ml || p.old5ml || p.old10ml || p.oldfull);
+    function openModalByName(brand, name) {
+        const p = allProducts.find(x => x.brand === brand && (x.nameUK === name || x.namePL === name));
+        if(!p) return;
 
-        let html = hits.length ? `<div class="section-header"><h2 class="section-title">${UI[curLang].hits}</h2></div><div class="product-grid">${hits.map(getCard).join('')}</div>` : '';
-        if (news.length) html += `<div class="section-header"><h2 class="section-title">${UI[curLang].news}</h2></div><div class="product-grid">${news.map(getCard).join('')}</div>`;
-        if (sales.length) html += `<div class="section-header"><h2 class="section-title">${UI[curLang].sales}</h2></div><div class="product-grid">${sales.map(getCard).join('')}</div>`;
+        document.getElementById('m-img').src = p.photo;
+        document.getElementById('m-brand').innerText = p.brand;
+        const finalName = curLang==='uk'?p.nameUK:p.namePL;
+        document.getElementById('m-title').innerText = finalName;
+        document.getElementById('m-desc').innerText = curLang==='uk'?p.descUK:p.descPL;
+        
+        let pr = '';
+        const sizes = [
+            {n:'2ml', v:p.price2ml, o:p.old2ml},
+            {n:'5ml', v:p.price5ml, o:p.old5ml},
+            {n:'10ml', v:p.price10ml, o:p.old10ml},
+            {n:'Full', v:p.fullPrice, o:p.oldFull}
+        ];
+        
+        sizes.forEach(s => {
+            if(s.v) {
+                pr += `<div class="price-row">
+                    <span><b>${s.n}</b></span>
+                    <span>${s.o ? `<span class="old-p">${s.o} zł</span>` : ''} <span style="color:var(--gold-text); font-weight:900">${s.v} zł</span></span>
+                </div>`;
+            }
+        });
 
-        document.getElementById('hits-section').innerHTML = html || '<p style="text-align:center;padding:40px;color:var(--sub-text);">Поки немає товарів</p>';
+        document.getElementById('m-prices').innerHTML = pr;
+        document.getElementById('m-tg').href = `https://t.me/${TG_NICK}?text=Замовлення: ${p.brand} ${finalName}`;
+        document.getElementById('m-inst').href = INSTA_URL;
+        document.getElementById('pModal').style.display = 'flex';
+        document.body.classList.add('modal-open');
     }
 
-    function showFullCatalog() {
-        document.getElementById('full-catalog').style.display = 'block';
-        document.querySelector('.show-all-btn').style.display = 'none';
-        document.getElementById('full-grid').innerHTML = allProducts.map(getCard).join('');
-    }
-
-    function toggleTheme() {
-        document.body.classList.toggle('dark-theme');
-        const isDark = document.body.classList.contains('dark-theme');
-        document.getElementById('themeBtn').innerText = isDark ? '☀️' : '🌙';
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-    }
-
-    // Завантаження теми при старті
-    if (localStorage.getItem('theme') === 'dark') {
-        document.body.classList.add('dark-theme');
-        document.getElementById('themeBtn').innerText = '☀️';
+    function closeModal() { 
+        document.getElementById('pModal').style.display = 'none'; 
+        document.body.classList.remove('modal-open');
     }
 
     init();
 </script>
 </body>
 </html>
+
