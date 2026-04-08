@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         body { font-family: system-ui, -apple-system, sans-serif; -webkit-tap-highlight-color: transparent; }
+        /* Блокування скролу фону */
+        body.lock-scroll { overflow: hidden; }
         .logo-font { font-family: Georgia, serif; letter-spacing: -1px; }
         #sidebar { transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
         #sidebar.open { transform: translateX(0); }
@@ -15,8 +17,8 @@
         .overlay.show { display: block; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .active-lang { border-color: #14b8a6 !important; color: #14b8a6 !important; opacity: 1 !important; }
-        .card-anim { animation: fadeInUp 0.4s ease forwards; opacity: 0; }
-        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .card-anim { animation: fadeInUp 0.3s ease forwards; opacity: 0; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="bg-[#F8F9FA] dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors">
@@ -36,11 +38,9 @@
   <div class="max-w-7xl mx-auto">
     <div class="relative mb-5">
         <input id="searchInput" type="text" onkeyup="refreshCatalog()" 
-               class="w-full bg-white text-black rounded-2xl py-3.5 px-6 pl-12 text-base outline-none"
-               placeholder="...">
+               class="w-full bg-white text-black rounded-2xl py-3.5 px-6 pl-12 text-base outline-none" placeholder="...">
         <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"></i>
     </div>
-    
     <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
       <button onclick="setCategory('all')" id="cat-all" class="cat-btn px-5 py-2.5 bg-white/20 rounded-xl text-xs font-bold whitespace-nowrap">УСІ</button>
       <button onclick="setCategory('female')" id="cat-female" class="cat-btn px-5 py-2.5 bg-white/10 rounded-xl text-xs font-bold whitespace-nowrap">ДЛЯ НЕЇ</button>
@@ -51,15 +51,15 @@
   </div>
 </header>
 
-<div id="sort-bar" class="max-w-7xl mx-auto px-4 py-3 flex justify-end gap-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+<div id="sort-bar" class="max-w-7xl mx-auto px-4 py-2 flex justify-end gap-4 text-[10px] font-bold text-gray-400 uppercase tracking-widest">
     <button onclick="setSort('cheap')" id="sort-cheap">ДЕШЕВШІ</button>
     <button onclick="setSort('expensive')" id="sort-expensive">ДОРОЖЧІ</button>
 </div>
 
 <div id="overlay" onclick="toggleSidebar()" class="overlay"></div>
 <div id="sidebar" class="fixed top-0 left-0 h-full w-[85%] max-w-[320px] bg-white dark:bg-gray-900 z-[1002] shadow-2xl flex flex-col">
-  <div class="bg-[#222] text-white p-5 flex justify-between items-center">
-    <div class="flex items-center gap-3"><i class="fas fa-circle-user text-2xl text-teal-400"></i><span id="side-login" class="font-bold">Вхід</span></div>
+  <div class="bg-[#1a1a1a] text-white p-5 flex justify-between items-center">
+    <div class="flex items-center gap-3"><i class="fas fa-circle-user text-2xl text-teal-400"></i><span id="side-login" class="font-bold uppercase tracking-tight">Вхід</span></div>
     <div class="flex items-center gap-4">
         <button onclick="toggleTheme()" class="text-xl">🌙</button>
         <button onclick="toggleSidebar()" class="text-xl">✕</button>
@@ -89,7 +89,7 @@
 
 <div id="cart-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-gray-900 z-[10000] shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
     <div class="p-5 border-b flex justify-between items-center bg-gray-50 dark:bg-gray-800">
-        <h2 id="cart-title" class="text-xl font-black">КОШИК</h2>
+        <h2 id="cart-title" class="text-xl font-black uppercase">Кошик</h2>
         <button onclick="toggleCart()" class="text-2xl">✕</button>
     </div>
     <div id="cart-items" class="flex-1 overflow-y-auto p-5 space-y-4"></div>
@@ -98,19 +98,20 @@
             <span id="cart-total-label" class="text-gray-400 font-bold">РАЗОМ:</span>
             <span id="cart-total" class="text-2xl font-black text-teal-600">0 zł</span>
         </div>
-        <button onclick="sendOrder()" id="cart-send-btn" class="w-full bg-black text-white py-5 rounded-2xl font-black flex items-center justify-center gap-3 active:scale-95 transition-all">
-            ЗАМОВИТИ У TELEGRAM
-        </button>
+        <button onclick="sendOrder()" id="cart-send-btn" class="w-full bg-black text-white py-5 rounded-2xl font-black flex items-center justify-center gap-3 active:scale-95 transition-all uppercase">Замовити</button>
     </div>
 </div>
 
 <div id="pModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999] p-4 backdrop-blur-sm" onclick="closeModal()">
   <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-[40px] p-8 relative max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
     <button onclick="closeModal()" class="absolute top-6 right-6 text-2xl text-gray-300">✕</button>
-    <img id="m-img" class="w-48 h-48 mx-auto object-contain mb-6 rounded-2xl" src="">
-    <div id="m-brand" class="text-center text-xs font-black text-teal-500 uppercase tracking-widest mb-1"></div>
-    <h2 id="m-title" class="text-center text-2xl font-black mb-6 tracking-tight"></h2>
-    <div id="m-prices" class="space-y-3 mb-8"></div>
+    <img id="m-img" class="w-44 h-44 mx-auto object-contain mb-4 rounded-2xl" src="">
+    <div id="m-brand" class="text-center text-[10px] font-black text-teal-500 uppercase tracking-widest mb-1"></div>
+    <h2 id="m-title" class="text-center text-2xl font-black mb-4 tracking-tight leading-tight px-4"></h2>
+    
+    <p id="m-desc" class="text-center text-sm text-gray-500 dark:text-gray-400 mb-6 leading-relaxed italic px-2"></p>
+    
+    <div id="m-prices" class="space-y-2 mb-8"></div>
     <button id="add-to-cart-btn" class="w-full bg-teal-500 text-white py-5 rounded-2xl font-black shadow-lg shadow-teal-500/30 active:scale-95 transition-all uppercase">Додати</button>
   </div>
 </div>
@@ -123,18 +124,18 @@ const langData = {
     uk: {
         search: "Шукайте аромат...", home: "Головна", brands: "Бренди", sales: "Акції",
         all: "УСІ", female: "ДЛЯ НЕЇ", male: "ДЛЯ НЬОГО", unisex: "УНІСЕКС", set: "НАБОРИ",
-        sort_cheap: "ДЕШЕВШІ", sort_exp: "ДОРОЖЧІ", login: "Вхід", 
+        sort_cheap: "ДЕШЕВШІ", sort_exp: "ДОРОЖЧІ", login: "ВХІД", 
         catalog: "Каталог парфумів", subtitle: "Тільки оригінальна продукція",
         cart: "МІЙ КОШИК", total: "РАЗОМ", send: "ОФОРМИТИ В TELEGRAM",
-        add: "ДОДАТИ В КОШИК", stock: "В наявності", no_stock: "Немає", empty: "Кошик порожній"
+        add: "ДОДАТИ В КОШИК", empty: "Кошик порожній"
     },
     pl: {
         search: "Szukaj zapachu...", home: "Główna", brands: "Marki", sales: "Promocje",
         all: "WSZYSTKO", female: "DLA NIEJ", male: "DLA NIEGO", unisex: "UNISEX", set: "ZESTAWY",
-        sort_cheap: "NAJTAŃSZE", sort_exp: "NAJDROŻSZE", login: "Zaloguj",
+        sort_cheap: "NAJTAŃSZE", sort_exp: "NAJDROŻSZE", login: "ZALOGUJ",
         catalog: "Katalog perfum", subtitle: "Tylko oryginalne produkty",
         cart: "MÓJ KOSZYK", total: "RAZEM", send: "ZAMÓW PRZEZ TELEGRAM",
-        add: "DODAJ DO KOSZYKA", stock: "Dostępny", no_stock: "Brak", empty: "Koszyk jest pusty"
+        add: "DODAJ DO KOSZYKA", empty: "Koszyk jest pusty"
     }
 };
 
@@ -175,11 +176,8 @@ function parseCSV(text) {
 }
 
 function setLang(l) {
-    curLang = l;
-    localStorage.setItem('ps_lang', l);
+    curLang = l; localStorage.setItem('ps_lang', l);
     const t = langData[l];
-    
-    // Переклад інтерфейсу
     document.getElementById('searchInput').placeholder = t.search;
     document.getElementById('nav-home').innerText = t.home;
     document.getElementById('nav-brands').innerText = t.brands;
@@ -198,11 +196,8 @@ function setLang(l) {
     document.getElementById('cart-total-label').innerText = t.total;
     document.getElementById('cart-send-btn').innerText = t.send;
     document.getElementById('add-to-cart-btn').innerText = t.add;
-
-    // Активна кнопка мови
     document.getElementById('btn-lang-uk').className = `flex-1 py-2 rounded-lg border-2 font-bold text-xs ${l==='uk'?'active-lang':'opacity-50 border-gray-100'}`;
     document.getElementById('btn-lang-pl').className = `flex-1 py-2 rounded-lg border-2 font-bold text-xs ${l==='pl'?'active-lang':'opacity-50 border-gray-100'}`;
-    
     refreshCatalog();
 }
 
@@ -211,18 +206,18 @@ function refreshCatalog() {
     let filtered = allProducts.filter(p => {
         const name = curLang === 'uk' ? (p.nameUK || p.name) : (p.namePL || p.name);
         const matchSearch = (p.brand + ' ' + name).toLowerCase().includes(q);
-        const matchCat = curCat === 'all' || p.category.toLowerCase().trim() === curCat;
+        const catValue = p.category.toLowerCase().trim();
+        // Фікс uniseks
+        const isUnisex = (curCat === 'unisex') && (catValue === 'unisex' || catValue === 'uniseks');
+        const matchCat = (curCat === 'all') || isUnisex || (catValue === curCat);
         return matchSearch && matchCat;
     });
-
     if (curSort === 'cheap') filtered.sort((a,b) => parseFloat(a.price2ml || a.fullPrice) - parseFloat(b.price2ml || b.fullPrice));
     if (curSort === 'expensive') filtered.sort((a,b) => parseFloat(b.price2ml || b.fullPrice) - parseFloat(a.price2ml || a.fullPrice));
 
     document.getElementById('catalog-area').innerHTML = filtered.map((p, i) => `
     <div onclick="openModal(${allProducts.indexOf(p)})" class="card-anim bg-white dark:bg-gray-900 rounded-[24px] p-3 border border-transparent hover:border-teal-500 transition-all cursor-pointer relative" style="animation-delay: ${i*0.03}s">
-        <div class="aspect-square mb-3 bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-center p-3">
-            <img src="${p.photo}" class="max-h-full object-contain">
-        </div>
+        <div class="aspect-square mb-3 bg-gray-50 dark:bg-gray-800 rounded-2xl flex items-center justify-center p-3"><img src="${p.photo}" class="max-h-full object-contain"></div>
         <div class="text-[9px] text-teal-500 font-black uppercase tracking-widest">${p.brand}</div>
         <div class="text-[11px] font-bold truncate dark:text-white">${curLang === 'uk' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
         <div class="mt-2 flex justify-between items-center">
@@ -237,10 +232,12 @@ function openModal(idx) {
     const p = allProducts[idx];
     sel = null;
     const name = curLang === 'uk' ? (p.nameUK || p.name) : (p.namePL || p.name);
+    const desc = curLang === 'uk' ? (p.descUK || p.desc) : (p.descPL || p.desc);
     
     document.getElementById('m-img').src = p.photo;
     document.getElementById('m-brand').innerText = p.brand;
     document.getElementById('m-title').innerText = name;
+    document.getElementById('m-desc').innerText = desc || ""; // Виводимо опис
     
     let html = '';
     [{l:'2ml', p:p.price2ml}, {l:'5ml', p:p.price5ml}, {l:'10ml', p:p.price10ml}, {l:'Full', p:p.fullPrice}].forEach(o => {
@@ -252,6 +249,7 @@ function openModal(idx) {
     });
     document.getElementById('m-prices').innerHTML = html;
     document.getElementById('pModal').classList.remove('hidden');
+    document.body.classList.add('lock-scroll'); // Блокуємо скрол
 }
 
 function selectOpt(el, size, price, brand, name, img) {
@@ -262,15 +260,13 @@ function selectOpt(el, size, price, brand, name, img) {
 
 function addToCart() {
     if(!sel) return alert(curLang === 'uk' ? "Оберіть об'єм!" : "Wybierz pojemność!");
-    cart.push(sel);
-    saveCart(); renderCart(); closeModal(); toggleCart(true);
+    cart.push(sel); saveCart(); renderCart(); closeModal(); toggleCart(true);
 }
 
 function renderCart() {
     const c = document.getElementById('cart-items');
     const b = document.getElementById('cart-count');
     b.innerText = cart.length; b.classList.toggle('hidden', cart.length === 0);
-    
     let total = 0;
     c.innerHTML = cart.map((item, i) => {
         total += parseFloat(item.price);
@@ -300,13 +296,23 @@ function sendOrder() {
 
 function saveCart() { localStorage.setItem('ps_cart', JSON.stringify(cart)); }
 function removeFromCart(i) { cart.splice(i, 1); saveCart(); renderCart(); }
-function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('show'); }
+function toggleSidebar() { 
+    const s = document.getElementById('sidebar');
+    const o = document.getElementById('overlay');
+    s.classList.toggle('open'); 
+    o.classList.toggle('show');
+    document.body.classList.toggle('lock-scroll', s.classList.contains('open'));
+}
 function toggleCart(st) { 
     const p = document.getElementById('cart-panel');
     if (st === true) p.classList.remove('translate-x-full');
     else p.classList.toggle('translate-x-full');
+    document.body.classList.toggle('lock-scroll', !p.classList.contains('translate-x-full'));
 }
-function closeModal() { document.getElementById('pModal').classList.add('hidden'); }
+function closeModal() { 
+    document.getElementById('pModal').classList.add('hidden'); 
+    document.body.classList.remove('lock-scroll'); 
+}
 function setCategory(c) { 
     curCat = c; 
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.replace('bg-white/20', 'bg-white/10'));
