@@ -13,8 +13,8 @@
         #sidebar.open { transform: translateX(0); }
         .overlay { display: none; background: rgba(0,0,0,0.5); position: fixed; inset: 0; z-index: 1001; }
         .overlay.show { display: block; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
         .active-lang { opacity: 1 !important; text-decoration: underline; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body class="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100 transition-colors">
@@ -36,8 +36,8 @@
         <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"></i>
     </div>
     <div class="flex gap-2">
-      <button onclick="setCategory('female')" id="btn-female" class="flex-1 py-3 bg-white/10 border border-white/20 rounded-xl text-sm font-medium">Для неї (<span id="count-female">0</span>)</button>
-      <button onclick="setCategory('male')" id="btn-male" class="flex-1 py-3 bg-white/10 border border-white/20 rounded-xl text-sm font-medium">Для нього (<span id="count-male">0</span>)</button>
+      <button onclick="setCategory('female')" class="flex-1 py-3 bg-white/10 border border-white/20 rounded-xl text-sm font-medium">Для неї (<span id="count-female">0</span>)</button>
+      <button onclick="setCategory('male')" class="flex-1 py-3 bg-white/10 border border-white/20 rounded-xl text-sm font-medium">Для нього (<span id="count-male">0</span>)</button>
     </div>
   </div>
 </header>
@@ -60,20 +60,15 @@
     <nav class="flex flex-col">
       <a href="#" onclick="goHome(); toggleSidebar(); return false;" class="px-6 py-3 text-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-800">Головна</a>
       <a href="#" onclick="showBrands(); toggleSidebar(); return false;" class="px-6 py-3 text-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-800">Бренди</a>
-      <a href="#" onclick="showSales(); toggleSidebar(); return false;" class="px-6 py-3 text-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-800">Акції</a>
-      <a href="#" onclick="showNews(); toggleSidebar(); return false;" class="px-6 py-3 text-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-800">Новини</a>
+      <a href="#" onclick="showSales(); toggleSidebar(); return false;" class="px-6 py-3 text-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-800 text-red-500">Акції %</a>
+      <a href="#" onclick="showNews(); toggleSidebar(); return false;" class="px-6 py-3 text-lg font-semibold hover:bg-gray-100 dark:hover:bg-gray-800">Новинки</a>
     </nav>
-  </div>
-  <div class="p-6 border-t dark:border-gray-800">
-    <div class="text-[10px] text-gray-400 uppercase mb-1">Гаряча лінія</div>
-    <div class="text-lg font-bold">0 800 508 880</div>
   </div>
 </div>
 
 <main class="max-w-7xl mx-auto pb-20">
     <div id="page-title-area" class="px-4 py-6">
         <h1 id="page-title" class="text-2xl font-bold">Оригінальні парфуми</h1>
-        <p id="page-subtitle" class="text-gray-500 text-xs">Тільки оригінальна продукція</p>
     </div>
     <div id="dynamic-content"></div>
     <div id="catalog-area" class="px-4 grid grid-cols-2 gap-4"></div>
@@ -82,15 +77,15 @@
 <div id="pModal" class="hidden fixed inset-0 bg-black/80 flex items-center justify-center z-[9999] p-4" onclick="closeModal()">
   <div class="bg-white dark:bg-gray-900 w-full max-w-md rounded-[32px] p-6 relative max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
     <button onclick="closeModal()" class="absolute top-4 right-4 text-2xl text-gray-400">✕</button>
-    <img id="m-img" class="w-full h-48 object-contain mb-4" src="">
+    <img id="m-img" class="w-full h-56 object-contain mb-4 rounded-2xl" src="">
     <div id="m-brand" class="text-[10px] uppercase tracking-widest text-gray-400"></div>
-    <h2 id="m-title" class="text-xl font-bold mb-2"></h2>
+    <h2 id="m-title" class="text-2xl font-bold mb-2 leading-tight"></h2>
     <div id="m-stock" class="mb-4"></div>
-    <p id="m-desc" class="text-sm text-gray-600 dark:text-gray-400 mb-6"></p>
-    <div id="m-prices" class="space-y-3 mb-6"></div>
-    <div class="flex gap-2">
-      <a id="m-tg" href="#" target="_blank" class="flex-1 bg-black text-white py-4 rounded-2xl text-center font-bold text-sm">Telegram</a>
-      <a href="https://www.instagram.com/perfume.shoppee" target="_blank" class="flex-1 bg-gradient-to-tr from-orange-500 to-purple-600 text-white py-4 rounded-2xl text-center font-bold text-sm">Instagram</a>
+    <p id="m-desc" class="text-sm text-gray-600 dark:text-gray-400 mb-6 leading-relaxed"></p>
+    <div id="m-prices" class="space-y-3 mb-8"></div>
+    <div class="flex gap-3">
+      <a id="m-tg" href="#" target="_blank" class="flex-1 bg-black text-white py-4 rounded-2xl text-center font-bold text-sm flex items-center justify-center gap-2"><i class="fab fa-telegram-plane"></i> Telegram</a>
+      <a href="https://www.instagram.com/perfume.shoppee" target="_blank" class="flex-1 bg-gradient-to-tr from-orange-500 via-pink-500 to-purple-600 text-white py-4 rounded-2xl text-center font-bold text-sm">Instagram</a>
     </div>
   </div>
 </div>
@@ -103,27 +98,41 @@ let allProducts = [];
 let curLang = 'uk';
 let curCat = 'all';
 
+// ФУНКЦІЯ ПАРСИНГУ (ТЕПЕР ЧІТКА)
+function parseCSV(text) {
+    const p = (csv) => {
+        let rows = [], row = [], col = '', inQuotes = false;
+        for (let i = 0; i < csv.length; i++) {
+            let char = csv[i], next = csv[i+1];
+            if (char === '"' && inQuotes && next === '"') { col += '"'; i++; }
+            else if (char === '"') inQuotes = !inQuotes;
+            else if (char === ',' && !inQuotes) { row.push(col.trim()); col = ''; }
+            else if ((char === '\r' || char === '\n') && !inQuotes) {
+                if (col || row.length) { row.push(col.trim()); rows.push(row); }
+                row = []; col = ''; if (char === '\r' && next === '\n') i++;
+            } else col += char;
+        }
+        if (col || row.length) { row.push(col.trim()); rows.push(row); }
+        return rows;
+    };
+    const data = p(text);
+    const headers = data[0];
+    return data.slice(1).map(r => {
+        let obj = {};
+        headers.forEach((h, i) => obj[h] = r[i] || "");
+        return obj;
+    });
+}
+
 async function init() {
     try {
         const res = await fetch(SPREADSHEET_URL);
-        const csvText = await res.text();
-        allProducts = parseCSV(csvText);
+        const text = await res.text();
+        allProducts = parseCSV(text);
+        console.log("Завантажено товарів:", allProducts.length);
         updateCounts();
         refreshCatalog();
-    } catch (e) {
-        console.error("Помилка завантаження таблиці:", e);
-    }
-}
-
-function parseCSV(csv) {
-    const lines = csv.split(/\r?\n/);
-    const headers = lines[0].split(',').map(h => h.trim());
-    return lines.slice(1).filter(line => line.length > 0).map(line => {
-        const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.replace(/^"|"$/g, '').trim());
-        let obj = {};
-        headers.forEach((h, i) => obj[h] = values[i] || "");
-        return obj;
-    });
+    } catch (e) { console.error("Помилка:", e); }
 }
 
 function updateCounts() {
@@ -162,7 +171,7 @@ function showBrands() {
     const brands = [...new Set(allProducts.map(p => p.brand).filter(Boolean))].sort();
     let html = `<div class="px-4 space-y-2">`;
     brands.forEach(b => {
-        html += `<div onclick="filterByBrand('${b}')" class="p-4 bg-white dark:bg-gray-900 rounded-2xl shadow-sm font-bold flex justify-between cursor-pointer"><span>${b}</span><i class="fas fa-chevron-right text-gray-300"></i></div>`;
+        html += `<div onclick="filterByBrand('${b.replace(/'/g, "\\'")}')" class="p-4 bg-white dark:bg-gray-900 rounded-2xl shadow-sm font-bold flex justify-between cursor-pointer"><span>${b}</span><i class="fas fa-chevron-right text-gray-300"></i></div>`;
     });
     document.getElementById('dynamic-content').innerHTML = html + `</div>`;
     document.getElementById('catalog-area').innerHTML = '';
@@ -178,7 +187,7 @@ function filterByBrand(b) {
 function showSales() {
     document.getElementById('main-header-bar').style.display = 'none';
     document.getElementById('page-title').innerText = "Акції %";
-    const filtered = allProducts.filter(p => p.old2ml || p.oldFull);
+    const filtered = allProducts.filter(p => p.old2ml || p.old5ml || p.old10ml || p.oldFull);
     document.getElementById('dynamic-content').innerHTML = '';
     document.getElementById('catalog-area').innerHTML = filtered.map(p => renderCard(p)).join('');
 }
@@ -191,41 +200,33 @@ function showNews() {
     document.getElementById('catalog-area').innerHTML = filtered.map(p => renderCard(p)).join('');
 }
 
-function setCategory(cat) {
-    curCat = cat;
-    refreshCatalog();
-}
-
 function refreshCatalog() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const filtered = allProducts.filter(p => {
         const name = curLang === 'uk' ? (p.nameUK || p.name) : (p.namePL || p.name);
-        const matchesSearch = (p.brand + ' ' + name).toLowerCase().includes(q);
-        const matchesCat = curCat === 'all' || p.category === curCat;
-        return matchesSearch && matchesCat;
+        return (p.brand + ' ' + name).toLowerCase().includes(q) && (curCat === 'all' || p.category === curCat);
     });
     document.getElementById('catalog-area').innerHTML = filtered.map(p => renderCard(p)).join('');
 }
 
 function renderCard(p) {
     const name = curLang === 'uk' ? (p.nameUK || p.name) : (p.namePL || p.name);
-    const price = p.price2ml || p.fullPrice || '---';
-    // Створюємо безпечний JSON для передачі в функцію
-    const productData = btoa(unescape(encodeURIComponent(JSON.stringify(p))));
+    const price = p.price2ml || p.price5ml || p.price10ml || p.fullPrice || '---';
+    const id = allProducts.indexOf(p); // Використовуємо індекс як унікальний ID
     
     return `
-    <div onclick="openModal('${productData}')" class="bg-white dark:bg-gray-900 rounded-[24px] p-3 shadow-sm border border-transparent hover:border-teal-500 transition-all cursor-pointer">
-        <div class="aspect-square mb-2 bg-gray-50 dark:bg-gray-800 rounded-xl flex items-center justify-center p-2">
+    <div onclick="openModalById(${id})" class="bg-white dark:bg-gray-900 rounded-[24px] p-3 shadow-sm border border-transparent hover:border-teal-500 transition-all cursor-pointer">
+        <div class="aspect-square mb-2 bg-gray-50 dark:bg-gray-800 rounded-xl flex items-center justify-center p-2 overflow-hidden">
             <img src="${p.photo}" class="max-h-full object-contain" loading="lazy">
         </div>
-        <div class="text-[9px] text-gray-400 uppercase font-bold">${p.brand}</div>
+        <div class="text-[9px] text-gray-400 uppercase font-bold truncate">${p.brand}</div>
         <div class="text-[11px] font-bold truncate mb-1">${name}</div>
         <div class="text-teal-600 font-black text-sm">${price} zł</div>
     </div>`;
 }
 
-function openModal(encodedData) {
-    const p = JSON.parse(decodeURIComponent(escape(atob(encodedData))));
+function openModalById(index) {
+    const p = allProducts[index];
     const name = curLang === 'uk' ? (p.nameUK || p.name) : (p.namePL || p.name);
     const desc = curLang === 'uk' ? (p.descUK || p.desc) : (p.descPL || p.desc);
     const inStock = p.status?.toLowerCase() !== 'out';
@@ -233,32 +234,34 @@ function openModal(encodedData) {
     document.getElementById('m-img').src = p.photo;
     document.getElementById('m-brand').innerText = p.brand;
     document.getElementById('m-title').innerText = name;
-    document.getElementById('m-desc').innerText = desc || "";
-    document.getElementById('m-stock').innerHTML = `<span class="${inStock?'bg-emerald-100 text-emerald-700':'bg-red-100 text-red-700'} px-3 py-1 rounded-full text-[10px] font-bold">${inStock ? 'В наявності' : 'Немає в наявності'}</span>`;
+    document.getElementById('m-desc').innerText = desc;
+    document.getElementById('m-stock').innerHTML = inStock 
+        ? `<span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-bold">✓ В наявності</span>`
+        : `<span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-[10px] font-bold">✕ Немає</span>`;
 
     let pricesHtml = '';
-    const priceLines = [
+    const items = [
         { l: '2ml', p: p.price2ml, o: p.old2ml },
         { l: '5ml', p: p.price5ml, o: p.old5ml },
         { l: '10ml', p: p.price10ml, o: p.old10ml },
         { l: 'Флакон', p: p.fullPrice, o: p.oldFull }
     ];
 
-    priceLines.forEach(item => {
-        if (item.p) {
+    items.forEach(i => {
+        if (i.p) {
             pricesHtml += `
             <div class="flex justify-between items-center border-b dark:border-gray-800 pb-2">
-                <span class="text-sm font-medium">${item.l}</span>
+                <span class="text-sm font-medium">${i.l}</span>
                 <div class="text-right">
-                    ${item.o ? `<span class="line-through text-gray-400 text-xs mr-2">${item.o} zł</span>` : ''}
-                    <span class="font-bold text-teal-600">${item.p} zł</span>
+                    ${i.o ? `<span class="line-through text-gray-400 text-xs mr-2">${i.o} zł</span>` : ''}
+                    <span class="font-bold text-teal-600">${i.p} zł</span>
                 </div>
             </div>`;
         }
     });
 
     document.getElementById('m-prices').innerHTML = pricesHtml;
-    document.getElementById('m-tg').href = `https://t.me/${TG_NICK}?text=Добрий день! Хочу замовити ${encodeURIComponent(p.brand + ' ' + name)}`;
+    document.getElementById('m-tg').href = `https://t.me/${TG_NICK}?text=Хочу замовити: ${encodeURIComponent(p.brand + ' ' + name)}`;
     
     document.getElementById('pModal').classList.remove('hidden');
 }
@@ -267,7 +270,6 @@ function closeModal() {
     document.getElementById('pModal').classList.add('hidden');
 }
 
-// Запуск
 init();
 </script>
 </body>
