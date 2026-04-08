@@ -40,7 +40,8 @@
                class="w-full bg-white text-black rounded-2xl py-3.5 px-6 pl-12 text-base outline-none" placeholder="...">
         <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-gray-400"></i>
     </div>
-    <div class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+    
+    <div id="category-panel" class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
       <button onclick="setCategory('all')" id="cat-all" class="cat-btn px-5 py-2.5 bg-white/20 rounded-xl text-xs font-bold whitespace-nowrap">УСІ</button>
       <button onclick="setCategory('female')" id="cat-female" class="cat-btn px-5 py-2.5 bg-white/10 rounded-xl text-xs font-bold whitespace-nowrap">ДЛЯ НЕЇ</button>
       <button onclick="setCategory('male')" id="cat-male" class="cat-btn px-5 py-2.5 bg-white/10 rounded-xl text-xs font-bold whitespace-nowrap">ДЛЯ НЬОГО</button>
@@ -71,7 +72,7 @@
     </div>
     <nav class="space-y-1">
         <a href="#" onclick="goHome(); toggleSidebar(); return false;" class="flex items-center gap-4 py-4 border-b dark:border-gray-800 font-bold"><i class="fas fa-house text-teal-500 w-5"></i> <span id="nav-home">Головна</span></a>
-        <a href="#" onclick="showBrandList(); return false;" class="flex items-center gap-4 py-4 border-b dark:border-gray-800 font-bold"><i class="fas fa-tag text-teal-500 w-5"></i> <span id="nav-brands">Бренди</span></a>
+        <a href="#" onclick="showBrandList(); toggleSidebar(); return false;" class="flex items-center gap-4 py-4 border-b dark:border-gray-800 font-bold"><i class="fas fa-tag text-teal-500 w-5"></i> <span id="nav-brands">Бренди</span></a>
         <a href="#" onclick="filterBy('new'); toggleSidebar(); return false;" class="flex items-center gap-4 py-4 border-b dark:border-gray-800 font-bold"><i class="fas fa-star text-teal-500 w-5"></i> <span id="nav-news">Новинки</span></a>
         <a href="#" onclick="filterBy('hit'); toggleSidebar(); return false;" class="flex items-center gap-4 py-4 border-b dark:border-gray-800 font-bold text-orange-500"><i class="fas fa-fire w-5"></i> <span id="nav-hits">Хіти</span></a>
         <a href="#" onclick="setCategory('set'); toggleSidebar(); return false;" class="flex items-center gap-4 py-4 border-b dark:border-gray-800 font-bold"><i class="fas fa-box-open text-teal-500 w-5"></i> <span id="nav-sets">Набори</span></a>
@@ -82,15 +83,15 @@
 
 <main class="max-w-7xl mx-auto pb-24">
     <div id="page-header" class="px-4 py-6">
-        <h1 id="page-title" class="text-2xl font-black">Каталог</h1>
+        <h1 id="page-title" class="text-2xl font-black italic">Каталог</h1>
         <p id="page-subtitle" class="text-gray-400 text-xs mt-1">Оригінальна продукція</p>
     </div>
     <div id="catalog-area" class="px-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
 </main>
 
-<div id="cart-panel" class="fixed top-0 right-0 h-full w-full max-md:max-w-md bg-white dark:bg-gray-900 z-[10000] shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
+<div id="cart-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-gray-900 z-[10000] shadow-2xl transform translate-x-full transition-transform duration-300 flex flex-col">
     <div class="p-5 border-b flex justify-between items-center bg-gray-50 dark:bg-gray-800">
-        <h2 id="cart-title" class="text-xl font-black">Кошик</h2>
+        <h2 id="cart-title" class="text-xl font-black uppercase tracking-tighter">Кошик</h2>
         <button onclick="toggleCart()" class="text-2xl">✕</button>
     </div>
     <div id="cart-items" class="flex-1 overflow-y-auto p-5 space-y-4"></div>
@@ -121,13 +122,13 @@ const TG_NICK = 'elenafragrance';
 
 const langData = {
     uk: {
-        search: "Шукайте аромат...", home: "Головна", brands: "Бренди", news: "Новинки", hits: "Хіти", sets: "Набори", sales: "Акції",
+        search: "Шукайте аромат...", home: "Головна", brands: "Бренди", new: "Новинки", hit: "Хіти", sets: "Набори", sale: "Акції",
         all: "УСІ", female: "ДЛЯ НЕЇ", male: "ДЛЯ НЬОГО", unisex: "УНІСЕКС", set: "НАБОРИ",
         sort_cheap: "ДЕШЕВШІ", sort_exp: "ДОРОЖЧІ", login: "ВХІД", catalog: "Каталог парфумів", subtitle: "Тільки оригінальна продукція",
         cart: "МІЙ КОШИК", total: "РАЗОМ", send: "ОФОРМИТИ В TELEGRAM", add: "ДОДАТИ В КОШИК", empty: "Кошик порожній"
     },
     pl: {
-        search: "Szukaj...", home: "Główna", brands: "Marki", news: "Nowości", hits: "Hity", sets: "Zestawy", sales: "Promocje",
+        search: "Szukaj...", home: "Główna", brands: "Marki", new: "Nowości", hit: "Hity", sets: "Zestawy", sale: "Promocje",
         all: "WSZYSTKO", female: "DLA NIEJ", male: "DLA NIEGO", unisex: "UNISEX", set: "ZESTAWY",
         sort_cheap: "NAJTAŃSZE", sort_exp: "NAJDROŻSZE", login: "ZALOGUJ", catalog: "Katalog perfum", subtitle: "Oryginalne produkty",
         cart: "MÓJ KOSZYK", total: "RAZEM", send: "ZAMÓW PRZEZ TELEGRAM", add: "DODAJ DO KOSZYKA", empty: "Koszyk jest pusty"
@@ -139,17 +140,14 @@ let cart = JSON.parse(localStorage.getItem('ps_cart')) || [];
 let curLang = localStorage.getItem('ps_lang') || 'uk';
 let curCat = 'all';
 let curSort = 'none';
-let currentFilter = 'all'; // 'all', 'new', 'hit', 'sale', 'brand'
+let currentFilter = 'all'; 
 
 async function init() {
     try {
         const res = await fetch(SPREADSHEET_URL);
         const text = await res.text();
         allProducts = parseCSV(text);
-        
-        // СОРТУВАННЯ ПО АЛФАВІТУ (Бренд + Назва)
         allProducts.sort((a, b) => a.brand.localeCompare(b.brand));
-
         setLang(curLang);
         renderCart();
     } catch (e) { console.error(e); }
@@ -181,10 +179,10 @@ function setLang(l) {
     document.getElementById('searchInput').placeholder = t.search;
     document.getElementById('nav-home').innerText = t.home;
     document.getElementById('nav-brands').innerText = t.brands;
-    document.getElementById('nav-news').innerText = t.news;
-    document.getElementById('nav-hits').innerText = t.hits;
+    document.getElementById('nav-news').innerText = t.new;
+    document.getElementById('nav-hits').innerText = t.hit;
     document.getElementById('nav-sets').innerText = t.sets;
-    document.getElementById('nav-sales').innerText = t.sales;
+    document.getElementById('nav-sales').innerText = t.sale;
     document.getElementById('cat-all').innerText = t.all;
     document.getElementById('cat-female').innerText = t.female;
     document.getElementById('cat-male').innerText = t.male;
@@ -207,7 +205,16 @@ function setLang(l) {
 function filterBy(type, brandName = null) {
     currentFilter = type;
     if (brandName) curCat = brandName;
-    document.getElementById('page-title').innerText = langData[curLang][type] || brandName || langData[curLang].catalog;
+    document.getElementById('page-title').innerText = brandName || langData[curLang][type] || langData[curLang].catalog;
+    
+    // ХОВАЄМО ПАНЕЛЬ КАТЕГОРІЙ ДЛЯ БРЕНДІВ І СПЕЦ-ФІЛЬТРІВ
+    const catPanel = document.getElementById('category-panel');
+    if(type === 'brand' || type === 'new' || type === 'hit' || type === 'sale') {
+        catPanel.classList.add('hidden');
+    } else {
+        catPanel.classList.remove('hidden');
+    }
+    
     refreshCatalog();
 }
 
@@ -216,17 +223,18 @@ function showBrandList() {
     const area = document.getElementById('catalog-area');
     area.className = "px-4 space-y-2";
     area.innerHTML = brands.map(b => `
-        <button onclick="filterBy('brand', '${b}'); toggleSidebar();" class="w-full text-left p-4 bg-white dark:bg-gray-900 rounded-2xl font-bold shadow-sm flex justify-between items-center">
+        <button onclick="filterBy('brand', '${b}');" class="w-full text-left p-4 bg-white dark:bg-gray-900 rounded-2xl font-bold shadow-sm flex justify-between items-center active:scale-95 transition-all">
             ${b} <i class="fas fa-chevron-right text-teal-500 text-xs"></i>
         </button>
     `).join('');
     document.getElementById('page-title').innerText = langData[curLang].brands;
+    document.getElementById('category-panel').classList.add('hidden');
 }
 
 function refreshCatalog() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const area = document.getElementById('catalog-area');
-    area.className = "px-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4";
+    if (area.className.includes("space-y-2")) area.className = "px-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4";
     
     let filtered = allProducts.filter(p => {
         const name = curLang === 'uk' ? (p.nameUK || p.name) : (p.namePL || p.name);
@@ -236,11 +244,11 @@ function refreshCatalog() {
         let matchSpecial = true;
         if (currentFilter === 'new') matchSpecial = p.isNew?.toLowerCase() === 'yes';
         if (currentFilter === 'hit') matchSpecial = p.isHit?.toLowerCase() === 'yes';
-        if (currentFilter === 'sale') matchSpecial = !!(p.old2ml || p.oldFull);
+        if (currentFilter === 'sale') matchSpecial = !!(p.old2ml || p.oldFull || p.old5ml || p.old10ml);
         if (currentFilter === 'brand') matchSpecial = p.brand === curCat;
 
         const isUnisex = (curCat === 'unisex') && (catValue === 'unisex' || catValue === 'uniseks');
-        const matchCat = (curCat === 'all' || currentFilter === 'brand') || isUnisex || (catValue === curCat);
+        const matchCat = (curCat === 'all' || currentFilter === 'brand' || currentFilter === 'new' || currentFilter === 'hit' || currentFilter === 'sale') || isUnisex || (catValue === curCat);
         
         return matchSearch && matchCat && matchSpecial;
     });
@@ -323,26 +331,41 @@ function sendOrder() {
 
 function saveCart() { localStorage.setItem('ps_cart', JSON.stringify(cart)); }
 function removeFromCart(i) { cart.splice(i, 1); saveCart(); renderCart(); }
+
 function toggleSidebar() { 
     const s = document.getElementById('sidebar');
     s.classList.toggle('open'); document.getElementById('overlay').classList.toggle('show');
     document.body.classList.toggle('lock-scroll', s.classList.contains('open'));
 }
+
 function toggleCart(st) { 
     const p = document.getElementById('cart-panel');
     if (st === true) p.classList.remove('translate-x-full');
     else p.classList.toggle('translate-x-full');
     document.body.classList.toggle('lock-scroll', !p.classList.contains('translate-x-full'));
 }
+
 function closeModal() { document.getElementById('pModal').classList.add('hidden'); document.body.classList.remove('lock-scroll'); }
+
 function setCategory(c) { 
     curCat = c; currentFilter = 'all';
+    document.getElementById('category-panel').classList.remove('hidden');
     document.querySelectorAll('.cat-btn').forEach(b => b.classList.replace('bg-white/20', 'bg-white/10'));
     if(document.getElementById('cat-'+c)) document.getElementById('cat-'+c).classList.replace('bg-white/10', 'bg-white/20');
+    document.getElementById('page-title').innerText = langData[curLang].catalog;
     refreshCatalog(); 
 }
+
 function setSort(s) { curSort = s; refreshCatalog(); }
-function goHome() { curCat = 'all'; currentFilter = 'all'; document.getElementById('searchInput').value = ''; refreshCatalog(); }
+
+function goHome() { 
+    curCat = 'all'; currentFilter = 'all'; 
+    document.getElementById('searchInput').value = ''; 
+    document.getElementById('category-panel').classList.remove('hidden');
+    document.getElementById('page-title').innerText = langData[curLang].catalog;
+    refreshCatalog(); 
+}
+
 function toggleTheme() { document.documentElement.classList.toggle('dark'); }
 document.getElementById('add-to-cart-btn').onclick = addToCart;
 
