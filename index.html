@@ -6,6 +6,7 @@
     <title>perfume.shoppee</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:wght@700&display=swap');
         
@@ -15,7 +16,6 @@
 
         .glass-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(6, 44, 34, 0.08); }
 
-        /* ВИПРАВЛЕНО: Контейнер для фото, щоб флакон було видно ПОВНІСТЮ */
         .img-container { 
             display: flex; 
             align-items: center; 
@@ -29,7 +29,6 @@
         }
         .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-multiply: multiply; }
         
-        /* ВИПРАВЛЕНО: Стиль назви для повного відображення тексту */
         .product-title {
             font-size: 11px;
             font-weight: 700;
@@ -48,7 +47,22 @@
         .scroll-item { flex: 0 0 160px; scroll-snap-align: start; }
         .scroll-item .img-container { height: 150px; }
 
-        .product-card { background: white; border-radius: 24px; border: 1px solid rgba(0,0,0,0.03); transition: all 0.3s ease; }
+        /* АНІМАЦІЯ КАРТКИ */
+        .product-card { 
+            background: white; 
+            border-radius: 24px; 
+            border: 1px solid rgba(0,0,0,0.03); 
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
+        }
+        
+        /* Ефект при наведенні (тільки для ПК) або тапі */
+        @media (hover: hover) {
+            .product-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 20px 40px rgba(6, 44, 34, 0.08);
+                border-color: rgba(197, 160, 89, 0.2);
+            }
+        }
         
         #sidebar { background: var(--brand-deep); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         #sidebar.open { transform: translateX(0); }
@@ -70,7 +84,7 @@
   </div>
 </nav>
 
-<div class="px-6 py-4 bg-white">
+<div class="px-6 py-4 bg-white" data-aos="fade-down">
     <div class="relative max-w-2xl mx-auto">
         <input id="searchInput" type="text" onkeyup="refreshCatalog()" class="w-full bg-neutral-100 rounded-2xl py-4 px-12 text-sm outline-none" data-i18n-placeholder="search_placeholder">
         <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-neutral-300 text-xs"></i>
@@ -136,6 +150,8 @@
   </div>
 </div>
 
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
 <script>
 const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
 const TG_NICK = 'elenafragrance';
@@ -159,6 +175,9 @@ const i18n = {
 };
 
 async function init() {
+    // Ініціалізація анімацій
+    AOS.init({ duration: 800, once: true, offset: 50 });
+
     const res = await fetch(SPREADSHEET_URL);
     const text = await res.text();
     allProducts = parseCSV(text);
@@ -217,16 +236,18 @@ function refreshCatalog() {
     if (currentFilter === 'home' && q === '') {
         const banner = allProducts.find(p => p.brand === "BANNER");
         area.innerHTML = `
-            ${banner ? `<div class="mb-10 rounded-[28px] overflow-hidden shadow-sm"><img src="${banner.photo}" class="w-full object-cover"></div>` : ''}
+            ${banner ? `<div class="mb-10 rounded-[28px] overflow-hidden shadow-sm" data-aos="zoom-in"><img src="${banner.photo}" class="w-full object-cover"></div>` : ''}
             <div class="mb-12">
-                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].hits_title}</h2>
+                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40" data-aos="fade-right">${i18n[currentLang].hits_title}</h2>
                 <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.isBest?.toLowerCase() === 'yes'))}</div>
             </div>
             <div class="mb-12">
-                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].news_title}</h2>
+                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40" data-aos="fade-right">${i18n[currentLang].news_title}</h2>
                 <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.isNew?.toLowerCase() === 'yes'))}</div>
             </div>
         `;
+        // Перезапуск AOS для нових елементів
+        AOS.refresh();
         return;
     }
 
@@ -244,11 +265,14 @@ function refreshCatalog() {
     });
 
     area.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-4 gap-4">${renderList(filtered)}</div>`;
+    AOS.refresh();
 }
 
 function renderScrollList(list) {
-    return list.map(p => `
-        <div onclick="openModal(${allProducts.indexOf(p)})" class="scroll-item product-card p-4 flex flex-col h-full">
+    return list.map((p, index) => `
+        <div onclick="openModal(${allProducts.indexOf(p)})" 
+             class="scroll-item product-card p-4 flex flex-col h-full"
+             data-aos="fade-up" data-aos-delay="${index * 50}">
             <div class="img-container mb-3"><img src="${p.photo}" loading="lazy"></div>
             <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
             <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
@@ -258,7 +282,9 @@ function renderScrollList(list) {
 }
 
 function renderList(list) {
-    return list.map(p => `<div onclick="openModal(${allProducts.indexOf(p)})" class="product-card p-4 flex flex-col h-full">
+    return list.map((p, index) => `<div onclick="openModal(${allProducts.indexOf(p)})" 
+        class="product-card p-4 flex flex-col h-full"
+        data-aos="fade-up" data-aos-delay="${(index % 4) * 50}">
         <div class="img-container mb-4"><img src="${p.photo}" loading="lazy"></div>
         <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
         <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
