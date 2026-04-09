@@ -3,81 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>perfume.shoppee — Luxury Boutique</title>
+    <title>perfume.shoppee — Luxury Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:wght@700&display=swap');
         
         :root {
-            --brand-deep: #062C22; /* Глибокий зелений */
-            --brand-accent: #C5A059; /* Золото */
+            --brand-deep: #062C22;
+            --brand-accent: #C5A059;
             --bg-light: #FDFCFB;
         }
 
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-light); color: var(--brand-deep); }
         .logo-font { font-family: 'Playfair Display', serif; }
 
-        /* Стильне розмите меню */
         .glass-nav {
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(6, 44, 34, 0.05);
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(6, 44, 34, 0.08);
         }
 
-        /* Картки товарів */
-        .product-card {
-            background: white;
-            border-radius: 24px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border: 1px solid rgba(0,0,0,0.02);
-        }
-        .product-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(6, 44, 34, 0.08);
-            border-color: var(--brand-accent);
-        }
-
-        /* Кнопки вибору об'єму */
-        .size-btn {
-            border: 1px solid #EEE;
-            transition: all 0.3s ease;
+        .promo-banner {
+            background: linear-gradient(135deg, var(--brand-deep) 0%, #0a4d3c 100%);
+            border-radius: 32px;
             position: relative;
             overflow: hidden;
         }
-        .size-btn.active {
-            border-color: var(--brand-deep);
-            background: var(--brand-deep);
-            color: white;
-        }
 
-        /* Бокове меню */
+        .product-card {
+            background: white;
+            border-radius: 28px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(6, 44, 34, 0.1); }
+
+        .size-btn { border: 1px solid #F0F0F0; transition: all 0.2s; }
+        .size-btn.active { border-color: var(--brand-accent); background: #fdfaf3; color: var(--brand-accent); box-shadow: 0 0 0 1px var(--brand-accent); }
+
         #sidebar { 
             background: var(--brand-deep);
-            color: white;
             transform: translateX(-100%); 
             transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
         }
         #sidebar.open { transform: translateX(0); }
-        .sidebar-link {
-            color: rgba(255, 255, 255, 0.7);
-            transition: all 0.3s ease;
-        }
-        .sidebar-link:hover { color: var(--brand-accent); transform: translateX(10px); }
 
-        .section-title {
-            font-family: 'Playfair Display', serif;
-            position: relative;
-            display: inline-block;
-        }
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -5px; left: 0;
-            width: 30px; height: 2px;
-            background: var(--brand-accent);
-        }
-
+        .lang-btn.active { color: var(--brand-accent); font-weight: 800; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -85,49 +56,62 @@
 
 <nav class="glass-nav sticky top-0 z-50 px-6 py-4">
   <div class="max-w-7xl mx-auto flex justify-between items-center">
-    <button onclick="toggleSidebar()" class="text-2xl"><i class="fa-solid fa-bars-staggered"></i></button>
-    <span onclick="goHome()" class="text-2xl font-bold logo-font cursor-pointer tracking-tight">perfume.shoppee</span>
-    <button onclick="toggleCart()" class="relative">
-        <i class="fa-solid fa-paper-plane text-xl"></i>
+    <button onclick="toggleSidebar()" class="text-2xl text-[#062C22]"><i class="fa-solid fa-bars-staggered"></i></button>
+    
+    <div class="flex flex-col items-center">
+        <span onclick="goHome()" class="text-2xl font-bold logo-font cursor-pointer tracking-tight">perfume.shoppee</span>
+        <div class="flex gap-3 mt-1 text-[9px] font-bold uppercase tracking-widest text-neutral-400">
+            <button onclick="setLang('UA')" class="lang-btn active" id="lang-ua">UA</button>
+            <span class="opacity-20">|</span>
+            <button onclick="setLang('PL')" class="lang-btn" id="lang-pl">PL</button>
+        </div>
+    </div>
+
+    <button onclick="toggleCart()" class="relative text-[#062C22]">
+        <i class="fa-solid fa-bag-shopping text-xl"></i>
         <span id="cart-count" class="absolute -top-2 -right-2 bg-[#C5A059] text-white text-[9px] font-bold w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
     </button>
   </div>
 </nav>
 
-<div class="px-6 py-6 bg-white">
+<div class="px-6 py-4 bg-white">
     <div class="relative max-w-2xl mx-auto">
         <input id="searchInput" type="text" onkeyup="refreshCatalog()" 
-               class="w-full bg-neutral-50 border border-neutral-100 rounded-2xl py-4 px-6 pl-12 text-sm outline-none focus:border-[#C5A059] transition-all" 
-               placeholder="Знайдіть свій особливий аромат...">
-        <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-neutral-300"></i>
+               class="w-full bg-neutral-100 border-none rounded-2xl py-4 px-12 text-sm outline-none focus:ring-1 ring-[#C5A059]/30 transition-all" 
+               placeholder="Пошук аромату...">
+        <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-neutral-300 text-xs"></i>
     </div>
 </div>
 
 <div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[1001] hidden transition-opacity"></div>
-<div id="sidebar" class="fixed top-0 left-0 h-full w-[85%] max-w-[320px] z-[1002] shadow-2xl p-10 flex flex-col">
-    <div class="mb-16 flex justify-between items-center">
-        <span class="logo-font text-2xl">Menu</span>
-        <button onclick="toggleSidebar()" class="text-white/50"><i class="fa-solid fa-xmark text-xl"></i></button>
+<div id="sidebar" class="fixed top-0 left-0 h-full w-[85%] max-w-[320px] z-[1002] shadow-2xl p-10 flex flex-col text-white">
+    <div class="mb-12 flex justify-between items-center">
+        <span class="logo-font text-2xl tracking-tighter">Boutique</span>
+        <button onclick="toggleSidebar()" class="text-white/30 hover:text-white"><i class="fa-solid fa-xmark text-2xl"></i></button>
     </div>
-    <nav class="space-y-8 text-lg font-medium tracking-wide">
-        <a href="#" onclick="goHome(); toggleSidebar(); return false;" class="sidebar-link block">Головна</a>
-        <a href="#" onclick="showAllCatalog(); toggleSidebar(); return false;" class="sidebar-link block">Каталог</a>
-        <a href="#" onclick="showBrandList(); toggleSidebar(); return false;" class="sidebar-link block">Бренди</a>
-        <a href="#" onclick="filterBy('hit'); toggleSidebar(); return false;" class="sidebar-link block">Хіти</a>
-        <a href="#" onclick="filterBy('new'); toggleSidebar(); return false;" class="sidebar-link block">Новинки</a>
-        <a href="#" onclick="filterBy('sale'); toggleSidebar(); return false;" class="sidebar-link block text-red-400">Акції %</a>
+    <nav class="space-y-8 text-sm font-bold uppercase tracking-[0.2em]">
+        <a href="#" onclick="goHome(); toggleSidebar(); return false;" class="block hover:text-[#C5A059] transition-colors">Головна</a>
+        <a href="#" onclick="showAllCatalog(); toggleSidebar(); return false;" class="block hover:text-[#C5A059] transition-colors">Каталог</a>
+        <a href="#" onclick="showBrandList(); toggleSidebar(); return false;" class="block hover:text-[#C5A059] transition-colors">Бренди</a>
+        <a href="#" onclick="filterBy('hit'); toggleSidebar(); return false;" class="block hover:text-[#C5A059] transition-colors">Хіти</a>
+        <a href="#" onclick="filterBy('new'); toggleSidebar(); return false;" class="block hover:text-[#C5A059] transition-colors">Новинки</a>
+        <a href="#" onclick="filterBy('sale'); toggleSidebar(); return false;" class="block text-red-400">Sale %</a>
     </nav>
-    <div class="mt-auto pt-10 border-t border-white/10 text-[10px] uppercase tracking-[0.2em] text-white/30">
-        Premium Fragrance Store
+    <div class="mt-auto space-y-6">
+        <a href="https://instagram.com/elenafragrance" target="_blank" class="flex items-center gap-4 text-[#C5A059] font-bold">
+            <i class="fa-brands fa-instagram text-2xl"></i>
+            <span class="text-[10px] uppercase tracking-widest">Ми в Instagram</span>
+        </a>
+        <p class="text-[8px] uppercase tracking-[0.3em] text-white/20">© 2026 Perfume Shoppee</p>
     </div>
 </div>
 
-<main class="max-w-7xl mx-auto pb-20 pt-4">
-    <div id="catalog-filters" class="hidden px-6 mb-10 overflow-x-auto no-scrollbar flex gap-2">
-      <button onclick="setCategory('all')" id="cat-all" class="cat-btn px-8 py-3 bg-[#062C22] text-white rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all">Усі</button>
-      <button onclick="setCategory('female')" id="cat-female" class="cat-btn px-8 py-3 bg-white border border-neutral-100 text-neutral-500 rounded-xl text-[10px] font-bold uppercase tracking-widest">Жіночі</button>
-      <button onclick="setCategory('male')" id="cat-male" class="cat-btn px-8 py-3 bg-white border border-neutral-100 text-neutral-500 rounded-xl text-[10px] font-bold uppercase tracking-widest">Чоловічі</button>
-      <button onclick="setCategory('unisex')" id="cat-unisex" class="cat-btn px-8 py-3 bg-white border border-neutral-100 text-neutral-500 rounded-xl text-[10px] font-bold uppercase tracking-widest">Унісекс</button>
+<main class="max-w-7xl mx-auto pb-20 pt-2">
+    <div id="catalog-filters" class="hidden px-6 mb-8 overflow-x-auto no-scrollbar flex gap-2">
+      <button onclick="setCategory('all')" id="cat-all" class="cat-btn px-8 py-3 bg-[#062C22] text-white rounded-xl text-[10px] font-bold uppercase tracking-widest">Усі</button>
+      <button onclick="setCategory('female')" id="cat-female" class="cat-btn px-8 py-3 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[10px] font-bold uppercase tracking-widest">Жіночі</button>
+      <button onclick="setCategory('male')" id="cat-male" class="cat-btn px-8 py-3 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[10px] font-bold uppercase tracking-widest">Чоловічі</button>
+      <button onclick="setCategory('unisex')" id="cat-unisex" class="cat-btn px-8 py-3 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[10px] font-bold uppercase tracking-widest">Унісекс</button>
     </div>
 
     <div id="catalog-area" class="px-6"></div>
@@ -135,35 +119,34 @@
 
 <div id="cart-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[10000] shadow-2xl transform translate-x-full transition-transform duration-500 flex flex-col">
     <div class="p-8 border-b flex justify-between items-center bg-[#062C22] text-white">
-        <h2 class="text-xs font-bold uppercase tracking-[0.2em]">Ваше замовлення</h2>
+        <h2 class="text-[10px] font-bold uppercase tracking-[0.2em]">Ваше замовлення</h2>
         <button onclick="toggleCart()"><i class="fa-solid fa-xmark text-xl"></i></button>
     </div>
     <div id="cart-items" class="flex-1 overflow-y-auto p-8 space-y-8"></div>
-    <div class="p-8 border-t border-neutral-100 bg-neutral-50">
-        <div class="flex justify-between items-center mb-8">
-            <span class="text-[10px] font-bold uppercase text-neutral-400">Всього до оплати</span>
+    <div class="p-8 border-t border-neutral-100 bg-neutral-50 space-y-6">
+        <div class="flex justify-between items-center">
+            <span class="text-[10px] font-bold uppercase text-neutral-400 tracking-widest">Всього</span>
             <span id="cart-total" class="text-2xl font-bold text-[#062C22]">0 zł</span>
         </div>
-        <button onclick="sendOrder()" class="w-full bg-[#062C22] text-white py-6 rounded-2xl text-[11px] font-bold uppercase tracking-widest hover:bg-black transition-all">Замовити у Telegram</button>
+        <button onclick="sendOrder()" class="w-full bg-[#062C22] text-white py-6 rounded-2xl text-[11px] font-bold uppercase tracking-widest hover:shadow-lg transition-all">Оформити в Telegram</button>
     </div>
 </div>
 
-<div id="pModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-md z-[9999] flex items-end md:items-center justify-center p-0 md:p-6" onclick="closeModal()">
+<div id="pModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-md z-[9999] flex items-end md:items-center justify-center" onclick="closeModal()">
   <div class="bg-white w-full max-w-lg rounded-t-[40px] md:rounded-[32px] p-10 relative max-h-[92vh] overflow-y-auto" onclick="event.stopPropagation()">
-    <div class="w-12 h-1.5 bg-neutral-200 rounded-full mx-auto mb-8 md:hidden"></div>
-    <button onclick="closeModal()" class="absolute top-10 right-10 text-neutral-300 hover:text-black"><i class="fa-solid fa-xmark text-2xl"></i></button>
+    <button onclick="closeModal()" class="absolute top-8 right-8 text-neutral-300 hover:text-black transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
     
     <div class="flex flex-col items-center">
-        <div class="w-64 h-64 bg-neutral-50 rounded-[40px] flex items-center justify-center mb-8 p-10 shadow-inner">
+        <div class="w-56 h-56 bg-neutral-50 rounded-[40px] flex items-center justify-center mb-8 p-8">
             <img id="m-img" class="max-h-full object-contain mix-blend-multiply" src="">
         </div>
-        <div id="m-brand" class="text-[10px] font-extrabold text-[#C5A059] uppercase tracking-[0.3em] mb-3"></div>
-        <h2 id="m-title" class="text-2xl font-bold text-center mb-4 tracking-tight logo-font"></h2>
-        <p id="m-desc" class="text-center text-sm text-neutral-400 leading-relaxed mb-10 px-4"></p>
+        <div id="m-brand" class="text-[9px] font-black text-[#C5A059] uppercase tracking-[0.4em] mb-3"></div>
+        <h2 id="m-title" class="text-2xl font-bold text-center mb-4 tracking-tight logo-font text-[#062C22]"></h2>
+        <p id="m-desc" class="text-center text-xs text-neutral-400 leading-relaxed mb-10 px-4"></p>
         
         <div class="w-full space-y-3 mb-10" id="m-prices"></div>
         
-        <button id="add-to-cart-btn" class="w-full bg-[#062C22] text-white py-6 rounded-2xl text-[11px] font-bold uppercase tracking-widest opacity-20 cursor-not-allowed transition-all shadow-xl">
+        <button id="add-to-cart-btn" class="w-full bg-[#062C22] text-white py-6 rounded-2xl text-[11px] font-bold uppercase tracking-widest opacity-20 cursor-not-allowed transition-all">
             Додати в кошик
         </button>
     </div>
@@ -219,22 +202,41 @@ function refreshCatalog() {
     filters.classList.toggle('hidden', currentFilter !== 'all');
 
     if (currentFilter === 'home' && q === '') {
-        const hits = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes').slice(0, 4);
-        const news = allProducts.filter(p => p.isNew?.toLowerCase() === 'yes').slice(0, 4);
         area.innerHTML = `
-            <div class="mb-16">
-                <div class="flex justify-between items-center mb-8 border-b border-neutral-100 pb-4">
-                    <h2 class="section-title text-lg uppercase tracking-widest">Best Sellers</h2>
-                    <span onclick="filterBy('hit')" class="text-[9px] font-extrabold uppercase text-[#C5A059] cursor-pointer tracking-widest">Усі</span>
+            <div class="promo-banner mb-12 p-8 text-white flex items-center justify-between min-h-[180px]">
+                <div class="relative z-10 max-w-[60%]">
+                    <div class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 mb-2">Весняні новинки</div>
+                    <h2 class="text-3xl font-bold logo-font leading-tight mb-4 text-[#C5A059]">Знижка -20%</h2>
+                    <p class="text-[10px] uppercase font-bold tracking-widest leading-relaxed">На весь асортимент при купівлі від 2-х одиниць</p>
                 </div>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">${renderList(hits)}</div>
+                <div class="absolute right-[-20px] top-0 h-full opacity-20">
+                    <i class="fa-solid fa-droplet text-[180px] text-white"></i>
+                </div>
             </div>
+
             <div class="mb-16">
-                <div class="flex justify-between items-center mb-8 border-b border-neutral-100 pb-4">
-                    <h2 class="section-title text-lg uppercase tracking-widest">New Arrival</h2>
-                    <span onclick="filterBy('new')" class="text-[9px] font-extrabold uppercase text-[#C5A059] cursor-pointer tracking-widest">Усі</span>
+                <div class="flex justify-between items-end mb-8 border-b border-neutral-100 pb-4">
+                    <h2 class="text-sm font-bold uppercase tracking-widest text-[#062C22]">Популярні хіти</h2>
+                    <span onclick="filterBy('hit')" class="text-[9px] font-bold uppercase text-[#C5A059] cursor-pointer tracking-widest">Дивитись всі</span>
                 </div>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">${renderList(news)}</div>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">${renderList(allProducts.filter(p => p.isBest?.toLowerCase() === 'yes').slice(0, 4))}</div>
+            </div>
+
+            <div class="bg-neutral-100 rounded-[32px] p-8 mb-16 flex flex-col md:flex-row items-center gap-6 border border-neutral-200">
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold logo-font mb-2">Знайдіть свій аромат</h3>
+                    <p class="text-xs text-neutral-400 mb-4 uppercase tracking-widest">Перегляньте нашу повну колекцію брендів</p>
+                    <button onclick="showBrandList()" class="bg-[#062C22] text-white px-8 py-3 rounded-xl text-[9px] font-bold uppercase tracking-widest">Перейти</button>
+                </div>
+                <i class="fa-solid fa-leaf text-4xl text-[#062C22]/10"></i>
+            </div>
+
+            <div class="mb-16">
+                <div class="flex justify-between items-end mb-8 border-b border-neutral-100 pb-4">
+                    <h2 class="text-sm font-bold uppercase tracking-widest text-[#062C22]">Останні новинки</h2>
+                    <span onclick="filterBy('new')" class="text-[9px] font-bold uppercase text-[#C5A059] cursor-pointer tracking-widest">Дивитись всі</span>
+                </div>
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">${renderList(allProducts.filter(p => p.isNew?.toLowerCase() === 'yes').slice(0, 4))}</div>
             </div>
         `;
         return;
@@ -257,16 +259,25 @@ function refreshCatalog() {
 }
 
 function renderList(list) {
-    if (list.length === 0) return `<div class="col-span-full text-center py-20 text-neutral-400 text-[10px] uppercase tracking-[0.2em]">Нічого не знайдено</div>`;
+    if (list.length === 0) return `<div class="col-span-full text-center py-20 text-neutral-300 text-[9px] uppercase tracking-widest">Нічого не знайдено</div>`;
     return list.map((p, i) => `
-    <div onclick="openModal(${allProducts.indexOf(p)})" class="product-card p-4 flex flex-col h-full">
-        <div class="aspect-square mb-6 bg-neutral-50 rounded-2xl flex items-center justify-center p-6 group">
-            <img src="${p.photo}" class="max-h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-500" loading="lazy">
+    <div onclick="openModal(${allProducts.indexOf(p)})" class="product-card p-5 group flex flex-col h-full cursor-pointer">
+        <div class="aspect-square mb-6 bg-neutral-50 rounded-2xl flex items-center justify-center p-6 overflow-hidden">
+            <img src="${p.photo}" class="max-h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700" loading="lazy">
         </div>
-        <div class="text-[8px] font-extrabold text-[#C5A059] uppercase tracking-[0.2em] mb-2">${p.brand}</div>
-        <div class="text-sm font-bold leading-snug mb-3 flex-grow truncate">${p.nameUK || p.name}</div>
-        <div class="text-sm font-extrabold text-[#062C22]">${p.price2ml || p.fullPrice} zł</div>
+        <div class="text-[8px] font-black text-[#C5A059] uppercase tracking-[0.25em] mb-2">${p.brand}</div>
+        <div class="text-xs font-bold leading-snug mb-3 flex-grow text-[#062C22]">${p.nameUK || p.name}</div>
+        <div class="flex justify-between items-center mt-auto">
+            <div class="text-sm font-black text-[#062C22]">${p.price2ml || p.fullPrice} zł</div>
+            <div class="w-8 h-8 bg-[#062C22] text-white rounded-full flex items-center justify-center text-[10px]"><i class="fa-solid fa-plus"></i></div>
+        </div>
     </div>`).join('');
+}
+
+function setLang(l) {
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('lang-' + l.toLowerCase()).classList.add('active');
+    // Тут можна додати логіку зміни тексту, якщо він є в JS
 }
 
 function showAllCatalog() { currentFilter = 'all'; curCat = 'all'; document.getElementById('searchInput').value = ''; refreshCatalog(); }
@@ -274,9 +285,9 @@ function showBrandList() {
     currentFilter = 'brand';
     const brands = [...new Set(allProducts.map(p => p.brand))].sort();
     const area = document.getElementById('catalog-area');
-    area.innerHTML = `<h2 class="section-title text-lg uppercase tracking-widest mb-10">Бренди</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-4">` + brands.map(b => `
-        <button onclick="filterBy('brand', '${b}')" class="w-full text-left py-6 px-8 bg-white rounded-2xl border border-neutral-50 flex justify-between items-center text-sm font-bold hover:border-[#C5A059] transition-all">
-            ${b} <i class="fa-solid fa-arrow-right-long text-[#C5A059]"></i>
+    area.innerHTML = `<h2 class="text-xs font-bold uppercase tracking-widest mb-10 text-[#062C22]">Наші Бренди</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-3">` + brands.map(b => `
+        <button onclick="filterBy('brand', '${b}')" class="w-full text-left py-6 px-8 bg-white rounded-2xl border border-neutral-50 flex justify-between items-center text-[11px] font-bold uppercase tracking-widest hover:border-[#C5A059] transition-all">
+            ${b} <i class="fa-solid fa-chevron-right text-[#C5A059] text-[10px]"></i>
         </button>
     `).join('') + `</div>`;
 }
@@ -288,17 +299,16 @@ function setCategory(c) {
     curCat = c; 
     document.querySelectorAll('.cat-btn').forEach(b => {
         b.classList.remove('bg-[#062C22]', 'text-white');
-        b.classList.add('bg-white', 'text-neutral-500', 'border-neutral-100');
+        b.classList.add('bg-white', 'text-neutral-400', 'border-neutral-100');
     });
     const active = document.getElementById('cat-'+c);
     active.classList.replace('bg-white', 'bg-[#062C22]');
-    active.classList.replace('text-neutral-500', 'text-white');
+    active.classList.replace('text-neutral-400', 'text-white');
     refreshCatalog(); 
 }
 
 function openModal(idx) {
-    const p = allProducts[idx]; 
-    selectedOption = null;
+    const p = allProducts[idx]; selectedOption = null;
     const btn = document.getElementById('add-to-cart-btn');
     btn.classList.add('opacity-20', 'cursor-not-allowed');
     btn.innerText = "Додати в кошик";
@@ -306,14 +316,14 @@ function openModal(idx) {
     document.getElementById('m-img').src = p.photo;
     document.getElementById('m-brand').innerText = p.brand;
     document.getElementById('m-title').innerText = p.nameUK || p.name;
-    document.getElementById('m-desc').innerText = p.descUK || p.desc || "Вишуканий аромат з унікальним шлейфом.";
+    document.getElementById('m-desc').innerText = p.descUK || p.desc || "Преміальна якість, оригінальне звучання компонентів.";
     
     let html = '';
     [{l:'2ml', p:p.price2ml}, {l:'5ml', p:p.price5ml}, {l:'10ml', p:p.price10ml}, {l:'Full', p:p.fullPrice}].forEach(o => {
         if(o.p && o.p !== '---' && o.p !== '') {
             html += `<div onclick="selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${p.nameUK || p.name}', '${p.photo}')" 
-                class="size-btn flex justify-between items-center p-5 rounded-2xl cursor-pointer text-sm font-bold">
-                <span>${o.l}</span><span>${o.p} zł</span>
+                class="size-btn flex justify-between items-center p-5 rounded-2xl cursor-pointer text-xs font-bold">
+                <span class="uppercase tracking-widest">${o.l}</span><span class="text-[#062C22]">${o.p} zł</span>
             </div>`;
         }
     });
@@ -348,12 +358,12 @@ function renderCart() {
     } else {
         c.innerHTML = cart.map((item, i) => {
             total += parseFloat(item.price);
-            return `<div class="flex gap-6 items-center border-b border-neutral-50 pb-6">
+            return `<div class="flex gap-6 items-center">
                 <div class="w-20 h-20 bg-neutral-50 rounded-2xl p-4 flex-shrink-0"><img src="${item.img}" class="w-full h-full object-contain mix-blend-multiply"></div>
                 <div class="flex-1 min-w-0">
-                    <div class="text-[8px] font-extrabold text-[#C5A059] uppercase tracking-[0.2em] mb-1">${item.brand}</div>
-                    <div class="text-sm font-bold truncate mb-1">${item.name}</div>
-                    <div class="text-xs text-neutral-400">${item.size} • ${item.price} zł</div>
+                    <div class="text-[8px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${item.brand}</div>
+                    <div class="text-[11px] font-bold truncate text-[#062C22] mb-1">${item.name}</div>
+                    <div class="text-[10px] text-neutral-400 font-bold">${item.size} • ${item.price} zł</div>
                 </div>
                 <button onclick="removeFromCart(${i})" class="text-neutral-200 hover:text-red-400 p-2"><i class="fa-solid fa-xmark"></i></button>
             </div>`;
@@ -363,11 +373,12 @@ function renderCart() {
 }
 
 function removeFromCart(i) { cart.splice(i, 1); localStorage.setItem('ps_cart', JSON.stringify(cart)); renderCart(); }
+
 function sendOrder() {
     if (cart.length === 0) return;
-    let t = "🌟 Нове замовлення!\n\n";
+    let t = "🛍️ Замовлення від perfume.shoppee\n\n";
     cart.forEach((it, i) => t += `${i+1}. ${it.brand} ${it.name} (${it.size}) - ${it.price} zł\n`);
-    t += `\n💰 Сума: ${document.getElementById('cart-total').innerText}`;
+    t += `\n💰 Разом: ${document.getElementById('cart-total').innerText}`;
     window.open(`https://t.me/${TG_NICK}?text=${encodeURIComponent(t)}`, '_blank');
 }
 
