@@ -3,52 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>perfume.shoppee — Luxury Store</title>
+    <title>perfume.shoppee</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:wght@700&display=swap');
         
-        :root {
-            --brand-deep: #062C22;
-            --brand-accent: #C5A059;
-            --bg-light: #FDFCFB;
-        }
-
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-light); color: var(--brand-deep); }
+        :root { --brand-deep: #062C22; --brand-accent: #C5A059; --bg-light: #FDFCFB; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-light); color: var(--brand-deep); overflow-x: hidden; }
         .logo-font { font-family: 'Playfair Display', serif; }
 
-        .glass-nav {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(6, 44, 34, 0.08);
-        }
+        .glass-nav { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(6, 44, 34, 0.08); }
 
-        .promo-banner {
-            background: linear-gradient(135deg, var(--brand-deep) 0%, #0a4d3c 100%);
-            border-radius: 32px;
-            position: relative;
-            overflow: hidden;
-        }
+        /* Горизонтальна прокрутка */
+        .scroll-x { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 16px; padding-bottom: 20px; }
+        .scroll-x::-webkit-scrollbar { display: none; }
+        .scroll-item { flex: 0 0 170px; scroll-snap-align: start; }
 
-        .product-card {
-            background: white;
-            border-radius: 28px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .product-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(6, 44, 34, 0.1); }
-
-        .size-btn { border: 1px solid #F0F0F0; transition: all 0.2s; }
-        .size-btn.active { border-color: var(--brand-accent); background: #fdfaf3; color: var(--brand-accent); box-shadow: 0 0 0 1px var(--brand-accent); }
-
-        #sidebar { 
-            background: var(--brand-deep);
-            transform: translateX(-100%); 
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); 
-        }
+        .product-card { background: white; border-radius: 24px; transition: all 0.3s ease; border: 1px solid rgba(0,0,0,0.03); }
+        
+        #sidebar { background: var(--brand-deep); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         #sidebar.open { transform: translateX(0); }
 
-        .lang-btn.active { color: var(--brand-accent); font-weight: 800; }
+        .lang-node.active { background: var(--brand-accent); color: white; border-color: var(--brand-accent); }
+        
+        /* Менша модалка */
+        .modal-content { max-width: 400px; width: 90%; border-radius: 32px; padding: 24px; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
@@ -57,19 +37,10 @@
 <nav class="glass-nav sticky top-0 z-50 px-6 py-4">
   <div class="max-w-7xl mx-auto flex justify-between items-center">
     <button onclick="toggleSidebar()" class="text-2xl text-[#062C22]"><i class="fa-solid fa-bars-staggered"></i></button>
-    
-    <div class="flex flex-col items-center">
-        <span onclick="goHome()" class="text-2xl font-bold logo-font cursor-pointer tracking-tight">perfume.shoppee</span>
-        <div class="flex gap-3 mt-1 text-[9px] font-bold uppercase tracking-widest text-neutral-400">
-            <button onclick="setLang('UA')" class="lang-btn active" id="lang-ua">UA</button>
-            <span class="opacity-20">|</span>
-            <button onclick="setLang('PL')" class="lang-btn" id="lang-pl">PL</button>
-        </div>
-    </div>
-
+    <span onclick="goHome()" class="text-xl font-bold logo-font cursor-pointer tracking-tighter">perfume.shoppee</span>
     <button onclick="toggleCart()" class="relative text-[#062C22]">
         <i class="fa-solid fa-bag-shopping text-xl"></i>
-        <span id="cart-count" class="absolute -top-2 -right-2 bg-[#C5A059] text-white text-[9px] font-bold w-5 h-5 rounded-full flex items-center justify-center hidden">0</span>
+        <span id="cart-count" class="absolute -top-2 -right-2 bg-[#C5A059] text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span>
     </button>
   </div>
 </nav>
@@ -77,78 +48,74 @@
 <div class="px-6 py-4 bg-white">
     <div class="relative max-w-2xl mx-auto">
         <input id="searchInput" type="text" onkeyup="refreshCatalog()" 
-               class="w-full bg-neutral-100 border-none rounded-2xl py-4 px-12 text-sm outline-none focus:ring-1 ring-[#C5A059]/30 transition-all" 
-               placeholder="Пошук аромату...">
+               class="w-full bg-neutral-100 rounded-2xl py-4 px-12 text-sm outline-none" 
+               data-i18n-placeholder="search_placeholder">
         <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-neutral-300 text-xs"></i>
     </div>
 </div>
 
-<div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[1001] hidden transition-opacity"></div>
-<div id="sidebar" class="fixed top-0 left-0 h-full w-[85%] max-w-[320px] z-[1002] shadow-2xl p-10 flex flex-col text-white">
-    <div class="mb-12 flex justify-between items-center">
-        <span class="logo-font text-2xl tracking-tighter">Boutique</span>
-        <button onclick="toggleSidebar()" class="text-white/30 hover:text-white"><i class="fa-solid fa-xmark text-2xl"></i></button>
+<div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[1001] hidden"></div>
+<div id="sidebar" class="fixed top-0 left-0 h-full w-[280px] z-[1002] shadow-2xl p-8 flex flex-col text-white font-semibold">
+    <div class="mb-10 flex justify-between items-center">
+        <span class="logo-font text-lg">perfume.shoppee</span>
+        <button onclick="toggleSidebar()" class="text-white/30"><i class="fa-solid fa-xmark text-xl"></i></button>
     </div>
-    <nav class="space-y-8 text-sm font-bold uppercase tracking-[0.2em]">
-        <a href="#" onclick="goHome(); toggleSidebar(); return false;" class="block hover:text-[#C5A059] transition-colors">Головна</a>
-        <a href="#" onclick="showAllCatalog(); toggleSidebar(); return false;" class="block hover:text-[#C5A059] transition-colors">Каталог</a>
-        <a href="#" onclick="showBrandList(); toggleSidebar(); return false;" class="block hover:text-[#C5A059] transition-colors">Бренди</a>
-        <a href="#" onclick="filterBy('hit'); toggleSidebar(); return false;" class="block hover:text-[#C5A059] transition-colors">Хіти</a>
-        <a href="#" onclick="filterBy('new'); toggleSidebar(); return false;" class="block hover:text-[#C5A059] transition-colors">Новинки</a>
-        <a href="#" onclick="filterBy('sale'); toggleSidebar(); return false;" class="block text-red-400">Sale %</a>
+    
+    <div class="flex gap-2 mb-10">
+        <button onclick="setLang('UA')" id="btn-ua" class="lang-node flex-1 py-2 rounded-xl border border-white/10 text-[10px] active">UA</button>
+        <button onclick="setLang('PL')" id="btn-pl" class="lang-node flex-1 py-2 rounded-xl border border-white/10 text-[10px]">PL</button>
+    </div>
+
+    <nav class="space-y-6 text-xs uppercase tracking-widest">
+        <a href="#" onclick="goHome(); toggleSidebar(); return false;" data-i18n="menu_home" class="block"></a>
+        <a href="#" onclick="showAllCatalog(); toggleSidebar(); return false;" data-i18n="menu_catalog" class="block"></a>
+        <a href="#" onclick="showBrandList(); toggleSidebar(); return false;" data-i18n="menu_brands" class="block"></a>
+        <a href="#" onclick="filterBy('hit'); toggleSidebar(); return false;" data-i18n="menu_hits" class="block"></a>
+        <a href="#" onclick="filterBy('new'); toggleSidebar(); return false;" data-i18n="menu_news" class="block"></a>
+        <a href="#" onclick="filterBy('sale'); toggleSidebar(); return false;" data-i18n="menu_sale" class="block text-red-400"></a>
     </nav>
-    <div class="mt-auto space-y-6">
-        <a href="https://instagram.com/elenafragrance" target="_blank" class="flex items-center gap-4 text-[#C5A059] font-bold">
-            <i class="fa-brands fa-instagram text-2xl"></i>
-            <span class="text-[10px] uppercase tracking-widest">Ми в Instagram</span>
+
+    <div class="mt-auto">
+        <a href="https://www.instagram.com/perfume.shoppee?igsh=MWdya2RqbHpweW5vbQ==" target="_blank" class="flex items-center gap-3 text-[#C5A059]">
+            <i class="fa-brands fa-instagram text-xl"></i>
+            <span class="text-[9px] uppercase tracking-widest">Instagram</span>
         </a>
-        <p class="text-[8px] uppercase tracking-[0.3em] text-white/20">© 2026 Perfume Shoppee</p>
     </div>
 </div>
 
-<main class="max-w-7xl mx-auto pb-20 pt-2">
-    <div id="catalog-filters" class="hidden px-6 mb-8 overflow-x-auto no-scrollbar flex gap-2">
-      <button onclick="setCategory('all')" id="cat-all" class="cat-btn px-8 py-3 bg-[#062C22] text-white rounded-xl text-[10px] font-bold uppercase tracking-widest">Усі</button>
-      <button onclick="setCategory('female')" id="cat-female" class="cat-btn px-8 py-3 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[10px] font-bold uppercase tracking-widest">Жіночі</button>
-      <button onclick="setCategory('male')" id="cat-male" class="cat-btn px-8 py-3 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[10px] font-bold uppercase tracking-widest">Чоловічі</button>
-      <button onclick="setCategory('unisex')" id="cat-unisex" class="cat-btn px-8 py-3 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[10px] font-bold uppercase tracking-widest">Унісекс</button>
+<main class="max-w-7xl mx-auto pb-20">
+    <div id="catalog-filters" class="hidden px-6 mb-6 overflow-x-auto no-scrollbar flex gap-2">
+      <button onclick="setCategory('all')" id="cat-all" class="px-6 py-2 bg-[#062C22] text-white rounded-xl text-[9px] font-bold uppercase tracking-widest" data-i18n="cat_all"></button>
+      <button onclick="setCategory('female')" id="cat-female" class="px-6 py-2 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[9px] font-bold uppercase tracking-widest" data-i18n="cat_female"></button>
+      <button onclick="setCategory('male')" id="cat-male" class="px-6 py-2 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[9px] font-bold uppercase tracking-widest" data-i18n="cat_male"></button>
     </div>
-
     <div id="catalog-area" class="px-6"></div>
 </main>
 
 <div id="cart-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[10000] shadow-2xl transform translate-x-full transition-transform duration-500 flex flex-col">
-    <div class="p-8 border-b flex justify-between items-center bg-[#062C22] text-white">
-        <h2 class="text-[10px] font-bold uppercase tracking-[0.2em]">Ваше замовлення</h2>
+    <div class="p-6 border-b flex justify-between items-center bg-[#062C22] text-white">
+        <h2 class="text-[10px] font-bold uppercase tracking-widest" data-i18n="cart_title"></h2>
         <button onclick="toggleCart()"><i class="fa-solid fa-xmark text-xl"></i></button>
     </div>
-    <div id="cart-items" class="flex-1 overflow-y-auto p-8 space-y-8"></div>
-    <div class="p-8 border-t border-neutral-100 bg-neutral-50 space-y-6">
+    <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-6"></div>
+    <div class="p-8 border-t bg-neutral-50 space-y-6">
         <div class="flex justify-between items-center">
-            <span class="text-[10px] font-bold uppercase text-neutral-400 tracking-widest">Всього</span>
-            <span id="cart-total" class="text-2xl font-bold text-[#062C22]">0 zł</span>
+            <span class="text-[10px] font-bold uppercase text-neutral-400" data-i18n="cart_total_label"></span>
+            <span id="cart-total" class="text-xl font-bold">0 zł</span>
         </div>
-        <button onclick="sendOrder()" class="w-full bg-[#062C22] text-white py-6 rounded-2xl text-[11px] font-bold uppercase tracking-widest hover:shadow-lg transition-all">Оформити в Telegram</button>
+        <button onclick="sendOrder()" class="w-full bg-[#062C22] text-white py-5 rounded-2xl text-[10px] font-bold uppercase tracking-widest" data-i18n="cart_order_btn"></button>
     </div>
 </div>
 
-<div id="pModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-md z-[9999] flex items-end md:items-center justify-center" onclick="closeModal()">
-  <div class="bg-white w-full max-w-lg rounded-t-[40px] md:rounded-[32px] p-10 relative max-h-[92vh] overflow-y-auto" onclick="event.stopPropagation()">
-    <button onclick="closeModal()" class="absolute top-8 right-8 text-neutral-300 hover:text-black transition-colors"><i class="fa-solid fa-xmark text-2xl"></i></button>
-    
+<div id="pModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-md z-[9999] flex items-center justify-center p-4" onclick="closeModal()">
+  <div class="modal-content bg-white relative overflow-y-auto max-h-[90vh]" onclick="event.stopPropagation()">
+    <button onclick="closeModal()" class="absolute top-5 right-5 text-neutral-300"><i class="fa-solid fa-xmark text-xl"></i></button>
     <div class="flex flex-col items-center">
-        <div class="w-56 h-56 bg-neutral-50 rounded-[40px] flex items-center justify-center mb-8 p-8">
-            <img id="m-img" class="max-h-full object-contain mix-blend-multiply" src="">
-        </div>
-        <div id="m-brand" class="text-[9px] font-black text-[#C5A059] uppercase tracking-[0.4em] mb-3"></div>
-        <h2 id="m-title" class="text-2xl font-bold text-center mb-4 tracking-tight logo-font text-[#062C22]"></h2>
-        <p id="m-desc" class="text-center text-xs text-neutral-400 leading-relaxed mb-10 px-4"></p>
-        
-        <div class="w-full space-y-3 mb-10" id="m-prices"></div>
-        
-        <button id="add-to-cart-btn" class="w-full bg-[#062C22] text-white py-6 rounded-2xl text-[11px] font-bold uppercase tracking-widest opacity-20 cursor-not-allowed transition-all">
-            Додати в кошик
-        </button>
+        <img id="m-img" class="w-40 h-40 object-contain mb-6 mix-blend-multiply" src="">
+        <div id="m-brand" class="text-[8px] font-black text-[#C5A059] uppercase tracking-[0.3em] mb-2"></div>
+        <h2 id="m-title" class="text-lg font-bold text-center mb-4 logo-font"></h2>
+        <div class="w-full space-y-2 mb-8" id="m-prices"></div>
+        <button id="add-to-cart-btn" class="w-full bg-[#062C22] text-white py-5 rounded-2xl text-[10px] font-bold uppercase tracking-widest opacity-20 cursor-not-allowed" data-i18n="add_to_cart"></button>
     </div>
   </div>
 </div>
@@ -157,21 +124,29 @@
 const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
 const TG_NICK = 'elenafragrance';
 
-let allProducts = [];
-let cart = JSON.parse(localStorage.getItem('ps_cart')) || [];
-let curCat = 'all';
-let currentFilter = 'home';
-let selectedOption = null;
+let allProducts = [], cart = JSON.parse(localStorage.getItem('ps_cart')) || [];
+let curCat = 'all', currentFilter = 'home', selectedOption = null, currentLang = 'UA';
+
+const i18n = {
+    UA: {
+        search_placeholder: "Пошук аромату...", menu_home: "Головна", menu_catalog: "Каталог", menu_brands: "Бренди", menu_hits: "Хіти", menu_news: "Новинки", menu_sale: "Акції %",
+        cat_all: "Усі", cat_female: "Жіночі", cat_male: "Чоловічі", hits_title: "Хіти продажу", news_title: "Новинки", cart_title: "Ваш кошик", cart_total_label: "Разом",
+        cart_order_btn: "Оформити в Telegram", add_to_cart: "Додати в кошик", empty_cart: "Кошик порожній", order_msg: "Нове замовлення"
+    },
+    PL: {
+        search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_brands: "Marki", menu_hits: "Hity", menu_news: "Nowości", menu_sale: "Promocje %",
+        cat_all: "Wszystkie", cat_female: "Damskie", cat_male: "Męskie", hits_title: "Bestsellery", news_title: "Nowości", cart_title: "Twój koszyk", cart_total_label: "Suma",
+        cart_order_btn: "Zamów przez Telegram", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie"
+    }
+};
 
 async function init() {
-    try {
-        const res = await fetch(SPREADSHEET_URL);
-        const text = await res.text();
-        allProducts = parseCSV(text);
-        allProducts.sort((a, b) => a.brand.localeCompare(b.brand));
-        refreshCatalog();
-        renderCart();
-    } catch (e) { console.error(e); }
+    const res = await fetch(SPREADSHEET_URL);
+    const text = await res.text();
+    allProducts = parseCSV(text);
+    updateUI();
+    refreshCatalog();
+    renderCart();
 }
 
 function parseCSV(text) {
@@ -194,55 +169,44 @@ function parseCSV(text) {
     });
 }
 
+function setLang(l) {
+    currentLang = l;
+    document.querySelectorAll('.lang-node').forEach(b => b.classList.remove('active'));
+    document.getElementById('btn-' + l.toLowerCase()).classList.add('active');
+    updateUI();
+    refreshCatalog();
+    renderCart();
+}
+
+function updateUI() {
+    document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = i18n[currentLang][el.getAttribute('data-i18n')]);
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = i18n[currentLang][el.getAttribute('data-i18n-placeholder')]);
+}
+
 function refreshCatalog() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const area = document.getElementById('catalog-area');
-    const filters = document.getElementById('catalog-filters');
-    
-    filters.classList.toggle('hidden', currentFilter !== 'all');
+    document.getElementById('catalog-filters').classList.toggle('hidden', currentFilter !== 'all');
 
     if (currentFilter === 'home' && q === '') {
+        // Тут логіка банера з таблиці: якщо в таблиці є рядок з назвою "BANNER", беремо його фото
+        const banner = allProducts.find(p => p.brand === "BANNER");
         area.innerHTML = `
-            <div class="promo-banner mb-12 p-8 text-white flex items-center justify-between min-h-[180px]">
-                <div class="relative z-10 max-w-[60%]">
-                    <div class="text-[10px] font-bold uppercase tracking-[0.2em] opacity-60 mb-2">Весняні новинки</div>
-                    <h2 class="text-3xl font-bold logo-font leading-tight mb-4 text-[#C5A059]">Знижка -20%</h2>
-                    <p class="text-[10px] uppercase font-bold tracking-widest leading-relaxed">На весь асортимент при купівлі від 2-х одиниць</p>
-                </div>
-                <div class="absolute right-[-20px] top-0 h-full opacity-20">
-                    <i class="fa-solid fa-droplet text-[180px] text-white"></i>
-                </div>
+            ${banner ? `<div class="mb-10 rounded-[32px] overflow-hidden shadow-sm"><img src="${banner.photo}" class="w-full object-cover"></div>` : ''}
+            <div class="mb-12">
+                <h2 class="text-xs font-bold uppercase tracking-widest mb-6">${i18n[currentLang].hits_title}</h2>
+                <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.isBest?.toLowerCase() === 'yes'))}</div>
             </div>
-
-            <div class="mb-16">
-                <div class="flex justify-between items-end mb-8 border-b border-neutral-100 pb-4">
-                    <h2 class="text-sm font-bold uppercase tracking-widest text-[#062C22]">Популярні хіти</h2>
-                    <span onclick="filterBy('hit')" class="text-[9px] font-bold uppercase text-[#C5A059] cursor-pointer tracking-widest">Дивитись всі</span>
-                </div>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">${renderList(allProducts.filter(p => p.isBest?.toLowerCase() === 'yes').slice(0, 4))}</div>
-            </div>
-
-            <div class="bg-neutral-100 rounded-[32px] p-8 mb-16 flex flex-col md:flex-row items-center gap-6 border border-neutral-200">
-                <div class="flex-1">
-                    <h3 class="text-xl font-bold logo-font mb-2">Знайдіть свій аромат</h3>
-                    <p class="text-xs text-neutral-400 mb-4 uppercase tracking-widest">Перегляньте нашу повну колекцію брендів</p>
-                    <button onclick="showBrandList()" class="bg-[#062C22] text-white px-8 py-3 rounded-xl text-[9px] font-bold uppercase tracking-widest">Перейти</button>
-                </div>
-                <i class="fa-solid fa-leaf text-4xl text-[#062C22]/10"></i>
-            </div>
-
-            <div class="mb-16">
-                <div class="flex justify-between items-end mb-8 border-b border-neutral-100 pb-4">
-                    <h2 class="text-sm font-bold uppercase tracking-widest text-[#062C22]">Останні новинки</h2>
-                    <span onclick="filterBy('new')" class="text-[9px] font-bold uppercase text-[#C5A059] cursor-pointer tracking-widest">Дивитись всі</span>
-                </div>
-                <div class="grid grid-cols-2 lg:grid-cols-4 gap-6">${renderList(allProducts.filter(p => p.isNew?.toLowerCase() === 'yes').slice(0, 4))}</div>
+            <div class="mb-12">
+                <h2 class="text-xs font-bold uppercase tracking-widest mb-6">${i18n[currentLang].news_title}</h2>
+                <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.isNew?.toLowerCase() === 'yes'))}</div>
             </div>
         `;
         return;
     }
 
     let filtered = allProducts.filter(p => {
+        if(p.brand === "BANNER") return false;
         const matchSearch = (p.brand + ' ' + (p.nameUK || p.name)).toLowerCase().includes(q);
         const catValue = p.category?.toLowerCase().trim();
         let matchSpecial = true;
@@ -250,95 +214,84 @@ function refreshCatalog() {
         if (currentFilter === 'hit') matchSpecial = p.isBest?.toLowerCase() === 'yes';
         if (currentFilter === 'sale') matchSpecial = !!(p.old2ml || p.oldFull);
         if (currentFilter === 'brand') matchSpecial = p.brand === curCat;
-        const isUnisex = (curCat === 'unisex') && (catValue === 'unisex' || catValue === 'uniseks');
-        const matchCat = (curCat === 'all' || currentFilter === 'brand' || currentFilter === 'new' || currentFilter === 'hit' || currentFilter === 'sale') || isUnisex || (catValue === curCat);
+        const matchCat = (curCat === 'all' || currentFilter !== 'all') || (catValue === curCat);
         return matchSearch && matchCat && matchSpecial;
     });
 
-    area.innerHTML = `<div class="grid grid-cols-2 lg:grid-cols-4 gap-6">${renderList(filtered)}</div>`;
+    area.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-4 gap-4">${renderList(filtered)}</div>`;
+}
+
+function renderScrollList(list) {
+    return list.map(p => `
+        <div onclick="openModal(${allProducts.indexOf(p)})" class="scroll-item product-card p-4 flex flex-col h-full">
+            <div class="aspect-square bg-neutral-50 rounded-2xl flex items-center justify-center p-4 mb-3">
+                <img src="${p.photo}" class="max-h-full object-contain mix-blend-multiply">
+            </div>
+            <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
+            <div class="text-[10px] font-bold leading-tight truncate mb-2">${p.nameUK || p.name}</div>
+            <div class="text-[10px] font-black mt-auto text-[#062C22]">${p.price2ml || p.fullPrice} zł</div>
+        </div>
+    `).join('');
 }
 
 function renderList(list) {
-    if (list.length === 0) return `<div class="col-span-full text-center py-20 text-neutral-300 text-[9px] uppercase tracking-widest">Нічого не знайдено</div>`;
-    return list.map((p, i) => `
-    <div onclick="openModal(${allProducts.indexOf(p)})" class="product-card p-5 group flex flex-col h-full cursor-pointer">
-        <div class="aspect-square mb-6 bg-neutral-50 rounded-2xl flex items-center justify-center p-6 overflow-hidden">
-            <img src="${p.photo}" class="max-h-full object-contain mix-blend-multiply group-hover:scale-110 transition-transform duration-700" loading="lazy">
+    return list.map(p => `
+    <div onclick="openModal(${allProducts.indexOf(p)})" class="product-card p-4 flex flex-col h-full">
+        <div class="aspect-square bg-neutral-50 rounded-2xl flex items-center justify-center p-6 mb-4">
+            <img src="${p.photo}" class="max-h-full object-contain mix-blend-multiply">
         </div>
-        <div class="text-[8px] font-black text-[#C5A059] uppercase tracking-[0.25em] mb-2">${p.brand}</div>
-        <div class="text-xs font-bold leading-snug mb-3 flex-grow text-[#062C22]">${p.nameUK || p.name}</div>
-        <div class="flex justify-between items-center mt-auto">
-            <div class="text-sm font-black text-[#062C22]">${p.price2ml || p.fullPrice} zł</div>
-            <div class="w-8 h-8 bg-[#062C22] text-white rounded-full flex items-center justify-center text-[10px]"><i class="fa-solid fa-plus"></i></div>
-        </div>
+        <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
+        <div class="text-[11px] font-bold leading-tight mb-2 truncate">${p.nameUK || p.name}</div>
+        <div class="text-xs font-black text-[#062C22]">${p.price2ml || p.fullPrice} zł</div>
     </div>`).join('');
 }
 
-function setLang(l) {
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById('lang-' + l.toLowerCase()).classList.add('active');
-    // Тут можна додати логіку зміни тексту, якщо він є в JS
-}
-
-function showAllCatalog() { currentFilter = 'all'; curCat = 'all'; document.getElementById('searchInput').value = ''; refreshCatalog(); }
+function showAllCatalog() { currentFilter = 'all'; curCat = 'all'; refreshCatalog(); }
 function showBrandList() {
     currentFilter = 'brand';
-    const brands = [...new Set(allProducts.map(p => p.brand))].sort();
-    const area = document.getElementById('catalog-area');
-    area.innerHTML = `<h2 class="text-xs font-bold uppercase tracking-widest mb-10 text-[#062C22]">Наші Бренди</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-3">` + brands.map(b => `
-        <button onclick="filterBy('brand', '${b}')" class="w-full text-left py-6 px-8 bg-white rounded-2xl border border-neutral-50 flex justify-between items-center text-[11px] font-bold uppercase tracking-widest hover:border-[#C5A059] transition-all">
-            ${b} <i class="fa-solid fa-chevron-right text-[#C5A059] text-[10px]"></i>
+    const brands = [...new Set(allProducts.filter(p => p.brand !== "BANNER").map(p => p.brand))].sort();
+    document.getElementById('catalog-area').innerHTML = `<div class="grid grid-cols-1 gap-2">` + brands.map(b => `
+        <button onclick="filterBy('brand', '${b}')" class="w-full text-left py-5 px-6 bg-white rounded-2xl border border-neutral-50 flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+            ${b} <i class="fa-solid fa-chevron-right text-[#C5A059]"></i>
         </button>
     `).join('') + `</div>`;
 }
 
 function filterBy(type, val = null) { currentFilter = type; if (val) curCat = val; window.scrollTo({top: 0, behavior: 'smooth'}); refreshCatalog(); }
-function goHome() { currentFilter = 'home'; curCat = 'all'; document.getElementById('searchInput').value = ''; refreshCatalog(); }
-
-function setCategory(c) { 
-    curCat = c; 
-    document.querySelectorAll('.cat-btn').forEach(b => {
-        b.classList.remove('bg-[#062C22]', 'text-white');
-        b.classList.add('bg-white', 'text-neutral-400', 'border-neutral-100');
-    });
-    const active = document.getElementById('cat-'+c);
-    active.classList.replace('bg-white', 'bg-[#062C22]');
-    active.classList.replace('text-neutral-400', 'text-white');
-    refreshCatalog(); 
-}
+function goHome() { currentFilter = 'home'; curCat = 'all'; refreshCatalog(); }
+function setCategory(c) { curCat = c; refreshCatalog(); }
 
 function openModal(idx) {
     const p = allProducts[idx]; selectedOption = null;
     const btn = document.getElementById('add-to-cart-btn');
     btn.classList.add('opacity-20', 'cursor-not-allowed');
-    btn.innerText = "Додати в кошик";
+    btn.innerText = i18n[currentLang].add_to_cart;
 
     document.getElementById('m-img').src = p.photo;
     document.getElementById('m-brand').innerText = p.brand;
     document.getElementById('m-title').innerText = p.nameUK || p.name;
-    document.getElementById('m-desc').innerText = p.descUK || p.desc || "Преміальна якість, оригінальне звучання компонентів.";
     
     let html = '';
     [{l:'2ml', p:p.price2ml}, {l:'5ml', p:p.price5ml}, {l:'10ml', p:p.price10ml}, {l:'Full', p:p.fullPrice}].forEach(o => {
         if(o.p && o.p !== '---' && o.p !== '') {
             html += `<div onclick="selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${p.nameUK || p.name}', '${p.photo}')" 
-                class="size-btn flex justify-between items-center p-5 rounded-2xl cursor-pointer text-xs font-bold">
-                <span class="uppercase tracking-widest">${o.l}</span><span class="text-[#062C22]">${o.p} zł</span>
+                class="border border-neutral-100 flex justify-between items-center p-4 rounded-xl cursor-pointer text-xs font-bold">
+                <span>${o.l}</span><span>${o.p} zł</span>
             </div>`;
         }
     });
     document.getElementById('m-prices').innerHTML = html;
     document.getElementById('pModal').classList.remove('hidden');
-    document.body.classList.add('lock-scroll');
+    document.body.style.overflow = 'hidden';
 }
 
 function selectSize(el, size, price, brand, name, img) {
-    document.querySelectorAll('.size-btn').forEach(d => d.classList.remove('active'));
-    el.classList.add('active');
+    document.querySelectorAll('#m-prices div').forEach(d => d.style.borderColor = '#F0F0F0');
+    el.style.borderColor = '#C5A059';
     selectedOption = { size, price, brand, name, img, id: Date.now() };
     const btn = document.getElementById('add-to-cart-btn');
     btn.classList.remove('opacity-20', 'cursor-not-allowed');
-    btn.innerText = `Додати • ${price} zł`;
+    btn.innerText = `${i18n[currentLang].add_to_cart} • ${price} zł`;
 }
 
 function addToCart() {
@@ -350,22 +303,22 @@ function addToCart() {
 
 function renderCart() {
     const c = document.getElementById('cart-items');
-    const b = document.getElementById('cart-count');
-    b.innerText = cart.length; b.classList.toggle('hidden', cart.length === 0);
+    document.getElementById('cart-count').innerText = cart.length;
+    document.getElementById('cart-count').classList.toggle('hidden', cart.length === 0);
     let total = 0;
     if (cart.length === 0) {
-        c.innerHTML = `<div class="text-center py-20 text-neutral-300 text-[10px] uppercase font-bold tracking-widest">Кошик порожній</div>`;
+        c.innerHTML = `<div class="text-center py-10 text-neutral-300 text-[9px] uppercase font-bold">${i18n[currentLang].empty_cart}</div>`;
     } else {
         c.innerHTML = cart.map((item, i) => {
             total += parseFloat(item.price);
-            return `<div class="flex gap-6 items-center">
-                <div class="w-20 h-20 bg-neutral-50 rounded-2xl p-4 flex-shrink-0"><img src="${item.img}" class="w-full h-full object-contain mix-blend-multiply"></div>
+            return `<div class="flex gap-4 items-center">
+                <img src="${item.img}" class="w-16 h-16 object-contain bg-neutral-50 rounded-xl p-2">
                 <div class="flex-1 min-w-0">
-                    <div class="text-[8px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${item.brand}</div>
-                    <div class="text-[11px] font-bold truncate text-[#062C22] mb-1">${item.name}</div>
-                    <div class="text-[10px] text-neutral-400 font-bold">${item.size} • ${item.price} zł</div>
+                    <div class="text-[7px] font-black text-[#C5A059] uppercase">${item.brand}</div>
+                    <div class="text-[10px] font-bold truncate">${item.name}</div>
+                    <div class="text-[9px] text-neutral-400">${item.size} • ${item.price} zł</div>
                 </div>
-                <button onclick="removeFromCart(${i})" class="text-neutral-200 hover:text-red-400 p-2"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="removeFromCart(${i})" class="text-neutral-200"><i class="fa-solid fa-xmark"></i></button>
             </div>`;
         }).join('');
     }
@@ -376,23 +329,21 @@ function removeFromCart(i) { cart.splice(i, 1); localStorage.setItem('ps_cart', 
 
 function sendOrder() {
     if (cart.length === 0) return;
-    let t = "🛍️ Замовлення від perfume.shoppee\n\n";
+    let t = `${i18n[currentLang].order_msg}!\n\n`;
     cart.forEach((it, i) => t += `${i+1}. ${it.brand} ${it.name} (${it.size}) - ${it.price} zł\n`);
-    t += `\n💰 Разом: ${document.getElementById('cart-total').innerText}`;
+    t += `\n💰 ${i18n[currentLang].cart_total_label}: ${document.getElementById('cart-total').innerText}`;
     window.open(`https://t.me/${TG_NICK}?text=${encodeURIComponent(t)}`, '_blank');
 }
 
 function toggleSidebar() { 
     document.getElementById('sidebar').classList.toggle('open'); 
     document.getElementById('overlay').classList.toggle('hidden');
-    document.body.classList.toggle('lock-scroll');
 }
 function toggleCart(st) { 
     const p = document.getElementById('cart-panel');
     if (st === true) p.classList.remove('translate-x-full'); else p.classList.toggle('translate-x-full');
-    document.body.classList.toggle('lock-scroll', !p.classList.contains('translate-x-full'));
 }
-function closeModal() { document.getElementById('pModal').classList.add('hidden'); document.body.classList.remove('lock-scroll'); }
+function closeModal() { document.getElementById('pModal').classList.add('hidden'); document.body.style.overflow = ''; }
 
 document.getElementById('add-to-cart-btn').onclick = addToCart;
 init();
