@@ -47,15 +47,15 @@
         .scroll-item { flex: 0 0 160px; scroll-snap-align: start; }
         .scroll-item .img-container { height: 150px; }
 
-        /* АНІМАЦІЯ КАРТКИ */
+        /* Стилі для карток з анімацією */
         .product-card { 
             background: white; 
             border-radius: 24px; 
             border: 1px solid rgba(0,0,0,0.03); 
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
         }
-        
-        /* Ефект при наведенні (тільки для ПК) або тапі */
+
+        /* Ефект при наведенні */
         @media (hover: hover) {
             .product-card:hover {
                 transform: translateY(-8px);
@@ -64,6 +64,11 @@
             }
         }
         
+        /* Запобіжник: якщо AOS не завантажився, показуємо товари */
+        [data-aos] { opacity: 1 !important; transform: none !important; }
+        .aos-init[data-aos] { opacity: 0; transition-property: opacity, transform; }
+        .aos-animate[data-aos] { opacity: 1; transform: translateZ(0); }
+
         #sidebar { background: var(--brand-deep); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         #sidebar.open { transform: translateX(0); }
 
@@ -175,9 +180,6 @@ const i18n = {
 };
 
 async function init() {
-    // Ініціалізація анімацій
-    AOS.init({ duration: 800, once: true, offset: 50 });
-
     const res = await fetch(SPREADSHEET_URL);
     const text = await res.text();
     allProducts = parseCSV(text);
@@ -194,6 +196,11 @@ async function init() {
     updateCatButtons();
     refreshCatalog(); 
     renderCart();
+
+    // Запуск анімації після того, як все завантажено
+    setTimeout(() => {
+        AOS.init({ duration: 800, once: true, offset: 50 });
+    }, 200);
 }
 
 function parseCSV(text) {
@@ -246,7 +253,6 @@ function refreshCatalog() {
                 <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.isNew?.toLowerCase() === 'yes'))}</div>
             </div>
         `;
-        // Перезапуск AOS для нових елементів
         AOS.refresh();
         return;
     }
