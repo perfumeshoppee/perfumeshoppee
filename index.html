@@ -15,8 +15,9 @@
 
         .glass-nav { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(6, 44, 34, 0.08); }
 
-        .img-container { display: flex; align-items: center; justify-content: center; overflow: hidden; background: #f9f9f9; border-radius: 20px; }
-        .img-container img { max-width: 90%; max-height: 90%; object-fit: contain; mix-blend-multiply: multiply; transition: transform 0.5s ease; }
+        /* Виправлено відображення флаконів */
+        .img-container { display: flex; align-items: center; justify-content: center; overflow: hidden; background: #f9f9f9; border-radius: 20px; padding: 10px; height: 100%; width: 100%; }
+        .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-multiply: multiply; }
         
         .scroll-x { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; padding-bottom: 15px; -webkit-overflow-scrolling: touch; }
         .scroll-x::-webkit-scrollbar { display: none; }
@@ -70,12 +71,7 @@
         <a href="#" onclick="filterBy('new'); toggleSidebar(); return false;" data-i18n="menu_news" class="block"></a>
         <a href="#" onclick="filterBy('sale'); toggleSidebar(); return false;" data-i18n="menu_sale" class="block text-red-400"></a>
     </nav>
-
-    <div class="mt-auto pt-6 border-t border-white/10">
-        <a href="https://www.instagram.com/perfume.shoppee?igsh=MWdya2RqbHpweW5vbQ==" target="_blank" class="flex items-center gap-3 text-[#C5A059]">
-            <i class="fa-brands fa-instagram text-xl"></i><span class="text-[9px] uppercase tracking-widest">Instagram</span>
-        </a>
-    </div>
+    <div class="mt-auto pt-6 border-t border-white/10"><a href="https://www.instagram.com/perfume.shoppee?igsh=MWdya2RqbHpweW5vbQ==" target="_blank" class="flex items-center gap-3 text-[#C5A059]"><i class="fa-brands fa-instagram text-xl"></i><span class="text-[9px] uppercase tracking-widest">Instagram</span></a></div>
 </div>
 
 <main class="max-w-7xl mx-auto pb-20">
@@ -120,7 +116,10 @@ const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6Brg
 const TG_NICK = 'elenafragrance';
 
 let allProducts = [], cart = JSON.parse(localStorage.getItem('ps_cart')) || [];
-let curCat = 'all', currentFilter = 'home', selectedOption = null, currentLang = 'UA';
+// Відновлення стану після перезавантаження
+let curCat = localStorage.getItem('ps_curCat') || 'all';
+let currentFilter = localStorage.getItem('ps_currentFilter') || 'home';
+let selectedOption = null, currentLang = 'UA';
 
 const i18n = {
     UA: {
@@ -139,7 +138,20 @@ async function init() {
     const res = await fetch(SPREADSHEET_URL);
     const text = await res.text();
     allProducts = parseCSV(text);
-    updateUI(); refreshCatalog(); renderCart();
+    
+    // СОРТУВАННЯ ЗА АЛФАВІТОМ (Бренд + Назва)
+    allProducts.sort((a, b) => {
+        if (a.brand === "BANNER") return -1;
+        if (b.brand === "BANNER") return 1;
+        let brandCompare = a.brand.localeCompare(b.brand);
+        if (brandCompare !== 0) return brandCompare;
+        return (a.nameUK || a.name).localeCompare(b.nameUK || b.name);
+    });
+
+    updateUI(); 
+    updateCatButtons();
+    refreshCatalog(); 
+    renderCart();
 }
 
 function parseCSV(text) {
@@ -182,7 +194,7 @@ function refreshCatalog() {
     if (currentFilter === 'home' && q === '') {
         const banner = allProducts.find(p => p.brand === "BANNER");
         area.innerHTML = `
-            ${banner ? `<div class="mb-10 rounded-[28px] overflow-hidden"><img src="${banner.photo}" class="w-full object-cover"></div>` : ''}
+            ${banner ? `<div class="mb-10 rounded-[28px] overflow-hidden shadow-sm"><img src="${banner.photo}" class="w-full object-cover"></div>` : ''}
             <div class="mb-12">
                 <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].hits_title}</h2>
                 <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.isBest?.toLowerCase() === 'yes'))}</div>
@@ -231,14 +243,19 @@ function renderList(list) {
     </div>`).join('');
 }
 
-function showAllCatalog() { currentFilter = 'all'; curCat = 'all'; updateCatButtons(); refreshCatalog(); }
-function setCategory(c) { curCat = c; updateCatButtons(); refreshCatalog(); }
+function saveState() {
+    localStorage.setItem('ps_curCat', curCat);
+    localStorage.setItem('ps_currentFilter', currentFilter);
+}
+
+function showAllCatalog() { currentFilter = 'all'; curCat = 'all'; saveState(); updateCatButtons(); refreshCatalog(); }
+function setCategory(c) { curCat = c; saveState(); updateCatButtons(); refreshCatalog(); }
 function updateCatButtons() {
     document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.toggle('active', btn.id === 'cat-' + curCat));
 }
 
-function filterBy(type) { currentFilter = type; window.scrollTo({top: 0, behavior: 'smooth'}); refreshCatalog(); }
-function goHome() { currentFilter = 'home'; curCat = 'all'; refreshCatalog(); }
+function filterBy(type) { currentFilter = type; saveState(); window.scrollTo({top: 0, behavior: 'smooth'}); refreshCatalog(); }
+function goHome() { currentFilter = 'home'; curCat = 'all'; saveState(); refreshCatalog(); }
 
 function openModal(idx) {
     const p = allProducts[idx]; selectedOption = null;
@@ -292,7 +309,7 @@ function renderCart() {
         c.innerHTML = cart.map((item, i) => {
             total += parseFloat(item.price);
             return `<div class="flex gap-4 items-center">
-                <img src="${item.img}" class="w-14 h-14 object-contain bg-neutral-50 rounded-xl p-2">
+                <div class="w-14 h-14 bg-neutral-50 rounded-xl p-2 flex items-center justify-center"><img src="${item.img}" class="max-w-full max-h-full object-contain"></div>
                 <div class="flex-1 min-w-0">
                     <div class="text-[7px] font-black text-[#C5A059] uppercase">${item.brand}</div>
                     <div class="text-[10px] font-bold truncate">${item.name}</div>
