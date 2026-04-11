@@ -26,6 +26,7 @@
             padding: 12px; 
             height: 180px; 
             width: 100%; 
+            position: relative;
         }
         .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-multiply: multiply; }
         
@@ -52,10 +53,21 @@
             border-radius: 24px; 
             border: 1px solid rgba(0,0,0,0.03); 
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
+            position: relative;
+        }
+
+        /* Стиль для проданных товаров */
+        .out-of-stock { opacity: 0.5; filter: grayscale(0.8); }
+        .stock-badge { 
+            position: absolute; top: 10px; right: 10px; 
+            background: #000; color: #fff; 
+            font-size: 8px; padding: 4px 10px; border-radius: 8px; 
+            text-transform: uppercase; font-weight: 800; z-index: 10;
+            letter-spacing: 0.1em;
         }
 
         @media (hover: hover) {
-            .product-card:hover {
+            .product-card:not(.out-of-stock):hover {
                 transform: translateY(-8px);
                 box-shadow: 0 20px 40px rgba(6, 44, 34, 0.08);
                 border-color: rgba(197, 160, 89, 0.2);
@@ -75,7 +87,6 @@
         .modal-content { max-width: 420px; width: 95%; border-radius: 32px; padding: 24px; }
         .lock-scroll { overflow: hidden; }
 
-        /* Стилі для акційної ціни */
         .price-new { color: #ef4444; font-weight: 900; }
         .price-old { color: #a3a3a3; text-decoration: line-through; font-size: 0.85em; margin-left: 5px; font-weight: 400; }
     </style>
@@ -171,12 +182,14 @@ const i18n = {
     UA: {
         search_placeholder: "Пошук аромату...", menu_home: "Головна", menu_catalog: "Каталог", menu_hits: "Хіти", menu_news: "Новинки", menu_sale: "Акції %",
         cat_all: "Усі", cat_female: "Жіночі", cat_male: "Чоловічі", cat_uniseks: "Унісекс", cat_sets: "Набори", hits_title: "Хіти продажу", news_title: "Новинки", cart_title: "Ваш кошик", cart_total_label: "Разом",
-        cart_order_btn: "Оформити в Telegram", add_to_cart: "Додати в кошик", empty_cart: "Кошик порожній", order_msg: "Нове замовлення", default_desc: "Вишуканий аромат з унікальним шлейфом."
+        cart_order_btn: "Оформити в Telegram", add_to_cart: "Додати в кошик", empty_cart: "Кошик порожній", order_msg: "Нове замовлення", default_desc: "Вишуканий аромат з унікальним шлейфом.",
+        out_of_stock: "Немає в наявності", sold_out: "Sold Out"
     },
     PL: {
         search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_hits: "Hity", menu_news: "Nowości", menu_sale: "Promocje %",
         cat_all: "Wszystkie", cat_female: "Damskie", cat_male: "Męskie", cat_uniseks: "Uniseks", cat_sets: "Zestawy", hits_title: "Bestsellery", news_title: "Nowości", cart_title: "Twój koszyk", cart_total_label: "Suma",
-        cart_order_btn: "Zamów przez Telegram", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze."
+        cart_order_btn: "Zamów przez Telegram", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze.",
+        out_of_stock: "Brak w magazynie", sold_out: "Sold Out"
     }
 };
 
@@ -204,7 +217,7 @@ async function init() {
 }
 
 function parseCSV(text) {
-    let rows = [], row = [], col = '', q = false;
+    let rows = [], row = [], col = ''; let q = false;
     for (let i = 0; i < text.length; i++) {
         let c = text[i], n = text[i+1];
         if (c === '"' && q && n === '"') { col += '"'; i++; }
@@ -233,6 +246,12 @@ function setLang(l) {
 function updateUI() {
     document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = i18n[currentLang][el.getAttribute('data-i18n')]);
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = i18n[currentLang][el.getAttribute('data-i18n-placeholder')]);
+}
+
+// ПРОВЕРКА СТАТУСА "OUT"
+function isAvailable(p) {
+    const s = (p.status || "").toLowerCase().trim();
+    return s !== 'out';
 }
 
 function refreshCatalog() {
@@ -274,11 +293,9 @@ function refreshCatalog() {
     AOS.refresh();
 }
 
-// Допоміжна функція для відображення ціни зі знижкою
-function getPriceHTML(p, isScroll = false) {
+function getPriceHTML(p) {
     const mainPrice = p.price2ml || p.fullPrice;
     const oldPrice = p.price2ml ? p.old2ml : p.oldFull;
-    
     if (oldPrice && oldPrice !== '---' && oldPrice !== '') {
         return `<span class="price-new">${mainPrice} zł</span><span class="price-old">${oldPrice} zł</span>`;
     }
@@ -286,27 +303,37 @@ function getPriceHTML(p, isScroll = false) {
 }
 
 function renderScrollList(list) {
-    return list.map((p, index) => `
+    return list.map((p, index) => {
+        const avail = isAvailable(p);
+        return `
         <div onclick="openModal(${allProducts.indexOf(p)})" 
-             class="scroll-item product-card p-4 flex flex-col h-full"
+             class="scroll-item product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''}"
              data-aos="fade-up" data-aos-delay="${index * 50}">
-            <div class="img-container mb-3"><img src="${p.photo}" loading="lazy"></div>
+            <div class="img-container mb-3">
+                ${!avail ? `<div class="stock-badge">${i18n[currentLang].sold_out}</div>` : ''}
+                <img src="${p.photo}" loading="lazy">
+            </div>
             <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
             <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
             <div class="text-[10px] font-black mt-auto text-[#062C22]">${getPriceHTML(p)}</div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 function renderList(list) {
-    return list.map((p, index) => `<div onclick="openModal(${allProducts.indexOf(p)})" 
-        class="product-card p-4 flex flex-col h-full"
+    return list.map((p, index) => {
+        const avail = isAvailable(p);
+        return `<div onclick="openModal(${allProducts.indexOf(p)})" 
+        class="product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''}"
         data-aos="fade-up" data-aos-delay="${(index % 4) * 50}">
-        <div class="img-container mb-4"><img src="${p.photo}" loading="lazy"></div>
+        <div class="img-container mb-4">
+            ${!avail ? `<div class="stock-badge">${i18n[currentLang].sold_out}</div>` : ''}
+            <img src="${p.photo}" loading="lazy">
+        </div>
         <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
         <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
         <div class="text-xs font-black text-[#062C22]">${getPriceHTML(p)}</div>
-    </div>`).join('');
+    </div>`}).join('');
 }
 
 function saveState() {
@@ -325,11 +352,14 @@ function goHome() { currentFilter = 'home'; curCat = 'all'; saveState(); refresh
 
 function openModal(idx) {
     const p = allProducts[idx]; selectedOption = null;
+    const avail = isAvailable(p);
     const btn = document.getElementById('add-to-cart-btn');
+    
     btn.classList.add('opacity-20', 'cursor-not-allowed');
-    btn.innerText = i18n[currentLang].add_to_cart;
+    btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].out_of_stock;
 
     document.getElementById('m-img').src = p.photo;
+    document.getElementById('m-img').style.opacity = avail ? '1' : '0.4';
     document.getElementById('m-brand').innerText = p.brand;
     document.getElementById('m-title').innerText = currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name);
     document.getElementById('m-desc').innerText = currentLang === 'UA' ? (p.descUK || i18n.UA.default_desc) : (p.descPL || i18n.PL.default_desc);
@@ -345,8 +375,8 @@ function openModal(idx) {
     sizes.forEach(o => {
         if(o.p && o.p !== '---' && o.p !== '') {
             const hasDiscount = o.old && o.old !== '---' && o.old !== '';
-            html += `<div onclick="selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo}')" 
-                class="border border-neutral-100 flex justify-between items-center p-4 rounded-xl cursor-pointer text-xs font-bold transition-all hover:bg-neutral-50">
+            html += `<div onclick="${avail ? `selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo}')` : ''}" 
+                class="border border-neutral-100 flex justify-between items-center p-4 rounded-xl ${avail ? 'cursor-pointer hover:bg-neutral-50' : 'opacity-40 cursor-not-allowed'} text-xs font-bold transition-all">
                 <span class="uppercase tracking-widest">${o.l}</span>
                 <span class="text-[#062C22]">
                     ${hasDiscount ? `<span class="price-new">${o.p} zł</span><span class="price-old">${o.old} zł</span>` : `<span>${o.p} zł</span>`}
