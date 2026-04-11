@@ -56,14 +56,13 @@
             position: relative;
         }
 
-        /* Стиль для проданных товаров */
         .out-of-stock { opacity: 0.5; filter: grayscale(0.8); }
         .stock-badge { 
             position: absolute; top: 10px; right: 10px; 
-            background: #000; color: #fff; 
-            font-size: 8px; padding: 4px 10px; border-radius: 8px; 
+            background: rgba(0,0,0,0.7); color: #fff; 
+            font-size: 7px; padding: 4px 8px; border-radius: 8px; 
             text-transform: uppercase; font-weight: 800; z-index: 10;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.05em;
         }
 
         @media (hover: hover) {
@@ -183,13 +182,13 @@ const i18n = {
         search_placeholder: "Пошук аромату...", menu_home: "Головна", menu_catalog: "Каталог", menu_hits: "Хіти", menu_news: "Новинки", menu_sale: "Акції %",
         cat_all: "Усі", cat_female: "Жіночі", cat_male: "Чоловічі", cat_uniseks: "Унісекс", cat_sets: "Набори", hits_title: "Хіти продажу", news_title: "Новинки", cart_title: "Ваш кошик", cart_total_label: "Разом",
         cart_order_btn: "Оформити в Telegram", add_to_cart: "Додати в кошик", empty_cart: "Кошик порожній", order_msg: "Нове замовлення", default_desc: "Вишуканий аромат з унікальним шлейфом.",
-        out_of_stock: "Немає в наявності", sold_out: "Sold Out"
+        sold_badge: "Немає в наявності", out_of_stock_btn: "Немає в наявності"
     },
     PL: {
         search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_hits: "Hity", menu_news: "Nowości", menu_sale: "Promocje %",
         cat_all: "Wszystkie", cat_female: "Damskie", cat_male: "Męskie", cat_uniseks: "Uniseks", cat_sets: "Zestawy", hits_title: "Bestsellery", news_title: "Nowości", cart_title: "Twój koszyk", cart_total_label: "Suma",
         cart_order_btn: "Zamów przez Telegram", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze.",
-        out_of_stock: "Brak w magazynie", sold_out: "Sold Out"
+        sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak в magazynie"
     }
 };
 
@@ -248,7 +247,6 @@ function updateUI() {
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = i18n[currentLang][el.getAttribute('data-i18n-placeholder')]);
 }
 
-// ПРОВЕРКА СТАТУСА "OUT"
 function isAvailable(p) {
     const s = (p.status || "").toLowerCase().trim();
     return s !== 'out';
@@ -310,7 +308,7 @@ function renderScrollList(list) {
              class="scroll-item product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''}"
              data-aos="fade-up" data-aos-delay="${index * 50}">
             <div class="img-container mb-3">
-                ${!avail ? `<div class="stock-badge">${i18n[currentLang].sold_out}</div>` : ''}
+                ${!avail ? `<div class="stock-badge">${i18n[currentLang].sold_badge}</div>` : ''}
                 <img src="${p.photo}" loading="lazy">
             </div>
             <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
@@ -327,7 +325,7 @@ function renderList(list) {
         class="product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''}"
         data-aos="fade-up" data-aos-delay="${(index % 4) * 50}">
         <div class="img-container mb-4">
-            ${!avail ? `<div class="stock-badge">${i18n[currentLang].sold_out}</div>` : ''}
+            ${!avail ? `<div class="stock-badge">${i18n[currentLang].sold_badge}</div>` : ''}
             <img src="${p.photo}" loading="lazy">
         </div>
         <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
@@ -356,7 +354,8 @@ function openModal(idx) {
     const btn = document.getElementById('add-to-cart-btn');
     
     btn.classList.add('opacity-20', 'cursor-not-allowed');
-    btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].out_of_stock;
+    // Текст кнопки из i18n
+    btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].out_of_stock_btn;
 
     document.getElementById('m-img').src = p.photo;
     document.getElementById('m-img').style.opacity = avail ? '1' : '0.4';
