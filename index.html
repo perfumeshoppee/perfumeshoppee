@@ -47,7 +47,6 @@
         .scroll-item { flex: 0 0 160px; scroll-snap-align: start; }
         .scroll-item .img-container { height: 150px; }
 
-        /* Стилі для карток з анімацією */
         .product-card { 
             background: white; 
             border-radius: 24px; 
@@ -55,7 +54,6 @@
             transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
         }
 
-        /* Ефект при наведенні */
         @media (hover: hover) {
             .product-card:hover {
                 transform: translateY(-8px);
@@ -64,7 +62,6 @@
             }
         }
         
-        /* Запобіжник: якщо AOS не завантажився, показуємо товари */
         [data-aos] { opacity: 1 !important; transform: none !important; }
         .aos-init[data-aos] { opacity: 0; transition-property: opacity, transform; }
         .aos-animate[data-aos] { opacity: 1; transform: translateZ(0); }
@@ -77,6 +74,10 @@
         
         .modal-content { max-width: 420px; width: 95%; border-radius: 32px; padding: 24px; }
         .lock-scroll { overflow: hidden; }
+
+        /* Стилі для акційної ціни */
+        .price-new { color: #ef4444; font-weight: 900; }
+        .price-old { color: #a3a3a3; text-decoration: line-through; font-size: 0.85em; margin-left: 5px; font-weight: 400; }
     </style>
 </head>
 <body>
@@ -197,7 +198,6 @@ async function init() {
     refreshCatalog(); 
     renderCart();
 
-    // Запуск анімації після того, як все завантажено
     setTimeout(() => {
         AOS.init({ duration: 800, once: true, offset: 50 });
     }, 200);
@@ -274,6 +274,17 @@ function refreshCatalog() {
     AOS.refresh();
 }
 
+// Допоміжна функція для відображення ціни зі знижкою
+function getPriceHTML(p, isScroll = false) {
+    const mainPrice = p.price2ml || p.fullPrice;
+    const oldPrice = p.price2ml ? p.old2ml : p.oldFull;
+    
+    if (oldPrice && oldPrice !== '---' && oldPrice !== '') {
+        return `<span class="price-new">${mainPrice} zł</span><span class="price-old">${oldPrice} zł</span>`;
+    }
+    return `<span>${mainPrice} zł</span>`;
+}
+
 function renderScrollList(list) {
     return list.map((p, index) => `
         <div onclick="openModal(${allProducts.indexOf(p)})" 
@@ -282,7 +293,7 @@ function renderScrollList(list) {
             <div class="img-container mb-3"><img src="${p.photo}" loading="lazy"></div>
             <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
             <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
-            <div class="text-[10px] font-black mt-auto text-[#062C22]">${p.price2ml || p.fullPrice} zł</div>
+            <div class="text-[10px] font-black mt-auto text-[#062C22]">${getPriceHTML(p)}</div>
         </div>
     `).join('');
 }
@@ -294,7 +305,7 @@ function renderList(list) {
         <div class="img-container mb-4"><img src="${p.photo}" loading="lazy"></div>
         <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
         <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
-        <div class="text-xs font-black text-[#062C22]">${p.price2ml || p.fullPrice} zł</div>
+        <div class="text-xs font-black text-[#062C22]">${getPriceHTML(p)}</div>
     </div>`).join('');
 }
 
@@ -324,11 +335,22 @@ function openModal(idx) {
     document.getElementById('m-desc').innerText = currentLang === 'UA' ? (p.descUK || i18n.UA.default_desc) : (p.descPL || i18n.PL.default_desc);
     
     let html = '';
-    [{l:'2ml', p:p.price2ml}, {l:'5ml', p:p.price5ml}, {l:'10ml', p:p.price10ml}, {l:'Full', p:p.fullPrice}].forEach(o => {
+    const sizes = [
+        {l:'2ml', p:p.price2ml, old:p.old2ml}, 
+        {l:'5ml', p:p.price5ml, old:p.old5ml}, 
+        {l:'10ml', p:p.price10ml, old:p.old10ml}, 
+        {l:'Full', p:p.fullPrice, old:p.oldFull}
+    ];
+
+    sizes.forEach(o => {
         if(o.p && o.p !== '---' && o.p !== '') {
+            const hasDiscount = o.old && o.old !== '---' && o.old !== '';
             html += `<div onclick="selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo}')" 
                 class="border border-neutral-100 flex justify-between items-center p-4 rounded-xl cursor-pointer text-xs font-bold transition-all hover:bg-neutral-50">
-                <span class="uppercase tracking-widest">${o.l}</span><span class="text-[#062C22]">${o.p} zł</span>
+                <span class="uppercase tracking-widest">${o.l}</span>
+                <span class="text-[#062C22]">
+                    ${hasDiscount ? `<span class="price-new">${o.p} zł</span><span class="price-old">${o.old} zł</span>` : `<span>${o.p} zł</span>`}
+                </span>
             </div>`;
         }
     });
