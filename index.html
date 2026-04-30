@@ -94,7 +94,6 @@
         <a href="#" onclick="filterBy('new'); toggleSidebar(); return false;" data-i18n="menu_news" class="block"></a>
         <a href="#" onclick="filterBy('sale'); toggleSidebar(); return false;" data-i18n="menu_sale" class="block text-red-400"></a>
     </nav>
-    <div class="mt-auto pt-6 border-t border-white/10"><a href="https://www.instagram.com/perfume.shoppee?igsh=MWdya2RqbHpweW5vbQ==" target="_blank" class="flex items-center gap-3 text-[#C5A059]"><i class="fa-brands fa-instagram text-xl"></i><span class="text-[9px] uppercase tracking-widest">Instagram</span></a></div>
 </div>
 
 <main class="max-w-7xl mx-auto pb-20">
@@ -139,7 +138,9 @@ const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6Brg
 const TG_NICK = 'elenafragrance';
 
 let allProducts = [], cart = JSON.parse(localStorage.getItem('ps_cart')) || [];
-let curCat = 'all', currentFilter = 'home', currentLang = 'UA', selectedOption = null;
+let curCat = 'all';
+let currentFilter = 'home';
+let selectedOption = null, currentLang = 'UA';
 
 const i18n = {
     UA: {
@@ -169,12 +170,12 @@ async function init() {
         updateUI(); 
         refreshCatalog(); 
         renderCart();
-    } catch (e) { console.error("Load error", e); }
+    } catch (e) { console.error("Init Error", e); }
 }
 
 function parseCSV(text) {
     const lines = text.split('\n').filter(l => l.trim() !== '');
-    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+    const headers = lines[0].split(',').map(h => h.trim());
     return lines.slice(1).map(line => {
         const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
         let obj = {};
@@ -201,12 +202,13 @@ function updateUI() {
 function refreshCatalog() {
     const q = document.getElementById('searchInput').value.toLowerCase().trim();
     const area = document.getElementById('catalog-area');
-    document.getElementById('catalog-filters').classList.toggle('hidden', currentFilter !== 'all');
+    const filtersDiv = document.getElementById('catalog-filters');
 
     if (currentFilter === 'home' && q === '') {
+        filtersDiv.classList.add('hidden');
         const banner = allProducts.find(p => p.brand === "BANNER");
-        const hits = allProducts.filter(p => p.isbest?.toLowerCase() === 'yes');
-        const news = allProducts.filter(p => p.isnew?.toLowerCase() === 'yes');
+        const hits = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes');
+        const news = allProducts.filter(p => p.isNew?.toLowerCase() === 'yes');
         area.innerHTML = `
             ${banner ? `<div class="mb-10 rounded-[28px] overflow-hidden shadow-sm"><img src="${banner.photo}" class="w-full object-cover"></div>` : ''}
             <div class="mb-12"><h2 class="text-[10px] font-bold uppercase opacity-40 mb-6">${i18n[currentLang].hits_title}</h2><div class="scroll-x">${renderScrollList(hits)}</div></div>
@@ -215,17 +217,21 @@ function refreshCatalog() {
         return;
     }
 
+    filtersDiv.classList.remove('hidden');
     let filtered = allProducts.filter(p => {
         if (!p.brand || p.brand === "BANNER") return false;
-        const name = (currentLang === 'UA' ? p.nameuk : p.namepl) || p.nameuk || "";
+        const name = (currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)) || "";
         const matchSearch = (p.brand + " " + name).toLowerCase().includes(q);
-        const pCat = (p.category || "").toLowerCase().trim();
+        
         let matchFilter = true;
-        if (currentFilter === 'hit') matchFilter = p.isbest?.toLowerCase() === 'yes';
-        else if (currentFilter === 'new') matchFilter = p.isnew?.toLowerCase() === 'yes';
-        else if (currentFilter === 'sale') matchFilter = (p.old2ml || p.oldfull);
-        else if (currentFilter === 'all') matchFilter = (curCat === 'all' || pCat === curCat);
-        return matchSearch && matchFilter && p.status !== 'out';
+        if (currentFilter === 'hit') matchFilter = p.isBest?.toLowerCase() === 'yes';
+        else if (currentFilter === 'new') matchFilter = p.isNew?.toLowerCase() === 'yes';
+        else if (currentFilter === 'sale') matchFilter = (p.old2ml || p.oldFull);
+        
+        const pCat = (p.category || "").toLowerCase().trim();
+        const matchCat = (curCat === 'all' || pCat === curCat);
+
+        return matchSearch && matchFilter && matchCat && p.status !== 'out';
     });
 
     area.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-4 gap-4">${renderList(filtered)}</div>`;
@@ -236,26 +242,27 @@ function renderScrollList(list) {
         <div onclick="openModal(${allProducts.indexOf(p)})" class="scroll-item product-card p-4 flex flex-col h-full">
             <div class="img-container mb-3"><img src="${p.photo}"></div>
             <div class="text-[7px] font-black text-[#C5A059] uppercase mb-1">${p.brand}</div>
-            <div class="product-title">${currentLang === 'UA' ? (p.nameuk || p.brand) : (p.namepl || p.brand)}</div>
-            <div class="text-[10px] font-bold mt-auto text-[#062C22]">${p.price2ml || p.fullprice} zł</div>
+            <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
+            <div class="text-[10px] font-bold mt-auto text-[#062C22]">${p.price2ml || p.fullPrice} zł</div>
         </div>
     `).join('');
 }
 
 function renderList(list) {
+    if(list.length === 0) return `<div class="col-span-2 text-center py-20 opacity-20 uppercase text-[10px] font-bold">Нічого не знайдено</div>`;
     return list.map(p => `<div onclick="openModal(${allProducts.indexOf(p)})" class="product-card p-4 flex flex-col h-full">
         <div class="img-container mb-4"><img src="${p.photo}"></div>
         <div class="text-[7px] font-black text-[#C5A059] uppercase mb-1">${p.brand}</div>
-        <div class="product-title">${currentLang === 'UA' ? (p.nameuk || p.brand) : (p.namepl || p.brand)}</div>
-        <div class="text-xs font-bold text-[#062C22]">${p.price2ml || p.fullprice} zł</div>
+        <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
+        <div class="text-xs font-bold text-[#062C22]">${p.price2ml || p.fullPrice} zł</div>
     </div>`).join('');
 }
 
 function showAllCatalog() { currentFilter = 'all'; curCat = 'all'; updateCatButtons(); refreshCatalog(); }
 function setCategory(c) { curCat = c; updateCatButtons(); refreshCatalog(); }
 function updateCatButtons() { document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.toggle('active', btn.id === 'cat-' + curCat)); }
-function filterBy(type) { currentFilter = type; refreshCatalog(); }
-function goHome() { currentFilter = 'home'; refreshCatalog(); }
+function filterBy(type) { currentFilter = type; curCat = 'all'; updateCatButtons(); refreshCatalog(); }
+function goHome() { currentFilter = 'home'; curCat = 'all'; refreshCatalog(); }
 
 function openModal(idx) {
     const p = allProducts[idx]; selectedOption = null;
@@ -264,13 +271,12 @@ function openModal(idx) {
     btn.innerText = i18n[currentLang].add_to_cart;
     document.getElementById('m-img').src = p.photo;
     document.getElementById('m-brand').innerText = p.brand;
-    document.getElementById('m-title').innerText = currentLang === 'UA' ? (p.nameuk || p.brand) : (p.namepl || p.brand);
-    document.getElementById('m-desc').innerText = (currentLang === 'UA' ? p.descuk : p.descpl) || i18n[currentLang].default_desc;
+    document.getElementById('m-title').innerText = currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name);
+    document.getElementById('m-desc').innerText = (currentLang === 'UA' ? p.descUK : p.descPL) || i18n[currentLang].default_desc;
     let html = '';
-    const opts = [{l:'2ml', p:p.price2ml}, {l:'5ml', p:p.price5ml}, {l:'10ml', p:p.price10ml}, {l:'Full', p:p.fullprice}];
-    opts.forEach(o => {
+    [{l:'2ml', p:p.price2ml}, {l:'5ml', p:p.price5ml}, {l:'10ml', p:p.price10ml}, {l:'Full', p:p.fullPrice}].forEach(o => {
         if(o.p && o.p !== '---' && o.p !== '') {
-            html += `<div onclick="selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameuk || p.brand) : (p.namepl || p.brand)}', '${p.photo}')" 
+            html += `<div onclick="selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo}')" 
                 class="border border-neutral-100 flex justify-between items-center p-4 rounded-xl cursor-pointer text-xs font-bold transition-all hover:bg-neutral-50">
                 <span>${o.l}</span><span class="text-[#062C22]">${o.p} zł</span>
             </div>`;
