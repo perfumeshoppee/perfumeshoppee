@@ -72,10 +72,6 @@
                 border-color: rgba(197, 160, 89, 0.2);
             }
         }
-        
-        [data-aos] { opacity: 1 !important; transform: none !important; }
-        .aos-init[data-aos] { opacity: 0; transition-property: opacity, transform; }
-        .aos-animate[data-aos] { opacity: 1; transform: translateZ(0); }
 
         #sidebar { background: var(--brand-deep); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         #sidebar.open { transform: translateX(0); }
@@ -88,6 +84,8 @@
 
         .price-new { color: #ef4444; font-weight: 900; }
         .price-old { color: #a3a3a3; text-decoration: line-through; font-size: 0.85em; margin-left: 5px; font-weight: 400; }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
@@ -100,7 +98,7 @@
   </div>
 </nav>
 
-<div class="px-6 py-4 bg-white" data-aos="fade-down">
+<div class="px-6 py-4 bg-white">
     <div class="relative max-w-2xl mx-auto">
         <input id="searchInput" type="text" onkeyup="refreshCatalog()" class="w-full bg-neutral-100 rounded-2xl py-4 px-12 text-sm outline-none" data-i18n-placeholder="search_placeholder">
         <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-neutral-300 text-xs"></i>
@@ -137,7 +135,9 @@
       <button onclick="setCategory('uniseks')" id="cat-uniseks" class="cat-btn px-6 py-2 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[9px] font-bold uppercase tracking-widest" data-i18n="cat_uniseks"></button>
       <button onclick="setCategory('sets')" id="cat-sets" class="cat-btn px-6 py-2 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[9px] font-bold uppercase tracking-widest" data-i18n="cat_sets"></button>
     </div>
-    <div id="catalog-area" class="px-6"></div>
+    <div id="catalog-area" class="px-6 min-h-[50vh]">
+        <div class="flex justify-center items-center py-20 text-neutral-300"><i class="fa-solid fa-circle-notch fa-spin text-2xl"></i></div>
+    </div>
 </main>
 
 <div id="cart-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[10000] shadow-2xl transform translate-x-full transition-transform duration-500 flex flex-col">
@@ -169,12 +169,13 @@
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
 <script>
-const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
+// ОБНОВЛЕННАЯ ССЫЛКА (формат CSV экспорта)
+const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/17lsowoX7ko9bhSjNjHcMUypha_PKMsj_uuUhCPwTKhA/export?format=csv';
 const TG_NICK = 'elenafragrance';
 
 let allProducts = [], cart = JSON.parse(localStorage.getItem('ps_cart')) || [];
-let curCat = localStorage.getItem('ps_curCat') || 'all';
-let currentFilter = localStorage.getItem('ps_currentFilter') || 'home';
+let curCat = 'all';
+let currentFilter = 'home';
 let selectedOption = null, currentLang = 'UA';
 
 const i18n = {
@@ -188,31 +189,29 @@ const i18n = {
         search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_hits: "Hity", menu_news: "Nowości", menu_sale: "Promocje %",
         cat_all: "Wszystkie", cat_female: "Damskie", cat_male: "Męskie", cat_uniseks: "Uniseks", cat_sets: "Zestawy", hits_title: "Bestsellery", news_title: "Nowości", cart_title: "Twój koszyk", cart_total_label: "Suma",
         cart_order_btn: "Zamów przez Telegram", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze.",
-        sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak в magazynie"
+        sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak w magazynie"
     }
 };
 
 async function init() {
-    const res = await fetch(SPREADSHEET_URL);
-    const text = await res.text();
-    allProducts = parseCSV(text);
-    
-    allProducts.sort((a, b) => {
-        if (a.brand === "BANNER") return -1;
-        if (b.brand === "BANNER") return 1;
-        let brandCompare = a.brand.localeCompare(b.brand);
-        if (brandCompare !== 0) return brandCompare;
-        return (a.nameUK || a.name).localeCompare(b.nameUK || b.name);
-    });
+    try {
+        const res = await fetch(SPREADSHEET_URL);
+        const text = await res.text();
+        allProducts = parseCSV(text);
+        
+        allProducts.sort((a, b) => {
+            if (a.brand === "BANNER") return -1;
+            if (b.brand === "BANNER") return 1;
+            return a.brand.localeCompare(b.brand);
+        });
 
-    updateUI(); 
-    updateCatButtons();
-    refreshCatalog(); 
-    renderCart();
-
-    setTimeout(() => {
-        AOS.init({ duration: 800, once: true, offset: 50 });
-    }, 200);
+        updateUI(); 
+        refreshCatalog(); 
+        renderCart();
+        AOS.init({ duration: 800, once: true });
+    } catch (e) {
+        console.error("Data load error", e);
+    }
 }
 
 function parseCSV(text) {
@@ -237,8 +236,7 @@ function parseCSV(text) {
 
 function setLang(l) {
     currentLang = l;
-    document.querySelectorAll('.lang-node').forEach(b => b.classList.remove('active'));
-    document.getElementById('btn-' + l.toLowerCase()).classList.add('active');
+    document.querySelectorAll('.lang-node').forEach(b => b.classList.toggle('active', b.id === 'btn-' + l.toLowerCase()));
     updateUI(); refreshCatalog(); renderCart();
 }
 
@@ -248,8 +246,7 @@ function updateUI() {
 }
 
 function isAvailable(p) {
-    const s = (p.status || "").toLowerCase().trim();
-    return s !== 'out';
+    return (p.status || "").toLowerCase().trim() !== 'out';
 }
 
 function refreshCatalog() {
@@ -262,15 +259,14 @@ function refreshCatalog() {
         area.innerHTML = `
             ${banner ? `<div class="mb-10 rounded-[28px] overflow-hidden shadow-sm" data-aos="zoom-in"><img src="${banner.photo}" class="w-full object-cover"></div>` : ''}
             <div class="mb-12">
-                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40" data-aos="fade-right">${i18n[currentLang].hits_title}</h2>
+                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].hits_title}</h2>
                 <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.isBest?.toLowerCase() === 'yes'))}</div>
             </div>
             <div class="mb-12">
-                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40" data-aos="fade-right">${i18n[currentLang].news_title}</h2>
+                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].news_title}</h2>
                 <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.isNew?.toLowerCase() === 'yes'))}</div>
             </div>
         `;
-        AOS.refresh();
         return;
     }
 
@@ -279,16 +275,17 @@ function refreshCatalog() {
         const nameVal = (currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)).toLowerCase();
         const matchSearch = (p.brand.toLowerCase() + ' ' + nameVal).includes(q);
         const catValue = p.category?.toLowerCase().trim();
+        
         let matchSpecial = true;
         if (currentFilter === 'new') matchSpecial = p.isNew?.toLowerCase() === 'yes';
         if (currentFilter === 'hit') matchSpecial = p.isBest?.toLowerCase() === 'yes';
         if (currentFilter === 'sale') matchSpecial = !!(p.old2ml || p.oldFull);
+        
         const matchCat = (curCat === 'all' || currentFilter !== 'all') || (catValue === curCat);
         return matchSearch && matchCat && matchSpecial;
     });
 
     area.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-4 gap-4">${renderList(filtered)}</div>`;
-    AOS.refresh();
 }
 
 function getPriceHTML(p) {
@@ -301,12 +298,11 @@ function getPriceHTML(p) {
 }
 
 function renderScrollList(list) {
+    if(!list.length) return `<div class="text-neutral-200 text-[10px] py-4 uppercase">Скоро буде...</div>`;
     return list.map((p, index) => {
         const avail = isAvailable(p);
         return `
-        <div onclick="openModal(${allProducts.indexOf(p)})" 
-             class="scroll-item product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''}"
-             data-aos="fade-up" data-aos-delay="${index * 50}">
+        <div onclick="openModal(${allProducts.indexOf(p)})" class="scroll-item product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''}">
             <div class="img-container mb-3">
                 ${!avail ? `<div class="stock-badge">${i18n[currentLang].sold_badge}</div>` : ''}
                 <img src="${p.photo}" loading="lazy">
@@ -314,16 +310,15 @@ function renderScrollList(list) {
             <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
             <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
             <div class="text-[10px] font-black mt-auto text-[#062C22]">${getPriceHTML(p)}</div>
-        </div>
-    `}).join('');
+        </div>`
+    }).join('');
 }
 
 function renderList(list) {
+    if(!list.length) return `<div class="col-span-full text-center py-20 text-neutral-300 uppercase text-[10px] font-bold tracking-widest">Нічого не знайдено</div>`;
     return list.map((p, index) => {
         const avail = isAvailable(p);
-        return `<div onclick="openModal(${allProducts.indexOf(p)})" 
-        class="product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''}"
-        data-aos="fade-up" data-aos-delay="${(index % 4) * 50}">
+        return `<div onclick="openModal(${allProducts.indexOf(p)})" class="product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''}">
         <div class="img-container mb-4">
             ${!avail ? `<div class="stock-badge">${i18n[currentLang].sold_badge}</div>` : ''}
             <img src="${p.photo}" loading="lazy">
@@ -334,19 +329,14 @@ function renderList(list) {
     </div>`}).join('');
 }
 
-function saveState() {
-    localStorage.setItem('ps_curCat', curCat);
-    localStorage.setItem('ps_currentFilter', currentFilter);
-}
-
-function showAllCatalog() { currentFilter = 'all'; curCat = 'all'; saveState(); updateCatButtons(); refreshCatalog(); }
-function setCategory(c) { curCat = c; saveState(); updateCatButtons(); refreshCatalog(); }
+function showAllCatalog() { currentFilter = 'all'; curCat = 'all'; updateCatButtons(); refreshCatalog(); }
+function setCategory(c) { curCat = c; updateCatButtons(); refreshCatalog(); }
 function updateCatButtons() {
     document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.toggle('active', btn.id === 'cat-' + curCat));
 }
 
-function filterBy(type) { currentFilter = type; saveState(); window.scrollTo({top: 0, behavior: 'smooth'}); refreshCatalog(); }
-function goHome() { currentFilter = 'home'; curCat = 'all'; saveState(); refreshCatalog(); }
+function filterBy(type) { currentFilter = type; window.scrollTo({top: 0, behavior: 'smooth'}); refreshCatalog(); }
+function goHome() { currentFilter = 'home'; curCat = 'all'; refreshCatalog(); }
 
 function openModal(idx) {
     const p = allProducts[idx]; selectedOption = null;
@@ -354,7 +344,6 @@ function openModal(idx) {
     const btn = document.getElementById('add-to-cart-btn');
     
     btn.classList.add('opacity-20', 'cursor-not-allowed');
-    // Текст кнопки из i18n
     btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].out_of_stock_btn;
 
     document.getElementById('m-img').src = p.photo;
@@ -364,22 +353,14 @@ function openModal(idx) {
     document.getElementById('m-desc').innerText = currentLang === 'UA' ? (p.descUK || i18n.UA.default_desc) : (p.descPL || i18n.PL.default_desc);
     
     let html = '';
-    const sizes = [
-        {l:'2ml', p:p.price2ml, old:p.old2ml}, 
-        {l:'5ml', p:p.price5ml, old:p.old5ml}, 
-        {l:'10ml', p:p.price10ml, old:p.old10ml}, 
-        {l:'Full', p:p.fullPrice, old:p.oldFull}
-    ];
+    const sizes = [{l:'2ml', p:p.price2ml, old:p.old2ml}, {l:'5ml', p:p.price5ml, old:p.old5ml}, {l:'10ml', p:p.price10ml, old:p.old10ml}, {l:'Full', p:p.fullPrice, old:p.oldFull}];
 
     sizes.forEach(o => {
         if(o.p && o.p !== '---' && o.p !== '') {
-            const hasDiscount = o.old && o.old !== '---' && o.old !== '';
             html += `<div onclick="${avail ? `selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo}')` : ''}" 
                 class="border border-neutral-100 flex justify-between items-center p-4 rounded-xl ${avail ? 'cursor-pointer hover:bg-neutral-50' : 'opacity-40 cursor-not-allowed'} text-xs font-bold transition-all">
                 <span class="uppercase tracking-widest">${o.l}</span>
-                <span class="text-[#062C22]">
-                    ${hasDiscount ? `<span class="price-new">${o.p} zł</span><span class="price-old">${o.old} zł</span>` : `<span>${o.p} zł</span>`}
-                </span>
+                <span class="text-[#062C22]">${o.old && o.old !== '---' ? `<span class="price-new">${o.p} zł</span><span class="price-old">${o.old} zł</span>` : `<span>${o.p} zł</span>`}</span>
             </div>`;
         }
     });
@@ -421,7 +402,7 @@ function renderCart() {
                     <div class="text-[10px] font-bold truncate">${item.name}</div>
                     <div class="text-[9px] text-neutral-400 font-bold">${item.size} • ${item.price} zł</div>
                 </div>
-                <button onclick="removeFromCart(${i})" class="text-neutral-200 hover:text-red-400"><i class="fa-solid fa-xmark"></i></button>
+                <button onclick="removeFromCart(${i})" class="text-neutral-200"><i class="fa-solid fa-xmark"></i></button>
             </div>`;
         }).join('');
     }
@@ -438,15 +419,8 @@ function sendOrder() {
     window.open(`https://t.me/${TG_NICK}?text=${encodeURIComponent(t)}`, '_blank');
 }
 
-function toggleSidebar() { 
-    document.getElementById('sidebar').classList.toggle('open'); 
-    document.getElementById('overlay').classList.toggle('hidden');
-    document.body.classList.toggle('lock-scroll');
-}
-function toggleCart(st) { 
-    const p = document.getElementById('cart-panel');
-    if (st === true) p.classList.remove('translate-x-full'); else p.classList.toggle('translate-x-full');
-}
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('hidden'); }
+function toggleCart(st) { const p = document.getElementById('cart-panel'); if (st === true) p.classList.remove('translate-x-full'); else p.classList.toggle('translate-x-full'); }
 function closeModal() { document.getElementById('pModal').classList.add('hidden'); document.body.classList.remove('lock-scroll'); }
 
 document.getElementById('add-to-cart-btn').onclick = addToCart;
