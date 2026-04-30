@@ -252,6 +252,11 @@ function isAvailable(p) {
     return s !== 'out';
 }
 
+function getPhotoPath(photo) {
+    if (!photo) return "";
+    return photo.includes("http") ? photo : `img/${photo}`;
+}
+
 function getPriceHTML(p) {
     const isSet = p.category?.toLowerCase().trim() === 'sets';
     const mainPrice = isSet ? p.fullPrice : (p.price2ml || p.fullPrice);
@@ -270,7 +275,7 @@ function refreshCatalog() {
     if (currentFilter === 'home' && q === '') {
         const banner = allProducts.find(p => p.brand === "BANNER");
         area.innerHTML = `
-            ${banner ? `<div class="mb-10 rounded-[28px] overflow-hidden shadow-sm" data-aos="zoom-in"><img src="${banner.photo}" class="w-full object-cover"></div>` : ''}
+            ${banner ? `<div class="mb-10 rounded-[28px] overflow-hidden shadow-sm" data-aos="zoom-in"><img src="${getPhotoPath(banner.photo)}" class="w-full object-cover"></div>` : ''}
             <div class="mb-12">
                 <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40" data-aos="fade-right">${i18n[currentLang].hits_title}</h2>
                 <div class="scroll-x">${renderList(allProducts.filter(p => p.isBest?.toLowerCase() === 'yes'), true)}</div>
@@ -304,12 +309,13 @@ function refreshCatalog() {
 function renderList(list, isScroll) {
     return list.map((p, index) => {
         const avail = isAvailable(p);
+        const photo = getPhotoPath(p.photo);
         return `<div onclick="openModal(${allProducts.indexOf(p)})" 
         class="${isScroll ? 'scroll-item' : ''} product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''}"
         data-aos="fade-up" data-aos-delay="${(index % 4) * 50}">
         <div class="img-container mb-4">
             ${!avail ? `<div class="stock-badge">${i18n[currentLang].sold_badge}</div>` : ''}
-            <img src="${p.photo}" loading="lazy">
+            <img src="${photo}" loading="lazy">
         </div>
         <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
         <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
@@ -334,35 +340,37 @@ function goHome() { currentFilter = 'home'; curCat = 'all'; saveState(); refresh
 function openModal(idx) {
     const p = allProducts[idx]; selectedOption = null;
     const avail = isAvailable(p);
-    const isSet = p.category?.toLowerCase().trim() === 'sets';
+    const photo = getPhotoPath(p.photo);
     const btn = document.getElementById('add-to-cart-btn');
     
     btn.classList.add('opacity-20', 'cursor-not-allowed');
     btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].out_of_stock_btn;
 
-    document.getElementById('m-img').src = p.photo;
+    document.getElementById('m-img').src = photo;
     document.getElementById('m-brand').innerText = p.brand;
     document.getElementById('m-title').innerText = currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name);
     document.getElementById('m-desc').innerText = currentLang === 'UA' ? (p.descUK || i18n.UA.default_desc) : (p.descPL || i18n.PL.default_desc);
     
     let html = '';
-    const sizes = isSet ? [{l: i18n[currentLang].set_label, p:p.fullPrice, old:p.oldFull}] : [
+    const sizes = [
         {l:'2ml', p:p.price2ml, old:p.old2ml}, 
         {l:'5ml', p:p.price5ml, old:p.old5ml}, 
         {l:'10ml', p:p.price10ml, old:p.old10ml}, 
         {l:'Full', p:p.fullPrice, old:p.oldFull}
-    ];
+    ].filter(o => o.p && o.p !== '---' && o.p !== '');
+
+    if (sizes.length === 0) {
+        sizes.push({l: i18n[currentLang].set_label, p:p.fullPrice, old:p.oldFull});
+    }
 
     sizes.forEach(o => {
-        if(o.p && o.p !== '---' && o.p !== '') {
-            html += `<div onclick="${avail ? `selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo}')` : ''}" 
-                class="border border-neutral-100 flex justify-between items-center p-4 rounded-xl ${avail ? 'cursor-pointer hover:bg-neutral-50' : 'opacity-40 cursor-not-allowed'} text-xs font-bold transition-all">
-                <span class="uppercase tracking-widest">${o.l}</span>
-                <span class="text-[#062C22]">
-                    ${o.old && o.old !== '---' ? `<span class="price-new">${o.p} zł</span><span class="price-old">${o.old} zł</span>` : `<span>${o.p} zł</span>`}
-                </span>
-            </div>`;
-        }
+        html += `<div onclick="${avail ? `selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${photo}')` : ''}" 
+            class="border border-neutral-100 flex justify-between items-center p-4 rounded-xl ${avail ? 'cursor-pointer hover:bg-neutral-50' : 'opacity-40 cursor-not-allowed'} text-xs font-bold transition-all">
+            <span class="uppercase tracking-widest">${o.l}</span>
+            <span class="text-[#062C22]">
+                ${o.old && o.old !== '---' && o.old !== '' ? `<span class="price-new">${o.p} zł</span><span class="price-old">${o.old} zł</span>` : `<span>${o.p} zł</span>`}
+            </span>
+        </div>`;
     });
     document.getElementById('m-prices').innerHTML = html;
     document.getElementById('pModal').classList.remove('hidden');
