@@ -200,9 +200,9 @@ async function init() {
     allProducts.sort((a, b) => {
         if (a.brand === "BANNER") return -1;
         if (b.brand === "BANNER") return 1;
-        let brandCompare = (a.brand || "").localeCompare(b.brand || "");
+        let brandCompare = a.brand.localeCompare(b.brand);
         if (brandCompare !== 0) return brandCompare;
-        return (a.nameUK || a.name || "").localeCompare(b.nameUK || b.name || "");
+        return (a.nameUK || a.name).localeCompare(b.nameUK || b.name);
     });
 
     updateUI(); 
@@ -215,20 +215,23 @@ async function init() {
     }, 200);
 }
 
-// Покращений парсер CSV для складних текстів
 function parseCSV(text) {
-    const lines = text.split(/\r?\n/).filter(line => line.trim() !== "");
-    if (lines.length === 0) return [];
-
-    const headers = lines[0].split(',').map(h => h.trim());
-    
-    return lines.slice(1).map(line => {
-        const matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
-        const row = matches.map(m => m.replace(/^"|"$/g, '').trim());
-        
-        let obj = {};
-        headers.forEach((h, i) => obj[h] = row[i] || "");
-        return obj;
+    let rows = [], row = [], col = ''; let q = false;
+    for (let i = 0; i < text.length; i++) {
+        let c = text[i], n = text[i+1];
+        if (c === '"' && q && n === '"') { col += '"'; i++; }
+        else if (c === '"') q = !q;
+        else if (c === ',' && !q) { row.push(col.trim()); col = ''; }
+        else if ((c === '\r' || c === '\n') && !q) {
+            if (col || row.length) { row.push(col.trim()); rows.push(row); }
+            row = []; col = ''; if (c === '\r' && n === '\n') i++;
+        } else col += c;
+    }
+    if (col || row.length) { row.push(col.trim()); rows.push(row); }
+    const h = rows[0];
+    return rows.slice(1).map(r => {
+        let o = {}; h.forEach((k, i) => o[k] = r[i] || "");
+        return o;
     });
 }
 
@@ -250,24 +253,20 @@ function isAvailable(p) {
 }
 
 function refreshCatalog() {
-    const q = document.getElementById('searchInput').value.toLowerCase().trim();
+    const q = document.getElementById('searchInput').value.toLowerCase();
     const area = document.getElementById('catalog-area');
-    const filtersDiv = document.getElementById('catalog-filters');
+    document.getElementById('catalog-filters').classList.toggle('hidden', currentFilter !== 'all');
 
-    // Показуємо кнопки категорій ТІЛЬКИ в режимі Каталогу
-    filtersDiv.classList.toggle('hidden', currentFilter !== 'all');
-
-    // Якщо це головна сторінка і пошук порожній
     if (currentFilter === 'home' && q === '') {
         const banner = allProducts.find(p => p.brand === "BANNER");
         area.innerHTML = `
             ${banner ? `<div class="mb-10 rounded-[28px] overflow-hidden shadow-sm" data-aos="zoom-in"><img src="${banner.photo}" class="w-full object-cover"></div>` : ''}
             <div class="mb-12">
-                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].hits_title}</h2>
+                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40" data-aos="fade-right">${i18n[currentLang].hits_title}</h2>
                 <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.isBest?.toLowerCase() === 'yes'))}</div>
             </div>
             <div class="mb-12">
-                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].news_title}</h2>
+                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40" data-aos="fade-right">${i18n[currentLang].news_title}</h2>
                 <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.isNew?.toLowerCase() === 'yes'))}</div>
             </div>
         `;
@@ -275,30 +274,20 @@ function refreshCatalog() {
         return;
     }
 
-    // Логіка фільтрації
     let filtered = allProducts.filter(p => {
         if(p.brand === "BANNER") return false;
-        
         const nameVal = (currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)).toLowerCase();
         const matchSearch = (p.brand.toLowerCase() + ' ' + nameVal).includes(q);
-        
+        const catValue = p.category?.toLowerCase().trim();
         let matchSpecial = true;
         if (currentFilter === 'new') matchSpecial = p.isNew?.toLowerCase() === 'yes';
         if (currentFilter === 'hit') matchSpecial = p.isBest?.toLowerCase() === 'yes';
         if (currentFilter === 'sale') matchSpecial = !!(p.old2ml || p.oldFull);
-
-        const catValue = (p.category || "").toLowerCase().trim();
-        const matchCat = (curCat === 'all' || catValue === curCat);
-
-        return matchSearch && matchSpecial && matchCat;
+        const matchCat = (curCat === 'all' || currentFilter !== 'all') || (catValue === curCat);
+        return matchSearch && matchCat && matchSpecial;
     });
 
-    if (filtered.length === 0) {
-        area.innerHTML = `<div class="text-center py-20 opacity-20 uppercase text-[10px] font-bold">Нічого не знайдено</div>`;
-    } else {
-        area.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-4 gap-4">${renderList(filtered)}</div>`;
-    }
-    
+    area.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-4 gap-4">${renderList(filtered)}</div>`;
     AOS.refresh();
 }
 
@@ -314,9 +303,8 @@ function getPriceHTML(p) {
 function renderScrollList(list) {
     return list.map((p, index) => {
         const avail = isAvailable(p);
-        const idx = allProducts.indexOf(p);
         return `
-        <div onclick="openModal(${idx})" 
+        <div onclick="openModal(${allProducts.indexOf(p)})" 
              class="scroll-item product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''}"
              data-aos="fade-up" data-aos-delay="${index * 50}">
             <div class="img-container mb-3">
@@ -333,8 +321,7 @@ function renderScrollList(list) {
 function renderList(list) {
     return list.map((p, index) => {
         const avail = isAvailable(p);
-        const idx = allProducts.indexOf(p);
-        return `<div onclick="openModal(${idx})" 
+        return `<div onclick="openModal(${allProducts.indexOf(p)})" 
         class="product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''}"
         data-aos="fade-up" data-aos-delay="${(index % 4) * 50}">
         <div class="img-container mb-4">
@@ -358,7 +345,7 @@ function updateCatButtons() {
     document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.toggle('active', btn.id === 'cat-' + curCat));
 }
 
-function filterBy(type) { currentFilter = type; curCat = 'all'; saveState(); window.scrollTo({top: 0, behavior: 'smooth'}); refreshCatalog(); }
+function filterBy(type) { currentFilter = type; saveState(); window.scrollTo({top: 0, behavior: 'smooth'}); refreshCatalog(); }
 function goHome() { currentFilter = 'home'; curCat = 'all'; saveState(); refreshCatalog(); }
 
 function openModal(idx) {
@@ -367,15 +354,14 @@ function openModal(idx) {
     const btn = document.getElementById('add-to-cart-btn');
     
     btn.classList.add('opacity-20', 'cursor-not-allowed');
+    // Текст кнопки из i18n
     btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].out_of_stock_btn;
 
     document.getElementById('m-img').src = p.photo;
     document.getElementById('m-img').style.opacity = avail ? '1' : '0.4';
     document.getElementById('m-brand').innerText = p.brand;
     document.getElementById('m-title').innerText = currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name);
-    
-    // Виправлена назва колонки desUK / desPL
-    document.getElementById('m-desc').innerText = currentLang === 'UA' ? (p.desUK || i18n.UA.default_desc) : (p.desPL || i18n.PL.default_desc);
+    document.getElementById('m-desc').innerText = currentLang === 'UA' ? (p.descUK || i18n.UA.default_desc) : (p.descPL || i18n.PL.default_desc);
     
     let html = '';
     const sizes = [
