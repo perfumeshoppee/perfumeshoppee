@@ -274,16 +274,6 @@ function refreshCatalog() {
         return;
     }
 
-    // ЛОГИКА ДЛЯ НАБОРОВ (Отображение одной картинки вместо списка)
-    if (curCat === 'sets' && q === '' && currentFilter === 'all') {
-        const setItem = allProducts.find(p => p.category?.toLowerCase().trim() === 'sets' && p.photo);
-        if (setItem) {
-            area.innerHTML = `<div class="w-full mt-2" data-aos="fade-up"><img src="${setItem.photo}" class="w-full rounded-[24px] shadow-sm"></div>`;
-            AOS.refresh();
-            return;
-        }
-    }
-
     let filtered = allProducts.filter(p => {
         if(p.brand === "BANNER") return false;
         const nameVal = (currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)).toLowerCase();
