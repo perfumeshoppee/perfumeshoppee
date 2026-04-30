@@ -6,6 +6,7 @@
     <title>perfume.shoppee</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:wght@700&display=swap');
         
@@ -25,6 +26,7 @@
             padding: 12px; 
             height: 180px; 
             width: 100%; 
+            position: relative;
         }
         .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-multiply: multiply; }
         
@@ -46,8 +48,35 @@
         .scroll-item { flex: 0 0 160px; scroll-snap-align: start; }
         .scroll-item .img-container { height: 150px; }
 
-        .product-card { background: white; border-radius: 24px; border: 1px solid rgba(0,0,0,0.03); transition: all 0.3s ease; }
+        .product-card { 
+            background: white; 
+            border-radius: 24px; 
+            border: 1px solid rgba(0,0,0,0.03); 
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); 
+            position: relative;
+        }
+
+        .out-of-stock { opacity: 0.5; filter: grayscale(0.8); }
+        .stock-badge { 
+            position: absolute; top: 10px; right: 10px; 
+            background: rgba(0,0,0,0.7); color: #fff; 
+            font-size: 7px; padding: 4px 8px; border-radius: 8px; 
+            text-transform: uppercase; font-weight: 800; z-index: 10;
+            letter-spacing: 0.05em;
+        }
+
+        @media (hover: hover) {
+            .product-card:not(.out-of-stock):hover {
+                transform: translateY(-8px);
+                box-shadow: 0 20px 40px rgba(6, 44, 34, 0.08);
+                border-color: rgba(197, 160, 89, 0.2);
+            }
+        }
         
+        [data-aos] { opacity: 1 !important; transform: none !important; }
+        .aos-init[data-aos] { opacity: 0; transition-property: opacity, transform; }
+        .aos-animate[data-aos] { opacity: 1; transform: translateZ(0); }
+
         #sidebar { background: var(--brand-deep); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         #sidebar.open { transform: translateX(0); }
 
@@ -56,6 +85,9 @@
         
         .modal-content { max-width: 420px; width: 95%; border-radius: 32px; padding: 24px; }
         .lock-scroll { overflow: hidden; }
+
+        .price-new { color: #ef4444; font-weight: 900; }
+        .price-old { color: #a3a3a3; text-decoration: line-through; font-size: 0.85em; margin-left: 5px; font-weight: 400; }
     </style>
 </head>
 <body>
@@ -68,7 +100,7 @@
   </div>
 </nav>
 
-<div class="px-6 py-4 bg-white">
+<div class="px-6 py-4 bg-white" data-aos="fade-down">
     <div class="relative max-w-2xl mx-auto">
         <input id="searchInput" type="text" onkeyup="refreshCatalog()" class="w-full bg-neutral-100 rounded-2xl py-4 px-12 text-sm outline-none" data-i18n-placeholder="search_placeholder">
         <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-neutral-300 text-xs"></i>
@@ -94,6 +126,7 @@
         <a href="#" onclick="filterBy('new'); toggleSidebar(); return false;" data-i18n="menu_news" class="block"></a>
         <a href="#" onclick="filterBy('sale'); toggleSidebar(); return false;" data-i18n="menu_sale" class="block text-red-400"></a>
     </nav>
+    <div class="mt-auto pt-6 border-t border-white/10"><a href="https://www.instagram.com/perfume.shoppee?igsh=MWdya2RqbHpweW5vbQ==" target="_blank" class="flex items-center gap-3 text-[#C5A059]"><i class="fa-brands fa-instagram text-xl"></i><span class="text-[9px] uppercase tracking-widest">Instagram</span></a></div>
 </div>
 
 <main class="max-w-7xl mx-auto pb-20">
@@ -133,57 +166,72 @@
   </div>
 </div>
 
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
 <script>
 const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
 const TG_NICK = 'elenafragrance';
 
 let allProducts = [], cart = JSON.parse(localStorage.getItem('ps_cart')) || [];
-let curCat = 'all';
-let currentFilter = 'home';
+let curCat = localStorage.getItem('ps_curCat') || 'all';
+let currentFilter = localStorage.getItem('ps_currentFilter') || 'home';
 let selectedOption = null, currentLang = 'UA';
 
 const i18n = {
     UA: {
         search_placeholder: "Пошук аромату...", menu_home: "Головна", menu_catalog: "Каталог", menu_hits: "Хіти", menu_news: "Новинки", menu_sale: "Акції %",
         cat_all: "Усі", cat_female: "Жіночі", cat_male: "Чоловічі", cat_uniseks: "Унісекс", cat_sets: "Набори", hits_title: "Хіти продажу", news_title: "Новинки", cart_title: "Ваш кошик", cart_total_label: "Разом",
-        cart_order_btn: "Оформити в Telegram", add_to_cart: "Додати в кошик", empty_cart: "Кошик порожній", order_msg: "Нове замовлення", default_desc: "Вишуканий аромат з унікальним шлейфом."
+        cart_order_btn: "Оформити в Telegram", add_to_cart: "Додати в кошик", empty_cart: "Кошик порожній", order_msg: "Нове замовлення", default_desc: "Вишуканий аромат з унікальним шлейфом.",
+        sold_badge: "Немає в наявності", out_of_stock_btn: "Немає в наявності"
     },
     PL: {
         search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_hits: "Hity", menu_news: "Nowości", menu_sale: "Promocje %",
         cat_all: "Wszystkie", cat_female: "Damskie", cat_male: "Męskie", cat_uniseks: "Uniseks", cat_sets: "Zestawy", hits_title: "Bestsellery", news_title: "Nowości", cart_title: "Twój koszyk", cart_total_label: "Suma",
-        cart_order_btn: "Zamów przez Telegram", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze."
+        cart_order_btn: "Zamów przez Telegram", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze.",
+        sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak в magazynie"
     }
 };
 
 async function init() {
-    try {
-        const res = await fetch(SPREADSHEET_URL + '&v=' + Date.now());
-        const text = await res.text();
-        allProducts = parseCSV(text);
-        
-        allProducts.sort((a, b) => {
-            if (a.brand === "BANNER") return -1;
-            if (b.brand === "BANNER") return 1;
-            return (a.brand || "").localeCompare(b.brand || "");
-        });
+    const res = await fetch(SPREADSHEET_URL);
+    const text = await res.text();
+    allProducts = parseCSV(text);
+    
+    allProducts.sort((a, b) => {
+        if (a.brand === "BANNER") return -1;
+        if (b.brand === "BANNER") return 1;
+        let brandCompare = a.brand.localeCompare(b.brand);
+        if (brandCompare !== 0) return brandCompare;
+        return (a.nameUK || a.name).localeCompare(b.nameUK || b.name);
+    });
 
-        updateUI(); 
-        refreshCatalog(); 
-        renderCart();
-    } catch (e) { console.error("Init Error", e); }
+    updateUI(); 
+    updateCatButtons();
+    refreshCatalog(); 
+    renderCart();
+
+    setTimeout(() => {
+        AOS.init({ duration: 800, once: true, offset: 50 });
+    }, 200);
 }
 
 function parseCSV(text) {
-    const lines = text.split('\n').filter(l => l.trim() !== '');
-    const headers = lines[0].split(',').map(h => h.trim());
-    return lines.slice(1).map(line => {
-        const values = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/);
-        let obj = {};
-        headers.forEach((h, i) => {
-            let val = values[i] ? values[i].replace(/^"|"$/g, '').trim() : "";
-            obj[h] = val;
-        });
-        return obj;
+    let rows = [], row = [], col = ''; let q = false;
+    for (let i = 0; i < text.length; i++) {
+        let c = text[i], n = text[i+1];
+        if (c === '"' && q && n === '"') { col += '"'; i++; }
+        else if (c === '"') q = !q;
+        else if (c === ',' && !q) { row.push(col.trim()); col = ''; }
+        else if ((c === '\r' || c === '\n') && !q) {
+            if (col || row.length) { row.push(col.trim()); rows.push(row); }
+            row = []; col = ''; if (c === '\r' && n === '\n') i++;
+        } else col += c;
+    }
+    if (col || row.length) { row.push(col.trim()); rows.push(row); }
+    const h = rows[0];
+    return rows.slice(1).map(r => {
+        let o = {}; h.forEach((k, i) => o[k] = r[i] || "");
+        return o;
     });
 }
 
@@ -199,86 +247,139 @@ function updateUI() {
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = i18n[currentLang][el.getAttribute('data-i18n-placeholder')]);
 }
 
+function isAvailable(p) {
+    const s = (p.status || "").toLowerCase().trim();
+    return s !== 'out';
+}
+
 function refreshCatalog() {
-    const q = document.getElementById('searchInput').value.toLowerCase().trim();
+    const q = document.getElementById('searchInput').value.toLowerCase();
     const area = document.getElementById('catalog-area');
-    const filtersDiv = document.getElementById('catalog-filters');
+    document.getElementById('catalog-filters').classList.toggle('hidden', currentFilter !== 'all');
 
     if (currentFilter === 'home' && q === '') {
-        filtersDiv.classList.add('hidden');
         const banner = allProducts.find(p => p.brand === "BANNER");
-        const hits = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes');
-        const news = allProducts.filter(p => p.isNew?.toLowerCase() === 'yes');
         area.innerHTML = `
-            ${banner ? `<div class="mb-10 rounded-[28px] overflow-hidden shadow-sm"><img src="${banner.photo}" class="w-full object-cover"></div>` : ''}
-            <div class="mb-12"><h2 class="text-[10px] font-bold uppercase opacity-40 mb-6">${i18n[currentLang].hits_title}</h2><div class="scroll-x">${renderScrollList(hits)}</div></div>
-            <div class="mb-12"><h2 class="text-[10px] font-bold uppercase opacity-40 mb-6">${i18n[currentLang].news_title}</h2><div class="scroll-x">${renderScrollList(news)}</div></div>
+            ${banner ? `<div class="mb-10 rounded-[28px] overflow-hidden shadow-sm" data-aos="zoom-in"><img src="${banner.photo}" class="w-full object-cover"></div>` : ''}
+            <div class="mb-12">
+                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40" data-aos="fade-right">${i18n[currentLang].hits_title}</h2>
+                <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.isBest?.toLowerCase() === 'yes'))}</div>
+            </div>
+            <div class="mb-12">
+                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40" data-aos="fade-right">${i18n[currentLang].news_title}</h2>
+                <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.isNew?.toLowerCase() === 'yes'))}</div>
+            </div>
         `;
+        AOS.refresh();
         return;
     }
 
-    filtersDiv.classList.remove('hidden');
     let filtered = allProducts.filter(p => {
-        if (!p.brand || p.brand === "BANNER") return false;
-        const name = (currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)) || "";
-        const matchSearch = (p.brand + " " + name).toLowerCase().includes(q);
-        
-        let matchFilter = true;
-        if (currentFilter === 'hit') matchFilter = p.isBest?.toLowerCase() === 'yes';
-        else if (currentFilter === 'new') matchFilter = p.isNew?.toLowerCase() === 'yes';
-        else if (currentFilter === 'sale') matchFilter = (p.old2ml || p.oldFull);
-        
-        const pCat = (p.category || "").toLowerCase().trim();
-        const matchCat = (curCat === 'all' || pCat === curCat);
-
-        return matchSearch && matchFilter && matchCat && p.status !== 'out';
+        if(p.brand === "BANNER") return false;
+        const nameVal = (currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)).toLowerCase();
+        const matchSearch = (p.brand.toLowerCase() + ' ' + nameVal).includes(q);
+        const catValue = p.category?.toLowerCase().trim();
+        let matchSpecial = true;
+        if (currentFilter === 'new') matchSpecial = p.isNew?.toLowerCase() === 'yes';
+        if (currentFilter === 'hit') matchSpecial = p.isBest?.toLowerCase() === 'yes';
+        if (currentFilter === 'sale') matchSpecial = !!(p.old2ml || p.oldFull);
+        const matchCat = (curCat === 'all' || currentFilter !== 'all') || (catValue === curCat);
+        return matchSearch && matchCat && matchSpecial;
     });
 
     area.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-4 gap-4">${renderList(filtered)}</div>`;
+    AOS.refresh();
+}
+
+function getPriceHTML(p) {
+    const mainPrice = p.price2ml || p.fullPrice;
+    const oldPrice = p.price2ml ? p.old2ml : p.oldFull;
+    if (oldPrice && oldPrice !== '---' && oldPrice !== '') {
+        return `<span class="price-new">${mainPrice} zł</span><span class="price-old">${oldPrice} zł</span>`;
+    }
+    return `<span>${mainPrice} zł</span>`;
 }
 
 function renderScrollList(list) {
-    return list.map(p => `
-        <div onclick="openModal(${allProducts.indexOf(p)})" class="scroll-item product-card p-4 flex flex-col h-full">
-            <div class="img-container mb-3"><img src="${p.photo}"></div>
-            <div class="text-[7px] font-black text-[#C5A059] uppercase mb-1">${p.brand}</div>
+    return list.map((p, index) => {
+        const avail = isAvailable(p);
+        return `
+        <div onclick="openModal(${allProducts.indexOf(p)})" 
+             class="scroll-item product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''}"
+             data-aos="fade-up" data-aos-delay="${index * 50}">
+            <div class="img-container mb-3">
+                ${!avail ? `<div class="stock-badge">${i18n[currentLang].sold_badge}</div>` : ''}
+                <img src="${p.photo}" loading="lazy">
+            </div>
+            <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
             <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
-            <div class="text-[10px] font-bold mt-auto text-[#062C22]">${p.price2ml || p.fullPrice} zł</div>
+            <div class="text-[10px] font-black mt-auto text-[#062C22]">${getPriceHTML(p)}</div>
         </div>
-    `).join('');
+    `}).join('');
 }
 
 function renderList(list) {
-    if(list.length === 0) return `<div class="col-span-2 text-center py-20 opacity-20 uppercase text-[10px] font-bold">Нічого не знайдено</div>`;
-    return list.map(p => `<div onclick="openModal(${allProducts.indexOf(p)})" class="product-card p-4 flex flex-col h-full">
-        <div class="img-container mb-4"><img src="${p.photo}"></div>
-        <div class="text-[7px] font-black text-[#C5A059] uppercase mb-1">${p.brand}</div>
+    return list.map((p, index) => {
+        const avail = isAvailable(p);
+        return `<div onclick="openModal(${allProducts.indexOf(p)})" 
+        class="product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''}"
+        data-aos="fade-up" data-aos-delay="${(index % 4) * 50}">
+        <div class="img-container mb-4">
+            ${!avail ? `<div class="stock-badge">${i18n[currentLang].sold_badge}</div>` : ''}
+            <img src="${p.photo}" loading="lazy">
+        </div>
+        <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
         <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
-        <div class="text-xs font-bold text-[#062C22]">${p.price2ml || p.fullPrice} zł</div>
-    </div>`).join('');
+        <div class="text-xs font-black text-[#062C22]">${getPriceHTML(p)}</div>
+    </div>`}).join('');
 }
 
-function showAllCatalog() { currentFilter = 'all'; curCat = 'all'; updateCatButtons(); refreshCatalog(); }
-function setCategory(c) { curCat = c; updateCatButtons(); refreshCatalog(); }
-function updateCatButtons() { document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.toggle('active', btn.id === 'cat-' + curCat)); }
-function filterBy(type) { currentFilter = type; curCat = 'all'; updateCatButtons(); refreshCatalog(); }
-function goHome() { currentFilter = 'home'; curCat = 'all'; refreshCatalog(); }
+function saveState() {
+    localStorage.setItem('ps_curCat', curCat);
+    localStorage.setItem('ps_currentFilter', currentFilter);
+}
+
+function showAllCatalog() { currentFilter = 'all'; curCat = 'all'; saveState(); updateCatButtons(); refreshCatalog(); }
+function setCategory(c) { curCat = c; saveState(); updateCatButtons(); refreshCatalog(); }
+function updateCatButtons() {
+    document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.toggle('active', btn.id === 'cat-' + curCat));
+}
+
+function filterBy(type) { currentFilter = type; saveState(); window.scrollTo({top: 0, behavior: 'smooth'}); refreshCatalog(); }
+function goHome() { currentFilter = 'home'; curCat = 'all'; saveState(); refreshCatalog(); }
 
 function openModal(idx) {
     const p = allProducts[idx]; selectedOption = null;
+    const avail = isAvailable(p);
     const btn = document.getElementById('add-to-cart-btn');
+    
     btn.classList.add('opacity-20', 'cursor-not-allowed');
-    btn.innerText = i18n[currentLang].add_to_cart;
+    // Текст кнопки из i18n
+    btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].out_of_stock_btn;
+
     document.getElementById('m-img').src = p.photo;
+    document.getElementById('m-img').style.opacity = avail ? '1' : '0.4';
     document.getElementById('m-brand').innerText = p.brand;
     document.getElementById('m-title').innerText = currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name);
-    document.getElementById('m-desc').innerText = (currentLang === 'UA' ? p.descUK : p.descPL) || i18n[currentLang].default_desc;
+    document.getElementById('m-desc').innerText = currentLang === 'UA' ? (p.descUK || i18n.UA.default_desc) : (p.descPL || i18n.PL.default_desc);
+    
     let html = '';
-    [{l:'2ml', p:p.price2ml}, {l:'5ml', p:p.price5ml}, {l:'10ml', p:p.price10ml}, {l:'Full', p:p.fullPrice}].forEach(o => {
+    const sizes = [
+        {l:'2ml', p:p.price2ml, old:p.old2ml}, 
+        {l:'5ml', p:p.price5ml, old:p.old5ml}, 
+        {l:'10ml', p:p.price10ml, old:p.old10ml}, 
+        {l:'Full', p:p.fullPrice, old:p.oldFull}
+    ];
+
+    sizes.forEach(o => {
         if(o.p && o.p !== '---' && o.p !== '') {
-            html += `<div onclick="selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo}')" 
-                class="border border-neutral-100 flex justify-between items-center p-4 rounded-xl cursor-pointer text-xs font-bold transition-all hover:bg-neutral-50">
-                <span>${o.l}</span><span class="text-[#062C22]">${o.p} zł</span>
+            const hasDiscount = o.old && o.old !== '---' && o.old !== '';
+            html += `<div onclick="${avail ? `selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo}')` : ''}" 
+                class="border border-neutral-100 flex justify-between items-center p-4 rounded-xl ${avail ? 'cursor-pointer hover:bg-neutral-50' : 'opacity-40 cursor-not-allowed'} text-xs font-bold transition-all">
+                <span class="uppercase tracking-widest">${o.l}</span>
+                <span class="text-[#062C22]">
+                    ${hasDiscount ? `<span class="price-new">${o.p} zł</span><span class="price-old">${o.old} zł</span>` : `<span>${o.p} zł</span>`}
+                </span>
             </div>`;
         }
     });
@@ -288,7 +389,7 @@ function openModal(idx) {
 }
 
 function selectSize(el, size, price, brand, name, img) {
-    document.querySelectorAll('#m-prices div').forEach(d => { d.style.borderColor = '#eee'; d.style.background = 'white'; });
+    document.querySelectorAll('#m-prices div').forEach(d => { d.style.borderColor = '#F0F0F0'; d.style.background = 'white'; });
     el.style.borderColor = '#C5A059'; el.style.background = '#fdfaf3';
     selectedOption = { size, price, brand, name, img, id: Date.now() };
     const btn = document.getElementById('add-to-cart-btn');
@@ -315,8 +416,12 @@ function renderCart() {
             total += parseFloat(item.price);
             return `<div class="flex gap-4 items-center">
                 <div class="w-14 h-14 bg-neutral-50 rounded-xl p-2 flex items-center justify-center"><img src="${item.img}" class="max-w-full max-h-full object-contain"></div>
-                <div class="flex-1 min-w-0"><div class="text-[7px] font-black text-[#C5A059] uppercase">${item.brand}</div><div class="text-[10px] font-bold truncate">${item.name}</div><div class="text-[9px] text-neutral-400 font-bold">${item.size} • ${item.price} zł</div></div>
-                <button onclick="removeFromCart(${i})"><i class="fa-solid fa-xmark text-neutral-300"></i></button>
+                <div class="flex-1 min-w-0">
+                    <div class="text-[7px] font-black text-[#C5A059] uppercase">${item.brand}</div>
+                    <div class="text-[10px] font-bold truncate">${item.name}</div>
+                    <div class="text-[9px] text-neutral-400 font-bold">${item.size} • ${item.price} zł</div>
+                </div>
+                <button onclick="removeFromCart(${i})" class="text-neutral-200 hover:text-red-400"><i class="fa-solid fa-xmark"></i></button>
             </div>`;
         }).join('');
     }
@@ -329,12 +434,19 @@ function sendOrder() {
     if (cart.length === 0) return;
     let t = `${i18n[currentLang].order_msg}!\n\n`;
     cart.forEach((it, i) => t += `${i+1}. ${it.brand} ${it.name} (${it.size}) - ${it.price} zł\n`);
-    t += `\n💰 Разом: ${document.getElementById('cart-total').innerText}`;
+    t += `\n💰 ${i18n[currentLang].cart_total_label}: ${document.getElementById('cart-total').innerText}`;
     window.open(`https://t.me/${TG_NICK}?text=${encodeURIComponent(t)}`, '_blank');
 }
 
-function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('hidden'); }
-function toggleCart(st) { const p = document.getElementById('cart-panel'); if (st === true) p.classList.remove('translate-x-full'); else p.classList.toggle('translate-x-full'); }
+function toggleSidebar() { 
+    document.getElementById('sidebar').classList.toggle('open'); 
+    document.getElementById('overlay').classList.toggle('hidden');
+    document.body.classList.toggle('lock-scroll');
+}
+function toggleCart(st) { 
+    const p = document.getElementById('cart-panel');
+    if (st === true) p.classList.remove('translate-x-full'); else p.classList.toggle('translate-x-full');
+}
 function closeModal() { document.getElementById('pModal').classList.add('hidden'); document.body.classList.remove('lock-scroll'); }
 
 document.getElementById('add-to-cart-btn').onclick = addToCart;
