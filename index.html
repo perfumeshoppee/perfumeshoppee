@@ -25,10 +25,10 @@
         }
         .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-multiply: multiply; }
         
-        /* Стили для слайдера Swiper */
-        .swiper { width: 100%; height: 220px; border-radius: 24px; margin-bottom: 15px; background: #f9f9f9; }
-        .swiper-slide { display: flex; align-items: center; justify-content: center; padding: 10px; }
-        .swiper-slide img { max-width: 100%; max-height: 100%; object-fit: contain; }
+        /* Стили для слайдера Swiper (ДЛЯ НАБОРОВ) */
+        .swiper-sets { width: 100%; height: 350px; border-radius: 0 0 24px 24px; margin-bottom: 20px; background: #fff; }
+        .swiper-sets .swiper-slide { display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .swiper-sets img { width: 100%; height: 100%; object-fit: cover; } /* Здесь картинка набора будет большой */
         .swiper-pagination-bullet-active { background: var(--brand-accent) !important; }
 
         .product-title {
@@ -51,7 +51,10 @@
         #sidebar.open { transform: translateX(0); }
         .lang-node.active { background: var(--brand-accent); color: white; border-color: var(--brand-accent); }
         .cat-btn.active { background: var(--brand-deep) !important; color: white !important; }
-        .modal-content { max-width: 420px; width: 95%; border-radius: 32px; padding: 24px; }
+        
+        /* Модальное окно */
+        .modal-content { max-width: 420px; width: 95%; border-radius: 32px; padding: 0; overflow: hidden; } /* Убрал внутренние падинги */
+        .modal-body { padding: 24px; }
         .lock-scroll { overflow: hidden; }
         .price-new { color: #ef4444; font-weight: 900; }
         .price-old { color: #a3a3a3; text-decoration: line-through; font-size: 0.85em; margin-left: 5px; font-weight: 400; }
@@ -119,12 +122,12 @@
 
 <div id="pModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-md z-[9999] flex items-center justify-center p-4" onclick="closeModal()">
   <div class="modal-content bg-white relative overflow-y-auto max-h-[95vh] shadow-2xl" onclick="event.stopPropagation()">
-    <button onclick="closeModal()" class="absolute top-5 right-5 text-neutral-300 z-10"><i class="fa-solid fa-xmark text-xl"></i></button>
-    <div class="flex flex-col items-center">
-        <div id="modal-media-slot" class="w-full">
-            <div class="img-container w-44 h-44 mx-auto mb-6 shadow-sm"><img id="m-img" src=""></div>
+    <button onclick="closeModal()" class="absolute top-5 right-5 text-white drop-shadow-md z-[20]"><i class="fa-solid fa-circle-xmark text-2xl"></i></button>
+    
+    <div id="modal-media-slot" class="w-full">
         </div>
-        
+    
+    <div class="modal-body flex flex-col items-center">
         <div id="m-brand" class="text-[8px] font-black text-[#C5A059] uppercase tracking-[0.3em] mb-1"></div>
         <h2 id="m-title" class="text-lg font-bold text-center mb-3 logo-font leading-tight"></h2>
         <p id="m-desc" class="text-[11px] text-neutral-400 text-center mb-6 leading-relaxed px-2"></p>
@@ -153,7 +156,7 @@ const i18n = {
         sold_badge: "Немає в наявності", out_of_stock_btn: "Немає в наявності"
     },
     PL: {
-        search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_hits: "Hity", menu_news: "Nowości", menu_sale: "Promocje %",
+        search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_hits: "Bestsellery", menu_news: "Nowości", menu_sale: "Promocje %",
         cat_all: "Wszystkie", cat_female: "Damskie", cat_male: "Męskie", cat_uniseks: "Uniseks", cat_sets: "Zestawy", hits_title: "Bestsellery", news_title: "Nowości", cart_title: "Twój koszyk", cart_total_label: "Suma",
         cart_order_btn: "Zamów przez Telegram", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze.",
         sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak в magazynie"
@@ -161,16 +164,18 @@ const i18n = {
 };
 
 async function init() {
-    const res = await fetch(SPREADSHEET_URL);
-    const text = await res.text();
-    allProducts = parseCSV(text);
-    allProducts.sort((a, b) => {
-        if (a.brand === "BANNER") return -1;
-        if (b.brand === "BANNER") return 1;
-        return (a.brand.localeCompare(b.brand)) || ((currentLang === 'UA' ? (a.nameUK || a.name) : (a.namePL || a.name)).localeCompare(currentLang === 'UA' ? (b.nameUK || b.name) : (b.namePL || b.name)));
-    });
-    updateUI(); updateCatButtons(); refreshCatalog(); renderCart();
-    setTimeout(() => { AOS.init({ duration: 800, once: true, offset: 50 }); }, 200);
+    try {
+        const res = await fetch(SPREADSHEET_URL);
+        const text = await res.text();
+        allProducts = parseCSV(text);
+        allProducts.sort((a, b) => {
+            if (a.brand === "BANNER") return -1;
+            if (b.brand === "BANNER") return 1;
+            return (a.brand.localeCompare(b.brand)) || ((currentLang === 'UA' ? (a.nameUK || a.name) : (a.namePL || a.name)).localeCompare(currentLang === 'UA' ? (b.nameUK || b.name) : (b.namePL || b.name)));
+        });
+        updateUI(); updateCatButtons(); refreshCatalog(); renderCart();
+        setTimeout(() => { AOS.init({ duration: 800, once: true, offset: 50 }); }, 200);
+    } catch (e) { console.error("CSV Load Error", e); }
 }
 
 function parseCSV(text) {
@@ -277,6 +282,7 @@ function renderList(list) {
     </div>`}).join('');
 }
 
+// ГЛАВНАЯ ФУНКЦИЯ ДЛЯ ТВОИХ НАБОРОВ
 function openModal(idx) {
     const p = allProducts[idx]; selectedOption = null;
     const avail = isAvailable(p);
@@ -287,16 +293,29 @@ function openModal(idx) {
     btn.classList.add('opacity-20', 'cursor-not-allowed');
     btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].out_of_stock_btn;
 
-    if (isSet && p.photo.includes(',')) {
+    // ЕСЛИ ЭТО НАБОР (SETS)
+    if (isSet) {
         const photos = p.photo.split(',').map(s => s.trim());
-        let sliderHTML = `<div class="swiper mySwiper"><div class="swiper-wrapper">`;
-        photos.forEach(url => { sliderHTML += `<div class="swiper-slide"><img src="${url}"></div>`; });
+        let sliderHTML = `<div class="swiper swiper-sets"><div class="swiper-wrapper">`;
+        photos.forEach(url => { 
+            sliderHTML += `<div class="swiper-slide"><img src="${url}" onerror="this.src='https://placehold.co/400x400?text=No+Photo'"></div>`; 
+        });
         sliderHTML += `</div><div class="swiper-pagination"></div></div>`;
         slot.innerHTML = sliderHTML;
-        setTimeout(() => { swiperInstance = new Swiper(".mySwiper", { pagination: { el: ".swiper-pagination", clickable: true } }); }, 50);
-    } else {
+        
+        setTimeout(() => { 
+            swiperInstance = new Swiper(".swiper-sets", { 
+                pagination: { el: ".swiper-pagination", clickable: true },
+                grabCursor: true,
+                effect: 'fade',
+                fadeEffect: { crossFade: true }
+            }); 
+        }, 50);
+    } 
+    // ЕСЛИ ЭТО ОБЫЧНЫЕ ДУХИ
+    else {
         const photo = p.photo.split(',')[0].trim();
-        slot.innerHTML = `<div class="img-container w-44 h-44 mx-auto mb-6 shadow-sm"><img id="m-img" src="${photo}"></div>`;
+        slot.innerHTML = `<div class="pt-8 pb-4"><div class="img-container w-48 h-48 mx-auto shadow-sm"><img id="m-img" src="${photo}"></div></div>`;
         if(!avail) document.getElementById('m-img').style.opacity = '0.4';
     }
 
@@ -324,7 +343,7 @@ function openModal(idx) {
 function closeModal() { 
     document.getElementById('pModal').classList.add('hidden'); 
     document.body.classList.remove('lock-scroll');
-    if(swiperInstance) { swiperInstance.destroy(); swiperInstance = null; }
+    if(swiperInstance) { swiperInstance.destroy(true, true); swiperInstance = null; }
 }
 
 function selectSize(el, size, price, brand, name, img) {
@@ -345,8 +364,9 @@ function addToCart() {
 
 function renderCart() {
     const c = document.getElementById('cart-items');
-    document.getElementById('cart-count').innerText = cart.length;
-    document.getElementById('cart-count').classList.toggle('hidden', cart.length === 0);
+    const countEl = document.getElementById('cart-count');
+    countEl.innerText = cart.length;
+    countEl.classList.toggle('hidden', cart.length === 0);
     let total = 0;
     if (cart.length === 0) {
         c.innerHTML = `<div class="text-center py-10 text-neutral-300 text-[9px] uppercase font-bold">${i18n[currentLang].empty_cart}</div>`;
