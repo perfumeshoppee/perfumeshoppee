@@ -11,7 +11,7 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Playfair+Display:wght@700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght=300;400;600;800&family=Playfair+Display:wght=700&display=swap');
         
         :root { --brand-deep: #062C22; --brand-accent: #C5A059; --bg-light: #FDFCFB; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-light); color: var(--brand-deep); overflow-x: hidden; scroll-behavior: smooth; }
@@ -29,7 +29,7 @@
         
         .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-multiply: multiply; }
         
-        /* Стили для слайдера Swiper (ДЛЯ НАБОРОВ в модалке) */
+        /* Стили для слайдера Swiper (ДЛЯ НАБОРОВ in модалке) */
         .swiper-sets { width: 100%; height: 300px; border-radius: 24px; margin-bottom: 15px; background: transparent; position: relative; }
         .swiper-sets .swiper-slide { display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .swiper-sets img { width: 100%; height: 100%; object-fit: contain; } 
@@ -54,11 +54,9 @@
         .out-of-stock { opacity: 0.5; filter: grayscale(0.8); }
         .stock-badge { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.7); color: #fff; font-size: 7px; padding: 4px 8px; border-radius: 8px; text-transform: uppercase; font-weight: 800; z-index: 10; }
         
-        /* Нові бейджі для новинок та знижок */
-        .new-badge { position: absolute; top: 10px; left: 10px; background: var(--brand-accent); color: #fff; font-size: 7px; padding: 4px 8px; border-radius: 8px; text-transform: uppercase; font-weight: 800; z-index: 10; }
-        .sale-badge { position: absolute; top: 10px; left: 10px; background: #ef4444; color: #fff; font-size: 7px; padding: 4px 8px; border-radius: 8px; text-transform: uppercase; font-weight: 800; z-index: 10; }
-        /* Якщо товар одночасно і Out, і має інший статус, зміщуємо знижку трохи нижче */
-        .stock-badge + .new-badge, .stock-badge + .sale-badge { top: 32px; }
+        /* Новые бейджи для новинок и акций */
+        .badge-new { background: #C5A059; color: white; }
+        .badge-sale { background: #ef4444; color: white; }
 
         #sidebar { background: var(--brand-deep); transform: translateX(-100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         #sidebar.open { transform: translateX(0); }
@@ -140,9 +138,9 @@
     <div id="modal-media-slot" class="w-full bg-white"></div>
     
     <div class="modal-body flex flex-col items-center">
-        <div id="m-brand-container" class="flex items-center gap-2 mb-1">
+        <div id="m-brand-wrapper" class="flex items-center gap-2 mb-1">
             <div id="m-brand" class="text-[8px] font-black text-[#C5A059] uppercase tracking-[0.3em]"></div>
-            <div id="m-status-badge" class="hidden text-[7px] font-extrabold text-white px-2 py-0.5 rounded-md uppercase tracking-wide"></div>
+            <div id="m-badge" class="hidden text-[7px] font-extrabold text-white uppercase px-2 py-0.5 rounded-md"></div>
         </div>
         <h2 id="m-title" class="text-lg font-bold text-center mb-2 logo-font leading-tight"></h2>
         <p id="m-desc" class="text-[11px] text-neutral-400 text-center mb-6 leading-relaxed px-2 min-h-[30px]"></p>
@@ -176,14 +174,14 @@ const i18n = {
         cat_all: "Усі", cat_female: "Жіночі", cat_male: "Чоловічі", cat_uniseks: "Унісекс", cat_sets: "Набори", hits_title: "Хіти продажу", news_title: "Новинки", 
         sets_title: "Набори", cart_title: "Ваш кошик", cart_total_label: "Разом",
         cart_order_btn: "Оформити в Telegram", add_to_cart: "Додати в кошик", empty_cart: "Кошик порожній", order_msg: "Нове замовлення", default_desc: "Вишуканий аромат з унікальним шлейфом.",
-        sold_badge: "Немає в наявності", out_of_stock_btn: "Немає в наявності", badge_new: "NEW", badge_sale: "SALE %"
+        sold_badge: "Немає в наявності", out_of_stock_btn: "Немає в наявності", badge_new_text: "NEW", badge_sale_text: "SALE %"
     },
     PL: {
         search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_hits: "Bestsellery", menu_news: "Nowości", menu_sale: "Promocje %",
         cat_all: "Wszystkie", cat_female: "Damskie", cat_male: "Męskie", cat_uniseks: "Uniseks", cat_sets: "Zestawy", hits_title: "Bestsellery", news_title: "Nowości", 
         sets_title: "Zestawy", cart_title: "Twój koszyk", cart_total_label: "Suma",
         cart_order_btn: "Zamów przez Telegram", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze.",
-        sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak в magazynie", badge_new: "NEW", badge_sale: "SALE %"
+        sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak в magazynie", badge_new_text: "NEW", badge_sale_text: "SALE %"
     }
 };
 
@@ -235,21 +233,19 @@ function updateUI() {
 }
 
 function isAvailable(p) { return (p.status || "").toLowerCase().trim() !== 'out'; }
-function isProductNew(p) { return p.isNew?.toLowerCase() === 'yes'; }
-function isProductSale(p) { return (p.old2ml || p.oldFull) && (p.old2ml !== '---' && p.oldFull !== '---' && p.old2ml !== '' && p.oldFull !== ''); }
+function isSaleProduct(p) { return (p.old2ml || p.oldFull) && (p.old2ml !== '---' && p.oldFull !== '---'); }
 
-function getBadgesHTML(p) {
-    let html = '';
-    const avail = isAvailable(p);
-    if (!avail) {
-        html += `<div class="stock-badge">${i18n[currentLang].sold_badge}</div>`;
+function getBadgeHTML(p) {
+    if (!isAvailable(p)) {
+        return `<div class="stock-badge">${i18n[currentLang].sold_badge}</div>`;
     }
-    if (isProductSale(p)) {
-        html += `<div class="sale-badge">${i18n[currentLang].badge_sale}</div>`;
-    } else if (isProductNew(p)) {
-        html += `<div class="new-badge">${i18n[currentLang].badge_new}</div>`;
+    if (isSaleProduct(p)) {
+        return `<div class="stock-badge badge-sale">${i18n[currentLang].badge_sale_text}</div>`;
     }
-    return html;
+    if (p.isNew?.toLowerCase() === 'yes') {
+        return `<div class="stock-badge badge-new">${i18n[currentLang].badge_new_text}</div>`;
+    }
+    return '';
 }
 
 function refreshCatalog() {
@@ -285,7 +281,7 @@ function refreshCatalog() {
         let matchSpecial = true;
         if (currentFilter === 'new') matchSpecial = p.isNew?.toLowerCase() === 'yes';
         if (currentFilter === 'hit') matchSpecial = p.isBest?.toLowerCase() === 'yes';
-        if (currentFilter === 'sale') matchSpecial = isProductSale(p);
+        if (currentFilter === 'sale') matchSpecial = isSaleProduct(p);
         const matchCat = (curCat === 'all' || currentFilter !== 'all') || (catValue === curCat);
         return matchSearch && matchCat && matchSpecial;
     });
@@ -308,7 +304,7 @@ function renderScrollList(list) {
         const isSet = p.category?.toLowerCase().trim() === 'sets';
         const photo = p.photo.split(',')[0].trim();
         return `<div onclick="openModal(${allProducts.indexOf(p)})" class="scroll-item product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''} ${isSet ? 'is-set-card' : ''}">
-            <div class="img-container mb-3">${getBadgesHTML(p)}<img src="${photo}" loading="lazy"></div>
+            <div class="img-container mb-3">${getBadgeHTML(p)}<img src="${photo}" loading="lazy"></div>
             <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
             <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
             <div class="text-[10px] font-black mt-auto text-[#062C22]">${getPriceHTML(p)}</div>
@@ -321,7 +317,7 @@ function renderList(list) {
         const isSet = p.category?.toLowerCase().trim() === 'sets';
         const photo = p.photo.split(',')[0].trim();
         return `<div onclick="openModal(${allProducts.indexOf(p)})" class="product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''} ${isSet ? 'is-set-card' : ''}">
-        <div class="img-container mb-4">${getBadgesHTML(p)}<img src="${photo}" loading="lazy"></div>
+        <div class="img-container mb-4">${getBadgeHTML(p)}<img src="${photo}" loading="lazy"></div>
         <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
         <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
         <div class="text-xs font-black text-[#062C22]">${getPriceHTML(p)}</div>
@@ -335,22 +331,25 @@ function openModal(idx) {
     const btn = document.getElementById('add-to-cart-btn');
     const slot = document.getElementById('modal-media-slot');
     const descEl = document.getElementById('m-desc');
-    const statusBadge = document.getElementById('m-status-badge');
+    const modalBadge = document.getElementById('m-badge');
     
     btn.classList.add('opacity-20', 'cursor-not-allowed');
     btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].out_of_stock_btn;
 
-    // Налаштування бейджа статусу для модалки
-    if (isProductSale(p)) {
-        statusBadge.innerText = i18n[currentLang].badge_sale;
-        statusBadge.className = "text-[7px] font-extrabold text-white px-2 py-0.5 rounded-md uppercase tracking-wide bg-red-500";
-        statusBadge.classList.remove('hidden');
-    } else if (isProductNew(p)) {
-        statusBadge.innerText = i18n[currentLang].badge_new;
-        statusBadge.className = "text-[7px] font-extrabold text-white px-2 py-0.5 rounded-md uppercase tracking-wide bg-[#C5A059]";
-        statusBadge.classList.remove('hidden');
-    } else {
-        statusBadge.classList.add('hidden');
+    // Логика отображения бейджей в модалке
+    modalBadge.className = "hidden text-[7px] font-extrabold text-white uppercase px-2 py-0.5 rounded-md";
+    if (!avail) {
+        modalBadge.innerText = i18n[currentLang].sold_badge;
+        modalBadge.classList.remove('hidden');
+        modalBadge.classList.add('bg-neutral-700');
+    } else if (isSaleProduct(p)) {
+        modalBadge.innerText = i18n[currentLang].badge_sale_text;
+        modalBadge.classList.remove('hidden');
+        modalBadge.classList.add('badge-sale');
+    } else if (p.isNew?.toLowerCase() === 'yes') {
+        modalBadge.innerText = i18n[currentLang].badge_new_text;
+        modalBadge.classList.remove('hidden');
+        modalBadge.classList.add('badge-new');
     }
 
     const rawDesc = currentLang === 'UA' ? (p.descUK || i18n.UA.default_desc) : (p.descPL || i18n.PL.default_desc);
