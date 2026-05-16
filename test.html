@@ -27,19 +27,25 @@
         
         .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-multiply: multiply; }
 
-        /* Бейджи */
+        /* Бейджи — праворуч, компактно */
         .product-badge {
             position: absolute;
             right: 8px;
-            text-white text-[10px] font-bold px-2.5 py-0.5 rounded shadow z-10 uppercase tracking-wider;
+            color: white;
             font-size: 9px;
+            font-weight: 800;
+            padding: 3px 7px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            z-index: 10;
+            uppercase tracking-wider;
             line-height: 1;
         }
 
         .badge-new { background: #C5A059; top: 8px; }
-        .badge-hit  { background: #22c55e; top: 28px; }
-        .badge-sale { background: #ef4444; top: 28px; }
-        .badge-out  { background: #6b7280; bottom: 8px; }
+        .badge-hit  { background: #22c55e; top: 26px; }
+        .badge-sale { background: #ef4444; top: 26px; }
+        .badge-out  { background: #6b7280; bottom: 8px; right: 8px; }
 
         .swiper-sets { width: 100%; height: 300px; border-radius: 24px; margin-bottom: 15px; background: transparent; position: relative; }
         .swiper-sets .swiper-slide { display: flex; align-items: center; justify-content: center; overflow: hidden; }
@@ -74,7 +80,63 @@
 </head>
 <body>
 
-<!-- ... (весь HTML до скрипта залишається такий самий) ... -->
+<nav class="glass-nav sticky top-0 z-50 px-6 py-4">
+  <div class="max-w-7xl mx-auto flex justify-between items-center">
+    <button onclick="toggleSidebar()" class="text-2xl text-[#062C22]"><i class="fa-solid fa-bars-staggered"></i></button>
+    <span onclick="goHome()" class="text-xl font-bold logo-font cursor-pointer tracking-tighter">perfume.shoppee</span>
+    <button onclick="toggleCart()" class="relative text-[#062C22]"><i class="fa-solid fa-bag-shopping text-xl"></i><span id="cart-count" class="absolute -top-2 -right-2 bg-[#C5A059] text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center hidden">0</span></button>
+  </div>
+</nav>
+
+<div class="px-6 py-4 bg-white">
+    <div class="relative max-w-2xl mx-auto">
+        <input id="searchInput" type="text" onkeyup="refreshCatalog()" class="w-full bg-neutral-100 rounded-2xl py-4 px-12 text-sm outline-none" data-i18n-placeholder="search_placeholder">
+        <i class="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-neutral-300 text-xs"></i>
+    </div>
+</div>
+
+<div id="overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[1001] hidden"></div>
+<div id="sidebar" class="fixed top-0 left-0 h-full w-[280px] z-[1002] shadow-2xl p-8 flex flex-col text-white font-semibold">
+    <div class="mb-8 flex justify-between items-center">
+        <span class="logo-font text-lg">perfume.shoppee</span>
+        <button onclick="toggleSidebar()" class="text-white/30"><i class="fa-solid fa-xmark text-xl"></i></button>
+    </div>
+    <div class="flex gap-2 mb-8">
+        <button onclick="setLang('UA')" id="btn-ua" class="lang-node flex-1 py-2 rounded-xl border border-white/10 text-[10px] active">UA</button>
+        <button onclick="setLang('PL')" id="btn-pl" class="lang-node flex-1 py-2 rounded-xl border border-white/10 text-[10px]">PL</button>
+    </div>
+    <nav class="space-y-6 text-[11px] uppercase tracking-widest">
+        <a href="#" onclick="goHome(); toggleSidebar(); return false;" data-i18n="menu_home" class="block"></a>
+        <a href="#" onclick="showAllCatalog(); toggleSidebar(); return false;" data-i18n="menu_catalog" class="block"></a>
+        <a href="#" onclick="filterBy('hit'); toggleSidebar(); return false;" data-i18n="menu_hits" class="block"></a>
+        <a href="#" onclick="filterBy('new'); toggleSidebar(); return false;" data-i18n="menu_news" class="block"></a>
+        <a href="#" onclick="filterBy('sale'); toggleSidebar(); return false;" data-i18n="menu_sale" class="block text-red-400"></a>
+    </nav>
+    <div class="mt-auto pt-6 border-t border-white/10"><a href="https://www.instagram.com/perfume.shoppee" target="_blank" class="flex items-center gap-3 text-[#C5A059]"><i class="fa-brands fa-instagram text-xl"></i><span class="text-[9px] uppercase tracking-widest">Instagram</span></a></div>
+</div>
+
+<main class="max-w-7xl mx-auto pb-20">
+    <div id="catalog-filters" class="hidden px-6 mb-6 overflow-x-auto no-scrollbar flex gap-2">
+      <button onclick="setCategory('all')" id="cat-all" class="cat-btn px-6 py-2 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[9px] font-bold uppercase tracking-widest active" data-i18n="cat_all"></button>
+      <button onclick="setCategory('female')" id="cat-female" class="cat-btn px-6 py-2 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[9px] font-bold uppercase tracking-widest" data-i18n="cat_female"></button>
+      <button onclick="setCategory('male')" id="cat-male" class="cat-btn px-6 py-2 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[9px] font-bold uppercase tracking-widest" data-i18n="cat_male"></button>
+      <button onclick="setCategory('uniseks')" id="cat-uniseks" class="cat-btn px-6 py-2 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[9px] font-bold uppercase tracking-widest" data-i18n="cat_uniseks"></button>
+      <button onclick="setCategory('sets')" id="cat-sets" class="cat-btn px-6 py-2 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[9px] font-bold uppercase tracking-widest" data-i18n="cat_sets"></button>
+    </div>
+    <div id="catalog-area" class="px-6"></div>
+</main>
+
+<div id="cart-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[10000] shadow-2xl transform translate-x-full transition-transform duration-500 flex flex-col">
+    <div class="p-6 border-b flex justify-between items-center bg-[#062C22] text-white">
+        <h2 class="text-[10px] font-bold uppercase tracking-widest" data-i18n="cart_title"></h2>
+        <button onclick="toggleCart()"><i class="fa-solid fa-xmark text-xl"></i></button>
+    </div>
+    <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-6"></div>
+    <div class="p-8 border-t bg-neutral-50 space-y-6">
+        <div class="flex justify-between items-center"><span class="text-[10px] font-bold uppercase text-neutral-400" data-i18n="cart_total_label"></span><span id="cart-total" class="text-xl font-bold">0 zł</span></div>
+        <button onclick="sendOrder()" class="w-full bg-[#062C22] text-white py-5 rounded-2xl text-[10px] font-bold uppercase tracking-widest" data-i18n="cart_order_btn"></button>
+    </div>
+</div>
 
 <div id="pModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-md z-[9999] flex items-center justify-center p-4" onclick="closeModal()">
   <div class="modal-content relative overflow-y-auto max-h-[90vh] shadow-2xl" onclick="event.stopPropagation()">
@@ -117,10 +179,7 @@ const i18n = {
         sets_title: "Набори", cart_title: "Ваш кошик", cart_total_label: "Разом",
         cart_order_btn: "Оформити в Telegram", add_to_cart: "Додати в кошик", empty_cart: "Кошик порожній", order_msg: "Нове замовлення", default_desc: "Вишуканий аромат з унікальним шлейфом.",
         sold_badge: "Немає в наявності", out_of_stock_btn: "Немає в наявності",
-        badgeNew: "НОВИНКА",
-        badgeSale: "АКЦІЯ",
-        badgeHit: "ХІТ",
-        outOfStock: "Немає в наявності"
+        badgeNew: "НОВИНКА", badgeSale: "АКЦІЯ", badgeHit: "ХІТ", outOfStock: "Немає в наявності"
     },
     PL: {
         search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_hits: "Bestsellery", menu_news: "Nowości", menu_sale: "Promocje %",
@@ -128,10 +187,7 @@ const i18n = {
         sets_title: "Zestawy", cart_title: "Twój koszyk", cart_total_label: "Suma",
         cart_order_btn: "Zamów przez Telegram", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze.",
         sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak w magazynie",
-        badgeNew: "NOWOŚĆ",
-        badgeSale: "PROMOCJA",
-        badgeHit: "HIT",
-        outOfStock: "Brak w magazynie"
+        badgeNew: "NOWOŚĆ", badgeSale: "PROMOCJA", badgeHit: "HIT", outOfStock: "Brak w magazynie"
     }
 };
 
@@ -150,7 +206,7 @@ async function init() {
     } catch (e) { console.error("CSV Load Error", e); }
 }
 
-function parseCSV(text) { /* ... той самий parseCSV ... */ 
+function parseCSV(text) {
     let rows = [], row = [], col = '', q = false;
     for (let i = 0; i < text.length; i++) {
         let c = text[i], n = text[i+1];
@@ -187,33 +243,57 @@ function isSaleProduct(p) { return (p.old2ml || p.oldFull) && (p.old2ml !== '---
 
 function getBadgesHTML(p) {
     let badgesHtml = '';
-
     const isNew = p.isNew?.toLowerCase() === 'yes' || p.isNew === true;
     const isHit = p.isBest?.toLowerCase() === 'yes' || p.isBest === true;
     const isSale = isSaleProduct(p);
     const avail = isAvailable(p);
 
-    // Новинка
-    if (isNew) {
-        badgesHtml += `<span class="product-badge badge-new"> ${i18n[currentLang].badgeNew}</span>`;
-    }
-
-    // Хіт або Акція
-    if (isHit) {
-        badgesHtml += `<span class="product-badge badge-hit">${i18n[currentLang].badgeHit}</span>`;
-    } else if (isSale) {
-        badgesHtml += `<span class="product-badge badge-sale">${i18n[currentLang].badgeSale}</span>`;
-    }
-
-    // Немає в наявності
-    if (!avail) {
-        badgesHtml += `<span class="product-badge badge-out">${i18n[currentLang].outOfStock}</span>`;
-    }
+    if (isNew) badgesHtml += `<span class="product-badge badge-new">${i18n[currentLang].badgeNew}</span>`;
+    if (isHit) badgesHtml += `<span class="product-badge badge-hit">${i18n[currentLang].badgeHit}</span>`;
+    else if (isSale) badgesHtml += `<span class="product-badge badge-sale">${i18n[currentLang].badgeSale}</span>`;
+    if (!avail) badgesHtml += `<span class="product-badge badge-out">${i18n[currentLang].outOfStock}</span>`;
 
     return badgesHtml;
 }
 
-function refreshCatalog() { /* ... залишається майже так само, тільки викликає getBadgesHTML ... */ 
+function getPriceHTML(p) {
+    const mainPrice = p.price2ml || p.fullPrice;
+    const oldPrice = p.price2ml ? p.old2ml : p.oldFull;
+    if (oldPrice && oldPrice !== '---' && oldPrice !== '') {
+        return `<span class="price-new">${mainPrice} zł</span><span class="price-old">${oldPrice} zł</span>`;
+    }
+    return `<span>${mainPrice} zł</span>`;
+}
+
+function renderScrollList(list) {
+    return list.map((p) => {
+        const avail = isAvailable(p);
+        const isSet = p.category?.toLowerCase().trim() === 'sets';
+        const photo = p.photo.split(',')[0].trim();
+        return `<div onclick="openModal(${allProducts.indexOf(p)})" class="scroll-item product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''} ${isSet ? 'is-set-card' : ''}">
+            <div class="img-container mb-3">${getBadgesHTML(p)}<img src="${photo}" loading="lazy"></div>
+            <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
+            <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
+            <div class="text-[10px] font-black mt-auto text-[#062C22]">${getPriceHTML(p)}</div>
+        </div>`;
+    }).join('');
+}
+
+function renderList(list) {
+    return list.map((p) => {
+        const avail = isAvailable(p);
+        const isSet = p.category?.toLowerCase().trim() === 'sets';
+        const photo = p.photo.split(',')[0].trim();
+        return `<div onclick="openModal(${allProducts.indexOf(p)})" class="product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''} ${isSet ? 'is-set-card' : ''}">
+        <div class="img-container mb-4">${getBadgesHTML(p)}<img src="${photo}" loading="lazy"></div>
+        <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
+        <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
+        <div class="text-xs font-black text-[#062C22]">${getPriceHTML(p)}</div>
+    </div>`;
+    }).join('');
+}
+
+function refreshCatalog() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const area = document.getElementById('catalog-area');
     document.getElementById('catalog-filters').classList.toggle('hidden', currentFilter !== 'all');
@@ -254,41 +334,6 @@ function refreshCatalog() { /* ... залишається майже так са
     area.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-4 gap-4">${renderList(filtered)}</div>`;
 }
 
-function renderScrollList(list) {
-    return list.map((p) => {
-        const avail = isAvailable(p);
-        const isSet = p.category?.toLowerCase().trim() === 'sets';
-        const photo = p.photo.split(',')[0].trim();
-        return `<div onclick="openModal(${allProducts.indexOf(p)})" class="scroll-item product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''} ${isSet ? 'is-set-card' : ''}">
-            <div class="img-container mb-3">${getBadgesHTML(p)}<img src="${photo}" loading="lazy"></div>
-            <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
-            <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
-            <div class="text-[10px] font-black mt-auto text-[#062C22]">${getPriceHTML(p)}</div>
-        </div>`}).join('');
-}
-
-function renderList(list) {
-    return list.map((p) => {
-        const avail = isAvailable(p);
-        const isSet = p.category?.toLowerCase().trim() === 'sets';
-        const photo = p.photo.split(',')[0].trim();
-        return `<div onclick="openModal(${allProducts.indexOf(p)})" class="product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''} ${isSet ? 'is-set-card' : ''}">
-        <div class="img-container mb-4">${getBadgesHTML(p)}<img src="${photo}" loading="lazy"></div>
-        <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
-        <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
-        <div class="text-xs font-black text-[#062C22]">${getPriceHTML(p)}</div>
-    </div>`}).join('');
-}
-
-function getPriceHTML(p) {
-    const mainPrice = p.price2ml || p.fullPrice;
-    const oldPrice = p.price2ml ? p.old2ml : p.oldFull;
-    if (oldPrice && oldPrice !== '---' && oldPrice !== '') {
-        return `<span class="price-new">${mainPrice} zł</span><span class="price-old">${oldPrice} zł</span>`;
-    }
-    return `<span>${mainPrice} zł</span>`;
-}
-
 function openModal(idx) {
     const p = allProducts[idx]; selectedOption = null;
     const avail = isAvailable(p);
@@ -301,14 +346,13 @@ function openModal(idx) {
     btn.classList.add('opacity-20', 'cursor-not-allowed');
     btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].out_of_stock_btn;
 
-    // Бейджи в модалці
     let modalBadges = '';
     const isNew = p.isNew?.toLowerCase() === 'yes' || p.isNew === true;
     const isHit = p.isBest?.toLowerCase() === 'yes' || p.isBest === true;
     const isSale = isSaleProduct(p);
 
     if (!avail) {
-        modalBadges += `<span class="badge-out text-[10px] font-bold px-2 py-0.5 rounded uppercase">${i18n[currentLang].outOfStock}</span>`;
+        modalBadges += `<span class="bg-gray-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">${i18n[currentLang].outOfStock}</span>`;
     } else {
         if (isNew) modalBadges += `<span class="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">${i18n[currentLang].badgeNew}</span>`;
         if (isHit) modalBadges += `<span class="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">${i18n[currentLang].badgeHit}</span>`;
@@ -320,7 +364,6 @@ function openModal(idx) {
         <div class="flex items-center gap-1.5">${modalBadges}</div>
     `;
 
-    // решта коду модалки без змін...
     const rawDesc = currentLang === 'UA' ? (p.descUK || i18n.UA.default_desc) : (p.descPL || i18n.PL.default_desc);
     const descParts = rawDesc.split('|').map(s => s.trim());
     descEl.innerText = descParts[0];
@@ -368,7 +411,6 @@ function openModal(idx) {
     document.body.classList.add('lock-scroll');
 }
 
-// решта функцій (closeModal, selectSize, addToCart і т.д.) — без змін
 function closeModal() { 
     document.getElementById('pModal').classList.add('hidden'); 
     document.body.classList.remove('lock-scroll');
@@ -391,7 +433,7 @@ function addToCart() {
     renderCart(); closeModal(); toggleCart(true);
 }
 
-function renderCart() { /* ... без змін ... */ 
+function renderCart() {
     const c = document.getElementById('cart-items');
     const countEl = document.getElementById('cart-count');
     countEl.innerText = cart.length;
