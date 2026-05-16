@@ -38,7 +38,8 @@
             border-radius: 6px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.15);
             z-index: 10;
-            uppercase tracking-wider;
+            text-transform: uppercase;
+            tracking-wider;
             line-height: 1;
         }
 
@@ -246,12 +247,14 @@ function getBadgesHTML(p) {
     const isNew = p.isNew?.toLowerCase() === 'yes' || p.isNew === true;
     const isHit = p.isBest?.toLowerCase() === 'yes' || p.isBest === true;
     const isSale = isSaleProduct(p);
-    const avail = isAvailable(p);
 
     if (isNew) badgesHtml += `<span class="product-badge badge-new">${i18n[currentLang].badgeNew}</span>`;
     if (isHit) badgesHtml += `<span class="product-badge badge-hit">${i18n[currentLang].badgeHit}</span>`;
     else if (isSale) badgesHtml += `<span class="product-badge badge-sale">${i18n[currentLang].badgeSale}</span>`;
-    if (!avail) badgesHtml += `<span class="product-badge badge-out">${i18n[currentLang].outOfStock}</span>`;
+    
+    if (!isAvailable(p)) {
+        badgesHtml += `<span class="product-badge badge-out">${i18n[currentLang].sold_badge}</span>`;
+    }
 
     return badgesHtml;
 }
@@ -344,7 +347,7 @@ function openModal(idx) {
     const brandWrapper = document.getElementById('m-brand-wrapper');
     
     btn.classList.add('opacity-20', 'cursor-not-allowed');
-    btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].out_of_stock_btn;
+    btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].sold_badge;
 
     let modalBadges = '';
     const isNew = p.isNew?.toLowerCase() === 'yes' || p.isNew === true;
@@ -352,7 +355,7 @@ function openModal(idx) {
     const isSale = isSaleProduct(p);
 
     if (!avail) {
-        modalBadges += `<span class="bg-gray-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">${i18n[currentLang].outOfStock}</span>`;
+        modalBadges += `<span class="bg-gray-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">${i18n[currentLang].sold_badge}</span>`;
     } else {
         if (isNew) modalBadges += `<span class="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">${i18n[currentLang].badgeNew}</span>`;
         if (isHit) modalBadges += `<span class="bg-green-500 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">${i18n[currentLang].badgeHit}</span>`;
