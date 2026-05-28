@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <title>Perfume Shoppee | Оригінальні Парфуми від 2 мл — Україна та Польща</title>
-    <meta name="description" content="Купити оригінальні парфуми від 2 мл. Люкс, ніша, унісекс. Швидка доставка по Україні та Польщі. Новинки, хіти та акції. 100% оригінал.">
+    <meta name="description" content="Купити оригінальні парфуми від 2 мл. Люкс, ніша, unisex. Швидка доставка по Україні та Польщі. Новинки, хіти та акції. 100% оригінал.">
     <meta name="keywords" content="парфуми, купити парфуми, оригінальні парфуми, пробники парфумів, парфумерія, люксові парфуми, нішеві аромати, парфуми Україна, парфуми Польща">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://perfumeshoppee.github.io">
@@ -39,7 +39,6 @@
         
         .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-multiply: multiply; }
 
-        /* Контейнер для бейджів зверху ліворуч рядком */
         .badges-wrapper {
             position: absolute;
             top: 10px;
@@ -50,7 +49,6 @@
             z-index: 20;
         }
 
-        /* Преміальний дизайн бейджів */
         .product-badge {
             font-size: 8px;
             font-weight: 800;
@@ -68,17 +66,17 @@
         }
 
         .badge-new { 
-            background: rgba(197, 160, 89, 0.9); /* Золотий брендовий */
+            background: rgba(197, 160, 89, 0.9); 
             color: white;
             border: 1px solid rgba(255,255,255,0.2);
         }
         .badge-hit { 
-            background: rgba(6, 44, 34, 0.9); /* Глибокий зелений */
+            background: rgba(6, 44, 34, 0.9); 
             color: #FDFCFB;
             border: 1px solid rgba(255,255,255,0.15);
         }
         .badge-sale { 
-            background: rgba(220, 38, 38, 0.85); /* Елегантний червоний */
+            background: rgba(220, 38, 38, 0.85); 
             color: white;
             border: 1px solid rgba(255,255,255,0.15);
         }
@@ -86,7 +84,7 @@
             position: absolute;
             bottom: 10px;
             right: 10px;
-            background: rgba(23, 23, 23, 0.75); /* Матовий темний */
+            background: rgba(23, 23, 23, 0.75); 
             color: #f5f5f5;
             border: 1px solid rgba(255,255,255,0.1);
             z-index: 20;
@@ -102,7 +100,8 @@
             overflow: hidden; text-overflow: ellipsis; min-height: 28px;
         }
 
-        .scroll-x { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; padding-bottom: 15px; -webkit-overflow-scrolling: touch; }
+        /* Плавний та красивий горизонтальний скрол */
+        .scroll-x { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; padding-bottom: 15px; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
         .scroll-x::-webkit-scrollbar { display: none; }
         .scroll-item { flex: 0 0 160px; scroll-snap-align: start; }
 
@@ -121,6 +120,10 @@
         .lock-scroll { overflow: hidden; }
         .price-new { color: #ef4444; font-weight: 900; }
         .price-old { color: #a3a3a3; text-decoration: line-through; font-size: 0.85em; margin-left: 5px; font-weight: 400; }
+        
+        /* Стилізація стрілочок навігації на Головній */
+        .scroll-nav-btn { display: flex; items-center: center; justify-content: center; width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(6, 44, 34, 0.1); color: var(--brand-deep); transition: all 0.2s; }
+        .scroll-nav-btn:active { background: rgba(6, 44, 34, 0.05); }
     </style>
 </head>
 <body>
@@ -352,6 +355,18 @@ function renderList(list) {
     }).join('');
 }
 
+/* Функція для плавної прокрутки стрічки за допомогою стрілочок */
+function scrollSection(sectionId, direction) {
+    const container = document.getElementById(sectionId);
+    if (container) {
+        const scrollAmount = 172; // Ширина картки (160) + gap (12)
+        container.scrollBy({
+            left: direction === 'next' ? scrollAmount : -scrollAmount,
+            behavior: 'smooth'
+        });
+    }
+}
+
 function refreshCatalog() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const area = document.getElementById('catalog-area');
@@ -361,17 +376,38 @@ function refreshCatalog() {
         const banner = allProducts.find(p => p.brand === "BANNER");
         area.innerHTML = `
             ${banner ? `<div class="mb-10 rounded-[28px] overflow-hidden shadow-sm"><img src="${banner.photo}" class="w-full object-cover"></div>` : ''}
+            
             <div class="mb-12">
-                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].sets_title}</h2>
-                <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.category?.toLowerCase().trim() === 'sets'))}</div>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-[10px] font-extrabold uppercase tracking-widest opacity-40">${i18n[currentLang].sets_title}</h2>
+                    <div class="flex gap-2">
+                        <button onclick="scrollSection('scroll-sets', 'prev')" class="scroll-nav-btn"><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+                        <button onclick="scrollSection('scroll-sets', 'next')" class="scroll-nav-btn"><i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+                    </div>
+                </div>
+                <div id="scroll-sets" class="scroll-x">${renderScrollList(allProducts.filter(p => p.category?.toLowerCase().trim() === 'sets'))}</div>
             </div>
+            
             <div class="mb-12">
-                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].hits_title}</h2>
-                <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.isBest?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets'))}</div>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-[10px] font-extrabold uppercase tracking-widest opacity-40">${i18n[currentLang].hits_title}</h2>
+                    <div class="flex gap-2">
+                        <button onclick="scrollSection('scroll-hits', 'prev')" class="scroll-nav-btn"><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+                        <button onclick="scrollSection('scroll-hits', 'next')" class="scroll-nav-btn"><i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+                    </div>
+                </div>
+                <div id="scroll-hits" class="scroll-x">${renderScrollList(allProducts.filter(p => p.isBest?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets'))}</div>
             </div>
+            
             <div class="mb-12">
-                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].news_title}</h2>
-                <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.isNew?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets'))}</div>
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-[10px] font-extrabold uppercase tracking-widest opacity-40">${i18n[currentLang].news_title}</h2>
+                    <div class="flex gap-2">
+                        <button onclick="scrollSection('scroll-news', 'prev')" class="scroll-nav-btn"><i class="fa-solid fa-chevron-left text-[10px]"></i></button>
+                        <button onclick="scrollSection('scroll-news', 'next')" class="scroll-nav-btn"><i class="fa-solid fa-chevron-right text-[10px]"></i></button>
+                    </div>
+                </div>
+                <div id="scroll-news" class="scroll-x">${renderScrollList(allProducts.filter(p => p.isNew?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets'))}</div>
             </div>
         `;
         return;
@@ -405,7 +441,6 @@ function openModal(idx) {
     btn.classList.add('opacity-20', 'cursor-not-allowed');
     btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].sold_badge;
 
-    /* Оновлений дизайн бейджів для модального вікна */
     let modalBadges = '';
     const isNew = p.isNew?.toLowerCase() === 'yes' || p.isNew === true;
     const isHit = p.isBest?.toLowerCase() === 'yes' || p.isBest === true;
@@ -468,7 +503,7 @@ function openModal(idx) {
     });
     document.getElementById('m-prices').innerHTML = html;
     document.getElementById('pModal').classList.remove('hidden');
-    document.DianaBodyClass = document.body.classList.add('lock-scroll');
+    document.body.classList.add('lock-scroll');
 }
 
 function closeModal() { 
