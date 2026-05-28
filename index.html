@@ -102,10 +102,6 @@
             overflow: hidden; text-overflow: ellipsis; min-height: 28px;
         }
 
-        .scroll-x { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; padding-bottom: 15px; -webkit-overflow-scrolling: touch; }
-        .scroll-x::-webkit-scrollbar { display: none; }
-        .scroll-item { flex: 0 0 160px; scroll-snap-align: start; }
-
         .product-card { background: white; border-radius: 24px; border: 1px solid rgba(0,0,0,0.03); transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); position: relative; cursor: pointer; }
         .product-card.is-set-card { border: none; background: transparent; }
         
@@ -121,6 +117,7 @@
         .lock-scroll { overflow: hidden; }
         .price-new { color: #ef4444; font-weight: 900; }
         .price-old { color: #a3a3a3; text-decoration: line-through; font-size: 0.85em; margin-left: 5px; font-weight: 400; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
     </style>
 </head>
 <body>
@@ -214,6 +211,7 @@
 <script>
 const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
 const TG_NICK = 'elenafragrance';
+const ITEMS_TO_SHOW_HOME = 4; // Скільки товарів показувати спочатку на головній сторінці
 
 let allProducts = [], cart = JSON.parse(localStorage.getItem('ps_cart')) || [];
 
@@ -234,7 +232,8 @@ const i18n = {
         sets_title: "Набори", cart_title: "Ваш кошик", cart_total_label: "Разом",
         cart_order_btn: "Оформити в Telegram", add_to_cart: "Додати в кошик", empty_cart: "Кошик порожній", order_msg: "Нове замовлення", default_desc: "Вишуканий аромат з унікальним шлейфом.",
         sold_badge: "Немає в наявності", out_of_stock_btn: "Немає в наявності",
-        badgeNew: "НОВИНКА", badgeSale: "АКЦІЯ", badgeHit: "ХІТ", outOfStock: "Немає в наявності"
+        badgeNew: "НОВИНКА", badgeSale: "АКЦІЯ", badgeHit: "ХІТ", outOfStock: "Немає в наявності",
+        show_more: "Показати більше"
     },
     PL: {
         search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_hits: "Bestsellery", menu_news: "Nowości", menu_sale: "Promocje %",
@@ -242,7 +241,8 @@ const i18n = {
         sets_title: "Zestawy", cart_title: "Twój koszyk", cart_total_label: "Suma",
         cart_order_btn: "Zamów przez Telegram", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze.",
         sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak w magazynie",
-        badgeNew: "NOWOŚĆ", badgeSale: "PROMOCJA", badgeHit: "HIT", outOfStock: "Brak w magazynie"
+        badgeNew: "NOWOŚĆ", badgeSale: "PROMOCJA", badgeHit: "HIT", outOfStock: "Brak w magazynie",
+        show_more: "Pokaż więcej"
     }
 };
 
@@ -304,12 +304,12 @@ function getBadgesHTML(p) {
 
     if (isNew) badgesHtml += `<span class="product-badge badge-new">✨ ${i18n[currentLang].badgeNew}</span>`;
     if (isHit) badgesHtml += `<span class="product-badge badge-hit">🔥 ${i18n[currentLang].badgeHit}</span>`;
-    if (isSale) badgesHtml += `<span class="product-badge badge-sale">% ${i18n[currentLang].badgeSale}</span>`;
+    if (isSale) badgesHtml += `<span class="product-badge badge-sale">%% ${i18n[currentLang].badgeSale}</span>`;
     
     badgesHtml += '</div>';
 
     if (!isAvailable(p)) {
-        badgesHtml += `<span class="product-badge badge-out"> ${i18n[currentLang].sold_badge}</span>`;
+        badgesHtml += `<span class="product-badge badge-out">🔒 ${i18n[currentLang].sold_badge}</span>`;
     }
 
     return badgesHtml;
@@ -322,20 +322,6 @@ function getPriceHTML(p) {
         return `<span class="price-new">${mainPrice} zł</span><span class="price-old">${oldPrice} zł</span>`;
     }
     return `<span>${mainPrice} zł</span>`;
-}
-
-function renderScrollList(list) {
-    return list.map((p) => {
-        const avail = isAvailable(p);
-        const isSet = p.category?.toLowerCase().trim() === 'sets';
-        const photo = p.photo.split(',')[0].trim();
-        return `<div onclick="openModal(${allProducts.indexOf(p)})" class="scroll-item product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''} ${isSet ? 'is-set-card' : ''}">
-            <div class="img-container mb-3">${getBadgesHTML(p)}<img src="${photo}" loading="lazy"></div>
-            <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
-            <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
-            <div class="text-[10px] font-black mt-auto text-[#062C22]">${getPriceHTML(p)}</div>
-        </div>`;
-    }).join('');
 }
 
 function renderList(list) {
@@ -352,6 +338,24 @@ function renderList(list) {
     }).join('');
 }
 
+// Функція для розкриття повного списку в конкретному блоці на головній
+function expandHomeSection(sectionType) {
+    let filtered = [];
+    if (sectionType === 'sets') {
+        filtered = allProducts.filter(p => p.category?.toLowerCase().trim() === 'sets');
+    } else if (sectionType === 'hits') {
+        filtered = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
+    } else if (sectionType === 'news') {
+        filtered = allProducts.filter(p => p.isNew?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
+    }
+    
+    const grid = document.getElementById(`home-grid-${sectionType}`);
+    const btnContainer = document.getElementById(`home-btn-wrapper-${sectionType}`);
+    
+    if (grid) grid.innerHTML = renderList(filtered);
+    if (btnContainer) btnContainer.remove(); // Видаляємо кнопку після натискання
+}
+
 function refreshCatalog() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const area = document.getElementById('catalog-area');
@@ -359,20 +363,62 @@ function refreshCatalog() {
 
     if (currentFilter === 'home' && q === '') {
         const banner = allProducts.find(p => p.brand === "BANNER");
+        
+        // Фільтруємо масиви для кожної секції головної сторінки
+        const setsList = allProducts.filter(p => p.category?.toLowerCase().trim() === 'sets');
+        const hitsList = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
+        const newsList = allProducts.filter(p => p.isNew?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
+
         area.innerHTML = `
             ${banner ? `<div class="mb-10 rounded-[28px] overflow-hidden shadow-sm"><img src="${banner.photo}" class="w-full object-cover"></div>` : ''}
-            <div class="mb-12">
-                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].sets_title}</h2>
-                <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.category?.toLowerCase().trim() === 'sets'))}</div>
-            </div>
-            <div class="mb-12">
-                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].hits_title}</h2>
-                <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.isBest?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets'))}</div>
-            </div>
-            <div class="mb-12">
-                <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].news_title}</h2>
-                <div class="scroll-x">${renderScrollList(allProducts.filter(p => p.isNew?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets'))}</div>
-            </div>
+            
+            ${setsList.length > 0 ? `
+                <div class="mb-14">
+                    <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].sets_title}</h2>
+                    <div id="home-grid-sets" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${renderList(setsList.slice(0, ITEMS_TO_SHOW_HOME))}
+                    </div>
+                    ${setsList.length > ITEMS_TO_SHOW_HOME ? `
+                        <div id="home-btn-wrapper-sets" class="text-center mt-8">
+                            <button onclick="expandHomeSection('sets')" class="px-8 py-3 border border-black text-[10px] uppercase tracking-widest font-bold hover:bg-black hover:text-white transition-all duration-300 rounded-xl">
+                                ${i18n[currentLang].show_more}
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            ` : ''}
+
+            ${hitsList.length > 0 ? `
+                <div class="mb-14">
+                    <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].hits_title}</h2>
+                    <div id="home-grid-hits" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${renderList(hitsList.slice(0, ITEMS_TO_SHOW_HOME))}
+                    </div>
+                    ${hitsList.length > ITEMS_TO_SHOW_HOME ? `
+                        <div id="home-btn-wrapper-hits" class="text-center mt-8">
+                            <button onclick="expandHomeSection('hits')" class="px-8 py-3 border border-black text-[10px] uppercase tracking-widest font-bold hover:bg-black hover:text-white transition-all duration-300 rounded-xl">
+                                ${i18n[currentLang].show_more}
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            ` : ''}
+
+            ${newsList.length > 0 ? `
+                <div class="mb-14">
+                    <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].news_title}</h2>
+                    <div id="home-grid-news" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${renderList(newsList.slice(0, ITEMS_TO_SHOW_HOME))}
+                    </div>
+                    ${newsList.length > ITEMS_TO_SHOW_HOME ? `
+                        <div id="home-btn-wrapper-news" class="text-center mt-8">
+                            <button onclick="expandHomeSection('news')" class="px-8 py-3 border border-black text-[10px] uppercase tracking-widest font-bold hover:bg-black hover:text-white transition-all duration-300 rounded-xl">
+                                ${i18n[currentLang].show_more}
+                            </button>
+                        </div>
+                    ` : ''}
+                </div>
+            ` : ''}
         `;
         return;
     }
@@ -405,7 +451,6 @@ function openModal(idx) {
     btn.classList.add('opacity-20', 'cursor-not-allowed');
     btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].sold_badge;
 
-    /* Оновлений дизайн бейджів для модального вікна */
     let modalBadges = '';
     const isNew = p.isNew?.toLowerCase() === 'yes' || p.isNew === true;
     const isHit = p.isBest?.toLowerCase() === 'yes' || p.isBest === true;
@@ -468,7 +513,7 @@ function openModal(idx) {
     });
     document.getElementById('m-prices').innerHTML = html;
     document.getElementById('pModal').classList.remove('hidden');
-    document.DianaBodyClass = document.body.classList.add('lock-scroll');
+    document.body.classList.add('lock-scroll');
 }
 
 function closeModal() { 
