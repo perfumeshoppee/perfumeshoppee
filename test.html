@@ -39,7 +39,6 @@
         
         .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-multiply: multiply; }
 
-        /* Контейнер для бейджів зверху ліворуч рядком */
         .badges-wrapper {
             position: absolute;
             top: 10px;
@@ -50,7 +49,6 @@
             z-index: 20;
         }
 
-        /* Преміальний дизайн бейджів */
         .product-badge {
             font-size: 8px;
             font-weight: 800;
@@ -67,29 +65,12 @@
             gap: 3px;
         }
 
-        .badge-new { 
-            background: rgba(197, 160, 89, 0.9); /* Золотий брендовий */
-            color: white;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .badge-hit { 
-            background: rgba(6, 44, 34, 0.9); /* Глибокий зелений */
-            color: #FDFCFB;
-            border: 1px solid rgba(255,255,255,0.15);
-        }
-        .badge-sale { 
-            background: rgba(220, 38, 38, 0.85); /* Елегантний червоний */
-            color: white;
-            border: 1px solid rgba(255,255,255,0.15);
-        }
+        .badge-new { background: rgba(197, 160, 89, 0.9); color: white; border: 1px solid rgba(255,255,255,0.2); }
+        .badge-hit { background: rgba(6, 44, 34, 0.9); color: #FDFCFB; border: 1px solid rgba(255,255,255,0.15); }
+        .badge-sale { background: rgba(220, 38, 38, 0.85); color: white; border: 1px solid rgba(255,255,255,0.15); }
         .badge-out { 
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(23, 23, 23, 0.75); /* Матовий темний */
-            color: #f5f5f5;
-            border: 1px solid rgba(255,255,255,0.1);
-            z-index: 20;
+            position: absolute; bottom: 10px; right: 10px; background: rgba(23, 23, 23, 0.75); 
+            color: #f5f5f5; border: 1px solid rgba(255,255,255,0.1); z-index: 20;
         }
 
         .swiper-sets { width: 100%; height: 300px; border-radius: 24px; margin-bottom: 15px; background: transparent; position: relative; }
@@ -97,7 +78,7 @@
         .swiper-sets img { width: 100%; height: 100%; object-fit: contain; } 
 
         .product-title {
-            font-size: 11px; font-weight: 700; line-height: 1.2; margin-bottom: 8px;
+            font-size: 11px; font-weight: 700; line-height: 1.2; margin-bottom: 6px;
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
             overflow: hidden; text-overflow: ellipsis; min-height: 28px;
         }
@@ -118,6 +99,17 @@
         .price-new { color: #ef4444; font-weight: 900; }
         .price-old { color: #a3a3a3; text-decoration: line-through; font-size: 0.85em; margin-left: 5px; font-weight: 400; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
+
+        /* Стилі для міні-селектора об'ємів у картці */
+        .size-pill {
+            font-size: 8px; font-weight: 700; padding: 3px 6px; border-radius: 6px;
+            border: 1px solid rgba(6, 44, 34, 0.1); color: var(--brand-deep);
+            background: rgba(255, 255, 255, 0.8); transition: all 0.2s ease;
+            text-transform: uppercase; letter-spacing: 0.02em;
+        }
+        .size-pill.active {
+            background: var(--brand-deep); color: white; border-color: var(--brand-deep);
+        }
     </style>
 </head>
 <body>
@@ -211,7 +203,7 @@
 <script>
 const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
 const TG_NICK = 'elenafragrance';
-const ITEMS_TO_SHOW_HOME = 4; // Скільки товарів показувати спочатку на головній сторінці
+const ITEMS_TO_SHOW_HOME = 4;
 
 let allProducts = [], cart = JSON.parse(localStorage.getItem('ps_cart')) || [];
 
@@ -315,37 +307,92 @@ function getBadgesHTML(p) {
     return badgesHtml;
 }
 
-function getPriceHTML(p) {
-    const mainPrice = p.price2ml || p.fullPrice;
-    const oldPrice = p.price2ml ? p.old2ml : p.oldFull;
+// Функція для зміни ціни та активної кнопки об'єму прямо в картці товару
+function switchCardSize(event, pIdx, sizeLabel, price, oldPrice) {
+    event.stopPropagation(); // Зупиняємо відкриття модального вікна при кліку на об'єм
     
-    // Перевіряємо, чи це відливант (якщо є ціна за 2, 5 або 10 мл), щоб додати префікс "od "
-    const isDecant = (p.price2ml && p.price2ml !== '---' && p.price2ml !== '') || 
-                     (p.price5ml && p.price5ml !== '---' && p.price5ml !== '') || 
-                     (p.price10ml && p.price10ml !== '---' && p.price10ml !== '');
-    const prefix = isDecant ? 'od ' : '';
+    const container = document.getElementById(`price-block-${pIdx}`);
+    if (!container) return;
 
+    // Зміна HTML тексту ціни
     if (oldPrice && oldPrice !== '---' && oldPrice !== '') {
-        return `<span class="price-new">${prefix}${mainPrice} zł</span><span class="price-old">${prefix}${oldPrice} zł</span>`;
+        container.innerHTML = `<span class="price-new">${price} zł</span><span class="price-old">${oldPrice} zł</span> <span class="text-[9px] text-neutral-400 font-normal">(${sizeLabel})</span>`;
+    } else {
+        container.innerHTML = `<span>${price} zł</span> <span class="text-[9px] text-neutral-400 font-normal">(${sizeLabel})</span>`;
     }
-    return `<span>${prefix}${mainPrice} zł</span>`;
+
+    // Оновлення активного класу на міні-кнопках
+    const card = container.closest('.product-card');
+    if (card) {
+        card.querySelectorAll('.size-pill').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = event.currentTarget;
+        if (activeBtn) activeBtn.classList.add('active');
+        
+        // Зберігаємо тимчасово вибраний розмір на самій картці, щоб при відкритті модалки підставити його
+        card.setAttribute('data-selected-size', sizeLabel);
+    }
 }
 
 function renderList(list) {
     return list.map((p) => {
+        const pIdx = allProducts.indexOf(p);
         const avail = isAvailable(p);
         const isSet = p.category?.toLowerCase().trim() === 'sets';
         const photo = p.photo.split(',')[0].trim();
-        return `<div onclick="openModal(${allProducts.indexOf(p)})" class="product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''} ${isSet ? 'is-set-card' : ''}">
-        <div class="img-container mb-4">${getBadgesHTML(p)}<img src="${photo}" loading="lazy"></div>
-        <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
-        <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
-        <div class="text-xs font-black text-[#062C22]">${getPriceHTML(p)}</div>
-    </div>`;
+        
+        // Збираємо всі доступні опції об'ємів для картки
+        const sizes = [
+            { label: '2ml', price: p.price2ml, old: p.old2ml },
+            { label: '5ml', price: p.price5ml, old: p.old5ml },
+            { label: '10ml', price: p.price10ml, old: p.old10ml },
+            { label: 'Full', price: p.fullPrice, old: p.oldFull }
+        ].filter(s => s.price && s.price !== '---' && s.price !== '');
+
+        // Беремо перший доступний розмір як початковий
+        const initialSize = sizes[0] || { label: '', price: '0', old: '' };
+
+        // Генеруємо HTML кнопок селектора об'ємів
+        let selectorHtml = '';
+        if (sizes.length > 1 && !isSet) {
+            selectorHtml = `<div class="flex flex-wrap gap-1 mb-3">`;
+            sizes.forEach((s, idx) => {
+                const isActive = idx === 0 ? 'active' : '';
+                selectorHtml += `
+                    <button onclick="switchCardSize(event, ${pIdx}, '${s.label}', '${s.price}', '${s.old || ''}')" 
+                            class="size-pill ${isActive}">
+                        ${s.label}
+                    </button>`;
+            });
+            selectorHtml += `</div>`;
+        }
+
+        // Початковий вигляд ціни
+        let priceHtml = '';
+        if (initialSize.old && initialSize.old !== '---' && initialSize.old !== '') {
+            priceHtml = `<span class="price-new">${initialSize.price} zł</span><span class="price-old">${initialSize.old} zł</span>`;
+        } else {
+            priceHtml = `<span>${initialSize.price} zł</span>`;
+        }
+        // Додаємо мітку об'єму до ціни (якщо це не набір)
+        if (!isSet && initialSize.label) {
+            priceHtml += ` <span class="text-[9px] text-neutral-400 font-normal">(${initialSize.label})</span>`;
+        }
+
+        return `
+        <div onclick="openModal(${pIdx})" id="prod-card-${pIdx}" data-selected-size="${initialSize.label}" class="product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''} ${isSet ? 'is-set-card' : ''}">
+            <div class="img-container mb-4">${getBadgesHTML(p)}<img src="${photo}" loading="lazy"></div>
+            <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
+            <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
+            
+            ${selectorHtml}
+            
+            <div class="mt-auto text-xs font-black text-[#062C22]" id="price-block-${pIdx}">
+                ${priceHtml}
+            </div>
+        </div>`;
     }).join('');
 }
 
-// Функція для розкриття повного списку в конкретному блоці на головній
 function expandHomeSection(sectionType) {
     let filtered = [];
     if (sectionType === 'sets') {
@@ -360,7 +407,7 @@ function expandHomeSection(sectionType) {
     const btnContainer = document.getElementById(`home-btn-wrapper-${sectionType}`);
     
     if (grid) grid.innerHTML = renderList(filtered);
-    if (btnContainer) btnContainer.remove(); // Видаляємо кнопку після натискання
+    if (btnContainer) btnContainer.remove();
 }
 
 function refreshCatalog() {
@@ -370,8 +417,6 @@ function refreshCatalog() {
 
     if (currentFilter === 'home' && q === '') {
         const banner = allProducts.find(p => p.brand === "BANNER");
-        
-        // Фільтруємо масиви для кожної секції головної сторінки
         const setsList = allProducts.filter(p => p.category?.toLowerCase().trim() === 'sets');
         const hitsList = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
         const newsList = allProducts.filter(p => p.isNew?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
@@ -455,6 +500,10 @@ function openModal(idx) {
     const descEl = document.getElementById('m-desc');
     const brandWrapper = document.getElementById('m-brand-wrapper');
     
+    // Дізнаємось, який об'єм було вибрано на картці перед відкриттям модалки
+    const cardEl = document.getElementById(`prod-card-${idx}`);
+    const preselectedSize = cardEl ? cardEl.getAttribute('data-selected-size') : '';
+
     btn.classList.add('opacity-20', 'cursor-not-allowed');
     btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].sold_badge;
 
@@ -508,19 +557,33 @@ function openModal(idx) {
     
     let html = '';
     const sizes = [{l:'2ml', p:p.price2ml, old:p.old2ml}, {l:'5ml', p:p.price5ml, old:p.old5ml}, {l:'10ml', p:p.price10ml, old:p.old10ml}, {l:'Full', p:p.fullPrice, old:p.oldFull}];
-    sizes.forEach(o => {
+    
+    sizes.forEach((o, index) => {
         if(o.p && o.p !== '---' && o.p !== '') {
             const hasDiscount = o.old && o.old !== '---' && o.old !== '';
-            html += `<div onclick="${avail ? `selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo.split(',')[0].trim()}')` : ''}" 
+            // Перевіряємо, чи цей рядок має бути активним (або збігається з preselectedSize, або якщо немає збігів — перший доступний)
+            const shouldPreselect = preselectedSize ? (o.l === preselectedSize) : (index === sizes.findIndex(s => s.p && s.p !== '---' && s.p !== ''));
+            
+            html += `<div id="m-size-row-${o.l}" onclick="${avail ? `selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo.split(',')[0].trim()}')` : ''}" 
                 class="border border-neutral-100 flex justify-between items-center p-4 rounded-xl ${avail ? 'cursor-pointer hover:bg-neutral-50' : 'opacity-40 cursor-not-allowed'} text-xs font-bold transition-all">
                 <span class="uppercase tracking-widest">${o.l}</span>
                 <span class="text-[#062C22]">${hasDiscount ? `<span class="price-new">${o.p} zł</span><span class="price-old">${o.old} zł</span>` : `<span>${o.p} zł</span>`}</span>
             </div>`;
         }
     });
+    
     document.getElementById('m-prices').innerHTML = html;
     document.getElementById('pModal').classList.remove('hidden');
     document.body.classList.add('lock-scroll');
+
+    // Активуємо обраний рядок в модальному вікні автоматично
+    if (avail) {
+        const targetLabel = preselectedSize || sizes.find(s => s.p && s.p !== '---' && s.p !== '')?.l;
+        if (targetLabel) {
+            const rowEl = document.getElementById(`m-size-row-${targetLabel}`);
+            if (rowEl) rowEl.click();
+        }
+    }
 }
 
 function closeModal() { 
