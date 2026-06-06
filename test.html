@@ -316,33 +316,19 @@ function getBadgesHTML(p) {
 }
 
 function getPriceHTML(p) {
-    let mainPrice = '';
-    let oldPrice = '';
-    let sizeLabel = '';
-
-    // Знаходимо перший доступний об'єм для відображення його ціни та назви
-    if (p.price2ml && p.price2ml !== '---' && p.price2ml !== '') {
-        mainPrice = p.price2ml;
-        oldPrice = p.old2ml;
-        sizeLabel = '2ml';
-    } else if (p.price5ml && p.price5ml !== '---' && p.price5ml !== '') {
-        mainPrice = p.price5ml;
-        oldPrice = p.old5ml;
-        sizeLabel = '5ml';
-    } else if (p.price10ml && p.price10ml !== '---' && p.price10ml !== '') {
-        mainPrice = p.price10ml;
-        oldPrice = p.old10ml;
-        sizeLabel = '10ml';
-    } else if (p.fullPrice && p.fullPrice !== '---' && p.fullPrice !== '') {
-        mainPrice = p.fullPrice;
-        oldPrice = p.oldFull;
-        sizeLabel = p.category?.toLowerCase().trim() === 'sets' ? 'set' : 'full';
-    }
+    const mainPrice = p.price2ml || p.fullPrice;
+    const oldPrice = p.price2ml ? p.old2ml : p.oldFull;
+    
+    // Перевіряємо, чи це відливант (якщо є ціна за 2, 5 або 10 мл), щоб додати префікс "od "
+    const isDecant = (p.price2ml && p.price2ml !== '---' && p.price2ml !== '') || 
+                     (p.price5ml && p.price5ml !== '---' && p.price5ml !== '') || 
+                     (p.price10ml && p.price10ml !== '---' && p.price10ml !== '');
+    const prefix = isDecant ? 'od ' : '';
 
     if (oldPrice && oldPrice !== '---' && oldPrice !== '') {
-        return `<span class="price-new">${mainPrice} zł</span><span class="price-old">${oldPrice} zł</span> <span class="text-[10px] font-normal text-neutral-400 ml-1">/ ${sizeLabel}</span>`;
+        return `<span class="price-new">${prefix}${mainPrice} zł</span><span class="price-old">${prefix}${oldPrice} zł</span>`;
     }
-    return `<span>${mainPrice} zł</span> <span class="text-[10px] font-normal text-neutral-400 ml-1">/ ${sizeLabel}</span>`;
+    return `<span>${prefix}${mainPrice} zł</span>`;
 }
 
 function renderList(list) {
