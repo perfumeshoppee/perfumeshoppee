@@ -170,6 +170,17 @@
     <div id="catalog-area" class="px-6"></div>
 </main>
 
+<section id="instagram-section" class="max-w-7xl mx-auto px-6 mb-20">
+    <div class="text-center mb-8">
+        <h2 class="text-[10px] font-extrabold uppercase tracking-[0.2em] mb-2 opacity-40" data-i18n="insta_title">Ми в Instagram</h2>
+        <a href="https://www.instagram.com/perfume.shoppee" target="_blank" class="text-sm font-bold logo-font text-[#C5A059] hover:underline flex items-center justify-center gap-2">
+            <i class="fa-brands fa-instagram text-base"></i>@perfume.shoppee
+        </a>
+    </div>
+    <figure data-behold-id="6baefc08-0131-4a11-8524-7c5148fb3c24"></figure>
+    <script src="https://w.behold.so/widget.js" type="text/javascript" async></script>
+</section>
+
 <div id="cart-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[10000] shadow-2xl transform translate-x-full transition-transform duration-500 flex flex-col">
     <div class="p-6 border-b flex justify-between items-center bg-[#062C22] text-white">
         <h2 class="text-[10px] font-bold uppercase tracking-widest" data-i18n="cart_title"></h2>
@@ -221,7 +232,7 @@ const i18n = {
     UA: {
         search_placeholder: "Пошук аромату...", menu_home: "Головна", menu_catalog: "Каталог", menu_hits: "Хіти", menu_news: "Новинки", menu_sale: "Акції %",
         cat_all: "Усі", cat_female: "Жіночі", cat_male: "Чоловічі", cat_uniseks: "Унісекс", cat_sets: "Набори", hits_title: "Хіти продажу", news_title: "Новинки", 
-        sets_title: "Набори", cart_title: "Ваш кошик", cart_total_label: "Разом",
+        sets_title: "Набори", cart_title: "Ваш кошик", cart_total_label: "Разом", insta_title: "Ми в Instagram",
         cart_order_btn: "Оформити в Telegram", add_to_cart: "Додати в кошик", empty_cart: "Кошик порожній", order_msg: "Нове замовлення", default_desc: "Вишуканий аромат з унікальним шлейфом.",
         sold_badge: "Немає в наявності", out_of_stock_btn: "Немає в наявності",
         badgeNew: "НОВИНКА", badgeSale: "АКЦІЯ", badgeHit: "ХІТ", outOfStock: "Немає в наявності",
@@ -230,7 +241,7 @@ const i18n = {
     PL: {
         search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_hits: "Bestsellery", menu_news: "Nowości", menu_sale: "Promocje %",
         cat_all: "Wszystkie", cat_female: "Damskie", cat_male: "Męskie", cat_uniseks: "Uniseks", cat_sets: "Zestawy", hits_title: "Bestsellery", news_title: "Nowości", 
-        sets_title: "Zestawy", cart_title: "Twój koszyk", cart_total_label: "Suma",
+        sets_title: "Zestawy", cart_title: "Twój koszyk", cart_total_label: "Suma", insta_title: "Nasza taśma Instagram",
         cart_order_btn: "Zamów przez Telegram", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze.",
         sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak w magazynie",
         badgeNew: "NOWOŚĆ", badgeSale: "PROMOCJA", badgeHit: "HIT", outOfStock: "Brak w magazynie",
@@ -307,28 +318,24 @@ function getBadgesHTML(p) {
     return badgesHtml;
 }
 
-// Функція для зміни ціни та активної кнопки об'єму прямо в картці товару
 function switchCardSize(event, pIdx, sizeLabel, price, oldPrice) {
-    event.stopPropagation(); // Зупиняємо відкриття модального вікна при кліку на об'єм
+    event.stopPropagation(); 
     
     const container = document.getElementById(`price-block-${pIdx}`);
     if (!container) return;
 
-    // Зміна HTML тексту ціни
     if (oldPrice && oldPrice !== '---' && oldPrice !== '') {
         container.innerHTML = `<span class="price-new">${price} zł</span><span class="price-old">${oldPrice} zł</span> <span class="text-[9px] text-neutral-400 font-normal">(${sizeLabel})</span>`;
     } else {
         container.innerHTML = `<span>${price} zł</span> <span class="text-[9px] text-neutral-400 font-normal">(${sizeLabel})</span>`;
     }
 
-    // Оновлення активного класу на міні-кнопках
     const card = container.closest('.product-card');
     if (card) {
         card.querySelectorAll('.size-pill').forEach(btn => btn.classList.remove('active'));
         const activeBtn = event.currentTarget;
         if (activeBtn) activeBtn.classList.add('active');
         
-        // Зберігаємо тимчасово вибраний розмір на самій картці, щоб при відкритті модалки підставити його
         card.setAttribute('data-selected-size', sizeLabel);
     }
 }
@@ -340,7 +347,6 @@ function renderList(list) {
         const isSet = p.category?.toLowerCase().trim() === 'sets';
         const photo = p.photo.split(',')[0].trim();
         
-        // Збираємо всі доступні опції об'ємів для картки
         const sizes = [
             { label: '2ml', price: p.price2ml, old: p.old2ml },
             { label: '5ml', price: p.price5ml, old: p.old5ml },
@@ -348,10 +354,8 @@ function renderList(list) {
             { label: 'Full', price: p.fullPrice, old: p.oldFull }
         ].filter(s => s.price && s.price !== '---' && s.price !== '');
 
-        // Беремо перший доступний розмір як початковий
         const initialSize = sizes[0] || { label: '', price: '0', old: '' };
 
-        // Генеруємо HTML кнопок селектора об'ємів
         let selectorHtml = '';
         if (sizes.length > 1 && !isSet) {
             selectorHtml = `<div class="flex flex-wrap gap-1 mb-3">`;
@@ -366,14 +370,12 @@ function renderList(list) {
             selectorHtml += `</div>`;
         }
 
-        // Початковий вигляд ціни
         let priceHtml = '';
         if (initialSize.old && initialSize.old !== '---' && initialSize.old !== '') {
             priceHtml = `<span class="price-new">${initialSize.price} zł</span><span class="price-old">${initialSize.old} zł</span>`;
         } else {
             priceHtml = `<span>${initialSize.price} zł</span>`;
         }
-        // Додаємо мітку об'єму до ціни (якщо це не набір)
         if (!isSet && initialSize.label) {
             priceHtml += ` <span class="text-[9px] text-neutral-400 font-normal">(${initialSize.label})</span>`;
         }
@@ -413,9 +415,11 @@ function expandHomeSection(sectionType) {
 function refreshCatalog() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const area = document.getElementById('catalog-area');
+    const instaSection = document.getElementById('instagram-section');
     document.getElementById('catalog-filters').classList.toggle('hidden', currentFilter !== 'all');
 
     if (currentFilter === 'home' && q === '') {
+        if(instaSection) instaSection.classList.remove('hidden');
         const banner = allProducts.find(p => p.brand === "BANNER");
         const setsList = allProducts.filter(p => p.category?.toLowerCase().trim() === 'sets');
         const hitsList = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
@@ -475,6 +479,8 @@ function refreshCatalog() {
         return;
     }
 
+    if(instaSection) instaSection.classList.add('hidden');
+
     let filtered = allProducts.filter(p => {
         if(p.brand === "BANNER") return false;
         const nameVal = (currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)).toLowerCase();
@@ -500,7 +506,6 @@ function openModal(idx) {
     const descEl = document.getElementById('m-desc');
     const brandWrapper = document.getElementById('m-brand-wrapper');
     
-    // Дізнаємось, який об'єм було вибрано на картці перед відкриттям модалки
     const cardEl = document.getElementById(`prod-card-${idx}`);
     const preselectedSize = cardEl ? cardEl.getAttribute('data-selected-size') : '';
 
@@ -561,9 +566,6 @@ function openModal(idx) {
     sizes.forEach((o, index) => {
         if(o.p && o.p !== '---' && o.p !== '') {
             const hasDiscount = o.old && o.old !== '---' && o.old !== '';
-            // Перевіряємо, чи цей рядок має бути активним (або збігається з preselectedSize, або якщо немає збігів — перший доступний)
-            const shouldPreselect = preselectedSize ? (o.l === preselectedSize) : (index === sizes.findIndex(s => s.p && s.p !== '---' && s.p !== ''));
-            
             html += `<div id="m-size-row-${o.l}" onclick="${avail ? `selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo.split(',')[0].trim()}')` : ''}" 
                 class="border border-neutral-100 flex justify-between items-center p-4 rounded-xl ${avail ? 'cursor-pointer hover:bg-neutral-50' : 'opacity-40 cursor-not-allowed'} text-xs font-bold transition-all">
                 <span class="uppercase tracking-widest">${o.l}</span>
@@ -576,7 +578,6 @@ function openModal(idx) {
     document.getElementById('pModal').classList.remove('hidden');
     document.body.classList.add('lock-scroll');
 
-    // Активуємо обраний рядок в модальному вікні автоматично
     if (avail) {
         const targetLabel = preselectedSize || sizes.find(s => s.p && s.p !== '---' && s.p !== '')?.l;
         if (targetLabel) {
