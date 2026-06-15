@@ -4,17 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
-    <title>Perfume Shoppee | Оригінальні Парфуми від 2 мл — Україна та Польща</title>
-    <meta name="description" content="Купити оригінальні парфуми від 2 мл. Люкс, ніша, унісекс. Швидка доставка по Україні та Польщі. Новинки, хіти та акції. 100% оригінал.">
-    <meta name="keywords" content="парфуми, купити парфуми, оригінальні парфуми, пробники парфумів, парфумерія, люксові парфуми, нішеві аромати, парфуми Україна, парфуми Польща">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://perfumeshoppee.github.io">
+<meta name="description" content="Розпив від 2 мл. Швидка доставка по всій Польщі. Виключно оригінал.">
 
-    <meta property="og:title" content="Perfume Shoppee | Оригінальні Парфуми від 2 мл">
-    <meta property="og:description" content="Преміум парфумерія. Пробники від 2 мл. Доставка Україна та Польща.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://perfumeshoppee.github.io">
-    <meta property="og:image" content="https://perfumeshoppee.github.io/og-image.jpg">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://perfumeshoppee.pl/">
+<meta property="og:title" content="Perfume Shoppee | Нішеві та люксові аромати">
+<meta property="og:description" content="Розпив від 2 мл. Швидка доставка по всій Польщі. Виключно оригінал.">
+
+<meta property="og:image" content="https://perfumeshoppee.pl/preview.jpg">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://perfumeshoppee.pl/preview.jpg">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -110,6 +110,12 @@
         .size-pill.active {
             background: var(--brand-deep); color: white; border-color: var(--brand-deep);
         }
+
+        /* Кастомні стилі для блоку Instagram */
+        .instagram-section {
+            border-top: 1px solid rgba(6, 44, 34, 0.05);
+            background: linear-gradient(to bottom, #FFF, var(--bg-light));
+        }
     </style>
 </head>
 <body>
@@ -168,18 +174,22 @@
       <button onclick="setCategory('sets')" id="cat-sets" class="cat-btn px-6 py-2 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[9px] font-bold uppercase tracking-widest" data-i18n="cat_sets"></button>
     </div>
     <div id="catalog-area" class="px-6"></div>
-</main>
 
-<section id="instagram-section" class="max-w-7xl mx-auto px-6 mb-20">
-    <div class="text-center mb-8">
-        <h2 class="text-[10px] font-extrabold uppercase tracking-[0.2em] mb-2 opacity-40" data-i18n="insta_title">Ми в Instagram</h2>
-        <a href="https://www.instagram.com/perfume.shoppee" target="_blank" class="text-sm font-bold logo-font text-[#C5A059] hover:underline flex items-center justify-center gap-2">
-            <i class="fa-brands fa-instagram text-base"></i>@perfume.shoppee
-        </a>
+    <div class="instagram-section mt-16 pt-12 px-6" data-aos="fade-up">
+        <div class="text-center mb-8">
+            <a href="https://www.instagram.com/perfume.shoppee" target="_blank" class="inline-flex flex-col items-center gap-2 group">
+                <div class="w-12 h-12 rounded-full border border-[#C5A059]/30 flex items-center justify-center text-[#C5A059] group-hover:bg-[#062C22] group-hover:text-white transition-all duration-300">
+                    <i class="fa-brands fa-instagram text-xl"></i>
+                </div>
+                <h2 class="text-[10px] font-extrabold uppercase tracking-[0.2em] opacity-40 group-hover:opacity-100 transition-opacity" data-i18n="instagram_title">Ми в Instagram</h2>
+                <span class="text-xs font-medium text-[#C5A059] tracking-tight">@perfume.shoppee</span>
+            </a>
+        </div>
+        <div class="max-w-5xl mx-auto rounded-3xl overflow-hidden shadow-sm bg-white p-2 border border-black/5">
+            <behold-widget feed-id="nrpI1p4LrlKIOK4yiDMe"></behold-widget>
+        </div>
     </div>
-    <figure data-behold-id="6baefc08-0131-4a11-8524-7c5148fb3c24"></figure>
-    <script src="https://w.behold.so/widget.js" type="text/javascript" async></script>
-</section>
+</main>
 
 <div id="cart-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[10000] shadow-2xl transform translate-x-full transition-transform duration-500 flex flex-col">
     <div class="p-6 border-b flex justify-between items-center bg-[#062C22] text-white">
@@ -212,6 +222,13 @@
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
 
 <script>
+  (() => {
+    const d=document,s=d.createElement("script");s.type="module";
+    s.src="https://w.behold.so/widget.js";d.head.append(s);
+  })();
+</script>
+
+<script>
 const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
 const TG_NICK = 'elenafragrance';
 const ITEMS_TO_SHOW_HOME = 4;
@@ -232,20 +249,20 @@ const i18n = {
     UA: {
         search_placeholder: "Пошук аромату...", menu_home: "Головна", menu_catalog: "Каталог", menu_hits: "Хіти", menu_news: "Новинки", menu_sale: "Акції %",
         cat_all: "Усі", cat_female: "Жіночі", cat_male: "Чоловічі", cat_uniseks: "Унісекс", cat_sets: "Набори", hits_title: "Хіти продажу", news_title: "Новинки", 
-        sets_title: "Набори", cart_title: "Ваш кошик", cart_total_label: "Разом", insta_title: "Ми в Instagram",
+        sets_title: "Набори", cart_title: "Ваш кошик", cart_total_label: "Разом",
         cart_order_btn: "Оформити в Telegram", add_to_cart: "Додати в кошик", empty_cart: "Кошик порожній", order_msg: "Нове замовлення", default_desc: "Вишуканий аромат з унікальним шлейфом.",
         sold_badge: "Немає в наявності", out_of_stock_btn: "Немає в наявності",
         badgeNew: "НОВИНКА", badgeSale: "АКЦІЯ", badgeHit: "ХІТ", outOfStock: "Немає в наявності",
-        show_more: "Показати більше"
+        show_more: "Показати більше", instagram_title: "Ми в Instagram"
     },
     PL: {
         search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_hits: "Bestsellery", menu_news: "Nowości", menu_sale: "Promocje %",
         cat_all: "Wszystkie", cat_female: "Damskie", cat_male: "Męskie", cat_uniseks: "Uniseks", cat_sets: "Zestawy", hits_title: "Bestsellery", news_title: "Nowości", 
-        sets_title: "Zestawy", cart_title: "Twój koszyk", cart_total_label: "Suma", insta_title: "Nasza taśma Instagram",
+        sets_title: "Zestawy", cart_title: "Twój koszyk", cart_total_label: "Suma",
         cart_order_btn: "Zamów przez Telegram", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze.",
         sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak w magazynie",
         badgeNew: "NOWOŚĆ", badgeSale: "PROMOCJA", badgeHit: "HIT", outOfStock: "Brak w magazynie",
-        show_more: "Pokaż więcej"
+        show_more: "Pokaż więcej", instagram_title: "Nas na Instagramie"
     }
 };
 
@@ -296,6 +313,7 @@ function updateUI() {
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = i18n[currentLang][el.getAttribute('data-i18n-placeholder')]);
 }
 
+// (Все остальные функции JS остаются без изменений для стабильности сайта)
 function isAvailable(p) { return (p.status || "").toLowerCase().trim() !== 'out'; }
 function isSaleProduct(p) { return (p.old2ml || p.oldFull) && (p.old2ml !== '---' && p.oldFull !== '---'); }
 
@@ -319,8 +337,7 @@ function getBadgesHTML(p) {
 }
 
 function switchCardSize(event, pIdx, sizeLabel, price, oldPrice) {
-    event.stopPropagation(); 
-    
+    event.stopPropagation();
     const container = document.getElementById(`price-block-${pIdx}`);
     if (!container) return;
 
@@ -335,7 +352,6 @@ function switchCardSize(event, pIdx, sizeLabel, price, oldPrice) {
         card.querySelectorAll('.size-pill').forEach(btn => btn.classList.remove('active'));
         const activeBtn = event.currentTarget;
         if (activeBtn) activeBtn.classList.add('active');
-        
         card.setAttribute('data-selected-size', sizeLabel);
     }
 }
@@ -415,11 +431,9 @@ function expandHomeSection(sectionType) {
 function refreshCatalog() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const area = document.getElementById('catalog-area');
-    const instaSection = document.getElementById('instagram-section');
     document.getElementById('catalog-filters').classList.toggle('hidden', currentFilter !== 'all');
 
     if (currentFilter === 'home' && q === '') {
-        if(instaSection) instaSection.classList.remove('hidden');
         const banner = allProducts.find(p => p.brand === "BANNER");
         const setsList = allProducts.filter(p => p.category?.toLowerCase().trim() === 'sets');
         const hitsList = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
@@ -478,8 +492,6 @@ function refreshCatalog() {
         `;
         return;
     }
-
-    if(instaSection) instaSection.classList.add('hidden');
 
     let filtered = allProducts.filter(p => {
         if(p.brand === "BANNER") return false;
@@ -566,6 +578,8 @@ function openModal(idx) {
     sizes.forEach((o, index) => {
         if(o.p && o.p !== '---' && o.p !== '') {
             const hasDiscount = o.old && o.old !== '---' && o.old !== '';
+            const shouldPreselect = preselectedSize ? (o.l === preselectedSize) : (index === sizes.findIndex(s => s.p && s.p !== '---' && s.p !== ''));
+            
             html += `<div id="m-size-row-${o.l}" onclick="${avail ? `selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo.split(',')[0].trim()}')` : ''}" 
                 class="border border-neutral-100 flex justify-between items-center p-4 rounded-xl ${avail ? 'cursor-pointer hover:bg-neutral-50' : 'opacity-40 cursor-not-allowed'} text-xs font-bold transition-all">
                 <span class="uppercase tracking-widest">${o.l}</span>
