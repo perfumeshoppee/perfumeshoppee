@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <title>Perfume Shoppee | Perfumy niszowe i luksusowe / Нішеві та люксові аромати</title>
-    <meta name="description" content="Odlewki perfum od 2 ml. Szybka wysyłka w Polsce. / Rozpis` vid 2 ml. Shvydka dostavka po vsiy Pol'shchi. Wyłącznie oryginaлы.">
+    <meta name="description" content="Odlewki perfum od 2 ml. Szybka wysyłka w Polsce. / Rozpis` vid 2 ml. Shvydka dostavka po vsiy Pol'shchi. Wyłącznie oryginały.">
     
     <meta name="keywords" content="perfumy, odlewki perfum, perfumy niszowe, oryginalne perfumy, próbki perfum, perfumy luksusowe, dekanty perfum, perfumy Polska, rozlewane, markowe perfumy, testery, zapachy luksusowe, tom ford odlewki, chanel, creed, baccarat, perfumy warszawa, kraków, wysyłka polska, tanie próbki, парфуми, купити парфуми, оригінальні парфуми, пробники парфумів, парфумерія, люксові парфуми, нішеві аромати, парфуми Польща, rozpyv, відливанти, оригінал парфуми, елітні парфуми, стійкі парфуми, парфуми недорого, розпив ніші, парфуми варшава, доставка польща, інтернет магазин парфумів">
     
@@ -149,7 +149,7 @@
     <div class="mt-auto pt-6 border-t border-white/10"><a href="https://www.instagram.com/perfume.shoppee" target="_blank" class="flex items-center gap-3 text-[#C5A059]"><i class="fa-brands fa-instagram text-xl"></i><span class="text-[9px] uppercase tracking-widest">Instagram</span></a></div>
 </div>
 
-<main class="max-w-7xl mx-auto pb-10">
+<nav class="max-w-7xl mx-auto pb-10">
     <div id="catalog-filters" class="hidden px-6 mb-6 overflow-x-auto no-scrollbar flex gap-2">
       <button onclick="setCategory('all')" id="cat-all" class="cat-btn px-6 py-2 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[9px] font-bold uppercase tracking-widest active" data-i18n="cat_all"></button>
       <button onclick="setCategory('female')" id="cat-female" class="cat-btn px-6 py-2 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[9px] font-bold uppercase tracking-widest" data-i18n="cat_female"></button>
@@ -158,7 +158,7 @@
       <button onclick="setCategory('sets')" id="cat-sets" class="cat-btn px-6 py-2 bg-white border border-neutral-100 text-neutral-400 rounded-xl text-[9px] font-bold uppercase tracking-widest" data-i18n="cat_sets"></button>
     </div>
     <div id="catalog-area" class="px-6"></div>
-</main>
+</nav>
 
 <section id="reviews-section" class="max-w-3xl mx-auto px-6 mb-16">
     <div class="text-center mb-10">
@@ -306,7 +306,7 @@ async function init() {
     } catch (e) { console.error("CSV Load Error", e); }
 }
 
-/* ==================== ОНОВЛЕНА, СУПЕР-ШВИДКА І НАДІЙНА СИСТЕМА ВІДГУКІВ ==================== */
+/* ==================== АВТОНОМНА СИСТЕМА ВІДГУКІВ ==================== */
 function setFormRating(rating) {
     userRating = rating;
     const stars = document.querySelectorAll('#formStars i');
@@ -339,7 +339,6 @@ function handleReviewSubmit(e) {
     
     if(!nameVal || !textVal) return;
 
-    // Увімкнення гарної анімації завантаження на кнопці
     btn.disabled = true;
     btn.style.opacity = "0.6";
     btnText.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> ' + i18n[currentLang].pub_loading;
@@ -355,12 +354,10 @@ function handleReviewSubmit(e) {
             date: new Date().toLocaleDateString()
         };
 
-        // Миттєве збереження в пам'ять бази даних на пристрої
         let clientReviews = JSON.parse(localStorage.getItem('ps_client_reviews')) || [];
         clientReviews.unshift(newReview);
         localStorage.setItem('ps_client_reviews', JSON.stringify(clientReviews));
 
-        // Повне очищення форми та повернення її до стандартного стану
         document.getElementById('revName').value = '';
         document.getElementById('revText').value = '';
         document.getElementById('uploadBtnText').innerText = i18n[currentLang].rev_choose_file;
@@ -372,7 +369,7 @@ function handleReviewSubmit(e) {
         btnText.innerText = i18n[currentLang].pub_review;
         
         loadGoogleReviews();
-    }, 800); // Затримка для гарного ефекту завантаження
+    }, 800);
 }
 
 function deleteOwnReview(id) {
@@ -436,7 +433,6 @@ function loadGoogleReviews() {
 
     listContainer.innerHTML = clientHTML;
 
-    // Авто-розрахунок середнього балу по відгуках
     const finalAvg = count > 0 ? (totalStars / count).toFixed(1) : "5.0";
     document.getElementById('average-rating-num').innerText = `${finalAvg} / 5 (${count})`;
     
@@ -686,6 +682,167 @@ function refreshCatalog() {
 
     area.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-4 gap-4">${renderList(filtered)}</div>`;
 }
+
+function openModal(idx) {
+    const p = allProducts[idx]; selectedOption = null;
+    const avail = isAvailable(p);
+    const isSet = p.category?.toLowerCase().trim() === 'sets';
+    const btn = document.getElementById('add-to-cart-btn');
+    const slot = document.getElementById('modal-media-slot');
+    const descEl = document.getElementById('m-desc');
+    const brandWrapper = document.getElementById('m-brand-wrapper');
+    
+    const cardEl = document.getElementById(`prod-card-${idx}`);
+    const preselectedSize = cardEl ? cardEl.getAttribute('data-selected-size') : '';
+
+    btn.classList.add('opacity-20', 'cursor-not-allowed');
+    btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].sold_badge;
+
+    let modalBadges = '';
+    const isNew = p.isNew?.toLowerCase() === 'yes' || p.isNew === true;
+    const isHit = p.isBest?.toLowerCase() === 'yes' || p.isBest === true;
+    const isSale = isSaleProduct(p);
+
+    if (!avail) {
+        modalBadges += `<span class="bg-neutral-800 text-white text-[9px] font-extrabold px-2 py-1 rounded-md tracking-wider uppercase flex items-center gap-1">🔒 ${i18n[currentLang].sold_badge}</span>`;
+    } else {
+        if (isNew) modalBadges += `<span class="bg-amber-500/15 text-amber-600 text-[9px] font-extrabold px-2 py-1 rounded-md tracking-wider uppercase flex items-center gap-1">✨ ${i18n[currentLang].badgeNew}</span>`;
+        if (isHit) modalBadges += `<span class="bg-emerald-600/15 text-emerald-700 text-[9px] font-extrabold px-2 py-1 rounded-md tracking-wider uppercase flex items-center gap-1">🔥 ${i18n[currentLang].badgeHit}</span>`;
+        if (isSale) modalBadges += `<span class="bg-red-600/15 text-red-600 text-[9px] font-extrabold px-2 py-1 rounded-md tracking-wider uppercase flex items-center gap-1">%% ${i18n[currentLang].badgeSale}</span>`;
+    }
+
+    brandWrapper.innerHTML = `
+        <div class="text-[9px] font-black text-[#C5A059] uppercase tracking-[0.2em]">${p.brand}</div>
+        <div class="flex items-center gap-1">${modalBadges}</div>
+    `;
+
+    const rawDesc = currentLang === 'UA' ? (p.descUK || i18n.UA.default_desc) : (p.descPL || i18n.PL.default_desc);
+    const descParts = rawDesc.split('|').map(s => s.trim());
+    descEl.innerText = descParts[0];
+
+    if (isSet) {
+        const photos = p.photo.split(',').map(s => s.trim());
+        let sliderHTML = `<div class="swiper swiper-sets"><div class="swiper-wrapper">`;
+        photos.forEach(url => { 
+            sliderHTML += `<div class="swiper-slide"><img src="${url}" onerror="this.src='https://placehold.co/400x400?text=No+Photo'"></div>`; 
+        });
+        sliderHTML += `</div><div class="swiper-pagination"></div><div class="swiper-button-next"></div><div class="swiper-button-prev"></div></div>`;
+        slot.innerHTML = sliderHTML;
+        
+        setTimeout(() => { 
+            swiperInstance = new Swiper(".swiper-sets", { 
+                navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
+                pagination: { el: ".swiper-pagination", clickable: true },
+                on: { slideChange: function () {
+                    if (descParts.length > 1) descEl.innerText = descParts[this.activeIndex] || descParts[0];
+                }}
+            }); 
+        }, 50);
+    } else {
+        const photo = p.photo.split(',')[0].trim();
+        slot.innerHTML = `<div class="pt-8 pb-4"><div class="img-container w-40 h-40 mx-auto bg-transparent"><img id="m-img" src="${photo}"></div></div>`;
+        if(!avail) document.getElementById('m-img').style.opacity = '0.4';
+    }
+
+    document.getElementById('m-title').innerText = currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name);
+    
+    let html = '';
+    const sizes = [{l:'2ml', p:p.price2ml, old:p.old2ml}, {l:'5ml', p:p.price5ml, old:p.old5ml}, {l:'10ml', p:p.price10ml, old:p.old10ml}, {l:'Full', p:p.fullPrice, old:p.oldFull}];
+    
+    sizes.forEach((o, index) => {
+        if(o.p && o.p !== '---' && o.p !== '') {
+            const hasDiscount = o.old && o.old !== '---' && o.old !== '';
+            html += `<div id="m-size-row-${o.l}" onclick="${avail ? `selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo.split(',')[0].trim()}')` : ''}" 
+                class="border border-neutral-100 flex justify-between items-center p-4 rounded-xl ${avail ? 'cursor-pointer hover:bg-neutral-50' : 'opacity-40 cursor-not-allowed'} text-xs font-bold transition-all">
+                <span class="uppercase tracking-widest">${o.l}</span>
+                <span class="text-[#062C22]">${hasDiscount ? `<span class="price-new">${o.p} zł</span><span class="price-old">${o.old} zł</span>` : `<span>${o.p} zł</span>`}</span>
+            </div>`;
+        }
+    });
+    
+    document.getElementById('m-prices').innerHTML = html;
+    document.getElementById('pModal').classList.remove('hidden');
+    document.body.classList.add('lock-scroll');
+
+    if (avail) {
+        const targetLabel = preselectedSize || sizes.find(s => s.p && s.p !== '---' && s.p !== '')?.l;
+        if (targetLabel) {
+            const rowEl = document.getElementById(`m-size-row-${targetLabel}`);
+            if (rowEl) rowEl.click();
+        }
+    }
+}
+
+function closeModal() { 
+    document.getElementById('pModal').classList.add('hidden'); 
+    document.body.classList.remove('lock-scroll');
+    if(swiperInstance) { swiperInstance.destroy(true, true); swiperInstance = null; }
+}
+
+function selectSize(el, size, price, brand, name, img) {
+    document.querySelectorAll('#m-prices div').forEach(d => { d.style.borderColor = '#F0F0F0'; d.style.background = 'white'; });
+    el.style.borderColor = '#C5A059'; el.style.background = '#fdfaf3';
+    selectedOption = { size, price, brand, name, img, id: Date.now() };
+    const btn = document.getElementById('add-to-cart-btn');
+    btn.classList.remove('opacity-20', 'cursor-not-allowed');
+    btn.innerText = `${i18n[currentLang].add_to_cart} • ${price} zł`;
+}
+
+function addToCart() {
+    if(!selectedOption) return;
+    cart.push(selectedOption);
+    localStorage.setItem('ps_cart', JSON.stringify(cart));
+    renderCart(); closeModal(); toggleCart(true);
+}
+
+function renderCart() {
+    const c = document.getElementById('cart-items');
+    const countEl = document.getElementById('cart-count');
+    countEl.innerText = cart.length;
+    countEl.classList.toggle('hidden', cart.length === 0);
+    let total = 0;
+    if (cart.length === 0) {
+        c.innerHTML = `<div class="text-center py-10 text-neutral-300 text-[9px] uppercase font-bold">${i18n[currentLang].empty_cart}</div>`;
+    } else {
+        c.innerHTML = cart.map((item, i) => {
+            total += parseFloat(item.price);
+            return `<div class="flex gap-4 items-center">
+                <div class="w-14 h-14 bg-neutral-50 rounded-xl p-2 flex items-center justify-center"><img src="${item.img}" class="max-w-full max-h-full object-contain"></div>
+                <div class="flex-1 min-w-0">
+                    <div class="text-[7px] font-black text-[#C5A059] uppercase">${item.brand}</div>
+                    <div class="text-[10px] font-bold truncate">${item.name}</div>
+                    <div class="text-[9px] text-neutral-400 font-bold">${item.size} • ${item.price} zł</div>
+                </div>
+                <button onclick="removeFromCart(${i})" class="text-neutral-200 hover:text-red-400"><i class="fa-solid fa-xmark"></i></button>
+            </div>`;
+        }).join('');
+    }
+    document.getElementById('cart-total').innerText = total.toFixed(2) + ' zł';
+}
+
+function removeFromCart(i) { cart.splice(i, 1); localStorage.setItem('ps_cart', JSON.stringify(cart)); renderCart(); }
+
+function sendOrder() {
+    if (cart.length === 0) return;
+    let t = `${i18n[currentLang].order_msg}!\n\n`;
+    cart.forEach((it, i) => t += `${i+1}. ${it.brand} ${it.name} (${it.size}) - ${it.price} zł\n`);
+    t += `\n💰 ${i18n[currentLang].cart_total_label}: ${document.getElementById('cart-total').innerText}`;
+    window.open(`https://t.me/${TG_NICK}?text=${encodeURIComponent(t)}`, '_blank');
+}
+
+function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('overlay').classList.toggle('hidden'); document.body.classList.toggle('lock-scroll'); }
+function toggleCart(st) { const p = document.getElementById('cart-panel'); if (st === true) p.classList.remove('translate-x-full'); else p.classList.toggle('translate-x-full'); }
+
+function saveState() {
+    localStorage.setItem('ps_currentFilter', currentFilter);
+    localStorage.setItem('ps_curCat', curCat);
+}
+
+function goHome() { currentFilter = 'home'; curCat = 'all'; saveState(); refreshCatalog(); }
+function showAllCatalog() { currentFilter = 'all'; curCat = 'all'; saveState(); updateCatButtons(); refreshCatalog(); }
+function setCategory(c) { curCat = c; saveState(); updateCatButtons(); refreshCatalog(); }
+function updateCatButtons() { document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.toggle('active', btn.id === 'cat-' + curCat)); }
+function filterBy(type) { currentFilter = type; saveState(); window.scrollTo({top: 0, behavior: 'smooth'}); refreshCatalog(); }
 
 document.getElementById('add-to-cart-btn').onclick = addToCart;
 init();
