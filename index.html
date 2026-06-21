@@ -252,8 +252,6 @@
 
 <script>
 const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
-// Надійна глобальна база даних відгуків через Firebase REST API
-const GLOBAL_DB_URL = 'https://ps-reviews-default-rtdb.europe-west1.firebasedatabase.app/reviews.json';
 const TG_NICK = 'elenafragrance';
 const ITEMS_TO_SHOW_HOME = 4;
 
@@ -310,7 +308,7 @@ async function init() {
     } catch (e) { console.error("CSV Load Error", e); }
 }
 
-/* ==================== СИСТЕМА ВІДГУКІВ З БАЗОЮ ДАНИХ ФАЙРБЕЙС ==================== */
+/* ==================== СИСТЕМА ЛОКАЛЬНИХ ВІДГУКІВ ==================== */
 function setFormRating(rating) {
     userRating = rating;
     const stars = document.querySelectorAll('#formStars i');
@@ -334,7 +332,7 @@ function handleFileSelect(input) {
     reader.readAsDataURL(file);
 }
 
-async function handleReviewSubmit(e) {
+function handleReviewSubmit(e) {
     e.preventDefault();
     const nameVal = document.getElementById('revName').value.trim();
     const textVal = document.getElementById('revText').value.trim();
@@ -347,122 +345,107 @@ async function handleReviewSubmit(e) {
     btn.style.opacity = "0.6";
     btnText.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> ' + i18n[currentLang].pub_loading;
 
-    const uniqueId = 'rev_' + Date.now();
-    const newReview = {
-        id: uniqueId,
-        name: nameVal,
-        text: textVal,
-        rating: userRating,
-        photo: uploadedPhotoUrl,
-        date: new Date().toLocaleDateString()
-    };
+    setTimeout(() => {
+        const uniqueId = 'rev_' + Date.now();
+        const newReview = {
+            id: uniqueId,
+            name: nameVal,
+            text: textVal,
+            rating: userRating,
+            photo: uploadedPhotoUrl,
+            date: new Date().toLocaleDateString()
+        };
 
-    try {
-        // Зберігаємо на сервер для всіх людей
-        await fetch(GLOBAL_DB_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newReview)
-        });
+        let clientReviews = JSON.parse(localStorage.getItem('ps_client_reviews')) || [];
+        clientReviews.unshift(newReview);
+        localStorage.setItem('ps_client_reviews', JSON.stringify(clientReviews));
 
-        // Маркуємо на цьому телефоні для кнопки видалення
-        let ownIds = JSON.parse(localStorage.getItem('ps_own_review_ids')) || [];
-        ownIds.push(uniqueId);
-        localStorage.setItem('ps_own_review_ids', JSON.stringify(ownIds));
-    } catch (err) { console.error(err); }
+        document.getElementById('revName').value = '';
+        document.getElementById('revText').value = '';
+        document.getElementById('uploadBtnText').innerText = i18n[currentLang].rev_choose_file;
+        uploadedPhotoUrl = "";
+        setFormRating(5);
+        
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        btnText.innerText = i18n[currentLang].pub_review;
+        
+        loadGoogleReviews();
+    }, 800);
+}
 
-    document.getElementById('revName').value = '';
-    document.getElementById('revText').value = '';
-    document.getElementById('uploadBtnText').innerText = i18n[currentLang].rev_choose_file;
-    uploadedPhotoUrl = "";
-    setFormRating(5);
-    
-    btn.disabled = false;
-    btn.style.opacity = "1";
-    btnText.innerText = i18n[currentLang].pub_review;
-    
+function deleteOwnReview(id) {
+    let clientReviews = JSON.parse(localStorage.getItem('ps_client_reviews')) || [];
+    clientReviews = clientReviews.filter(r => r.id !== id);
+    localStorage.setItem('ps_client_reviews', JSON.stringify(clientReviews));
     loadGoogleReviews();
 }
 
-async function deleteOwnReview(cloudKey) {
-    try {
-        await fetch(`https://ps-reviews-default-rtdb.europe-west1.firebasedatabase.app/reviews/${cloudKey}.json`, {
-            method: 'DELETE'
-        });
-        loadGoogleReviews();
-    } catch (err) { console.error(err); }
+function openPhotoModal(src) {
+    document.getElementById('photoFullImg').src = src;
+    document.getElementById('photoFullModal').classList.remove('hidden');
+    document.body.classList.add('lock-scroll');
 }
 
-async function loadGoogleReviews() {
+function closePhotoModal() {
+    document.getElementById('photoFullModal').classList.add('hidden');
+    document.body.classList.remove('lock-scroll');
+}
+
+function loadGoogleReviews() {
     const listContainer = document.getElementById('reviews-list');
-    let ownIds = JSON.parse(localStorage.getItem('ps_own_review_ids')) || [];
+    let clientReviews = JSON.parse(localStorage.getItem('ps_client_reviews')) || [];
     
     let totalStars = 0;
     let count = 0;
 
-    try {
-        const res = await fetch(GLOBAL_DB_URL);
-        const data = await res.json();
+    if(clientReviews.length === 0) {
+        listContainer.innerHTML = '<div class="text-center py-6 text-neutral-300 text-[10px] uppercase font-bold tracking-widest">' + i18n[currentLang].no_reviews + '</div>';
+        document.getElementById('average-rating-num').innerText = "5.0 / 5 (0)";
+        return;
+    }
 
-        if(!data) {
-            listContainer.innerHTML = '<div class="text-center py-6 text-neutral-300 text-[10px] uppercase font-bold tracking-widest">' + i18n[currentLang].no_reviews + '</div>';
-            document.getElementById('average-rating-num').innerText = "5.0 / 5 (0)";
-            return;
-        }
-
-        let keys = Object.keys(data).reverse();
-        
-        let reviewsHTML = keys.map(key => {
-            let r = data[key];
-            totalStars += parseInt(r.rating);
-            count++;
-            
-            let stars = '';
-            for(let i=1; i<=5; i++) { 
-                let isActive = i <= r.rating ? 'text-[#C5A059]' : 'text-neutral-200';
-                stars += '<i class="fa-solid fa-star ' + isActive + '"></i>'; 
-            }
-            
-            let photoHTML = '';
-            if (r.photo) {
-                photoHTML = '<div class="w-20 h-20 rounded-xl overflow-hidden bg-neutral-50 border border-neutral-100 shadow-sm cursor-pointer mt-3"><img src="' + r.photo + '" class="w-full h-full object-cover" onclick="openPhotoModal(\'' + r.photo + '\')"></div>';
-            }
-
-            let isAuthor = ownIds.includes(r.id);
-            let deleteButtonHTML = '';
-            if (isAuthor) {
-                deleteButtonHTML = '<button onclick="deleteOwnReview(\'' + key + '\')" class="absolute top-4 right-4 text-[9px] font-bold text-red-400 bg-red-50 px-2 py-1 rounded-md uppercase tracking-wider">' + i18n[currentLang].delete_btn + '</button>';
-            }
-
-            return `
-                <div class="bg-white p-5 rounded-2xl border border-neutral-100 shadow-sm border-l-2 border-l-[#C5A059] relative" data-aos="fade-up">
-                    ${deleteButtonHTML}
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="font-bold text-xs">${r.name}</span>
-                        <div class="text-[10px] flex gap-0.5">${stars}</div>
-                    </div>
-                    <div class="text-[9px] text-neutral-400 mb-2 font-medium">${r.date}</div>
-                    <p class="text-neutral-500 text-xs leading-relaxed">${r.text}</p>
-                    ${photoHTML}
-                </div>
-            `;
-        }).join('');
-
-        listContainer.innerHTML = reviewsHTML;
-
-        const finalAvg = count > 0 ? (totalStars / count).toFixed(1) : "5.0";
-        document.getElementById('average-rating-num').innerText = `${finalAvg} / 5 (${count})`;
-        
-        const starsContainer = document.getElementById('average-stars');
-        let avgStarsHTML = '';
-        const roundAvg = Math.round(parseFloat(finalAvg));
+    let clientHTML = clientReviews.map(r => {
+        totalStars += parseInt(r.rating);
+        count++;
+        let stars = '';
         for(let i=1; i<=5; i++) { 
-            let isActive = i <= roundAvg ? 'text-[#C5A059]' : 'text-neutral-200';
-            avgStarsHTML += '<i class="fa-solid fa-star ' + isActive + '"></i>'; 
+            let isActive = i <= r.rating ? 'text-[#C5A059]' : 'text-neutral-200';
+            stars += '<i class="fa-solid fa-star ' + isActive + '"></i>'; 
         }
-        starsContainer.innerHTML = avgStarsHTML;
+        
+        let photoHTML = '';
+        if (r.photo) {
+            photoHTML = '<div class="w-20 h-20 rounded-xl overflow-hidden bg-neutral-50 border border-neutral-100 shadow-sm cursor-pointer mt-3"><img src="' + r.photo + '" class="w-full h-full object-cover" onclick="openPhotoModal(\'' + r.photo + '\')"></div>';
+        }
 
-    } catch (e) { console.error(e); }
+        return `
+            <div class="bg-white p-5 rounded-2xl border border-neutral-100 shadow-sm border-l-2 border-l-[#C5A059] relative">
+                <button onclick="deleteOwnReview('${r.id}')" class="absolute top-4 right-4 text-[9px] font-bold text-red-400 bg-red-50 px-2 py-1 rounded-md uppercase tracking-wider">${i18n[currentLang].delete_btn}</button>
+                <div class="flex justify-between items-center mb-1">
+                    <span class="font-bold text-xs">${r.name}</span>
+                    <div class="text-[10px] flex gap-0.5">${stars}</div>
+                </div>
+                <div class="text-[9px] text-neutral-400 mb-2 font-medium">${r.date}</div>
+                <p class="text-neutral-500 text-xs leading-relaxed">${r.text}</p>
+                ${photoHTML}
+            </div>
+        `;
+    }).join('');
+
+    listContainer.innerHTML = clientHTML;
+
+    const finalAvg = count > 0 ? (totalStars / count).toFixed(1) : "5.0";
+    document.getElementById('average-rating-num').innerText = `${finalAvg} / 5 (${count})`;
+    
+    const starsContainer = document.getElementById('average-stars');
+    let avgStarsHTML = '';
+    const roundAvg = Math.round(parseFloat(finalAvg));
+    for(let i=1; i<=5; i++) { 
+        let isActive = i <= roundAvg ? 'text-[#C5A059]' : 'text-neutral-200';
+        avgStarsHTML += '<i class="fa-solid fa-star ' + isActive + '"></i>'; 
+    }
+    starsContainer.innerHTML = avgStarsHTML;
 }
 /* ===================================================================================== */
 
@@ -497,7 +480,7 @@ function updateUI() {
     document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = i18n[currentLang][el.getAttribute('data-i18n')]);
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = i18n[currentLang][el.getAttribute('data-i18n-placeholder')]);
     
-    // Суворе зачищення мови форми
+    // Суворе перемикання мови форми
     document.getElementById('reviews-heading-text').innerText = i18n[currentLang].reviews_heading;
     document.getElementById('leave-review-text').innerText = i18n[currentLang].leave_review;
     document.getElementById('your-rating-text').innerText = i18n[currentLang].your_rating;
@@ -710,17 +693,6 @@ function refreshCatalog() {
     area.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-4 gap-4">${renderList(filtered)}</div>`;
 }
 
-function openPhotoModal(src) {
-    document.getElementById('photoFullImg').src = src;
-    document.getElementById('photoFullModal').classList.remove('hidden');
-    document.body.classList.add('lock-scroll');
-}
-
-function closePhotoModal() {
-    document.getElementById('photoFullModal').classList.add('hidden');
-    document.body.classList.remove('lock-scroll');
-}
-
 function openModal(idx) {
     const p = allProducts[idx]; selectedOption = null;
     const avail = isAvailable(p);
@@ -876,6 +848,7 @@ function saveState() {
     localStorage.setItem('ps_curCat', curCat);
 }
 
+// Залізобетонна логіка перемикання розділів без багів
 function goHome() { currentFilter = 'home'; curCat = 'all'; saveState(); refreshCatalog(); }
 function showAllCatalog() { currentFilter = 'all'; curCat = 'all'; saveState(); updateCatButtons(); refreshCatalog(); }
 function setCategory(c) { curCat = c; saveState(); updateCatButtons(); refreshCatalog(); }
