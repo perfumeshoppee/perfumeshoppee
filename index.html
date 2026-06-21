@@ -252,7 +252,7 @@
 
 <script>
 const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
-// Залізобетонна хмарна база даних (Синхронізована для ВСІХ пристроїв)
+// Надійна глобальна база даних відгуків через Firebase REST API
 const GLOBAL_DB_URL = 'https://ps-reviews-default-rtdb.europe-west1.firebasedatabase.app/reviews.json';
 const TG_NICK = 'elenafragrance';
 const ITEMS_TO_SHOW_HOME = 4;
@@ -279,7 +279,7 @@ const i18n = {
         sold_badge: "Немає в наявності", out_of_stock_btn: "Немає в наявності",
         badgeNew: "НОВИНКА", badgeSale: "АКЦІЯ", badgeHit: "ХІТ", outOfStock: "Немає в наявності",
         show_more: "Показати більше", reviews_heading: "Відгуки клієнтів", leave_review: "Залишити свій відгук", your_rating: "Ваша оцінка:", 
-        pub_review: "Опублікувати відгук", pub_loading: "Завантаження...", rev_choose_file: "Обрати файл", label_photo: "Фото:", delete_btn: "Видалити",
+        pub_review: "Опублікувати відгук", pub_loading: "Завантаження...", rev_choose_file: "Обрати фото", label_photo: "Фото з галереї:", delete_btn: "Видалити",
         name_placeholder: "Ваше ім'я", text_placeholder: "Ваш відгук", no_reviews: "Тут з'являться перші відгуки"
     },
     PL: {
@@ -290,7 +290,7 @@ const i18n = {
         sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak w magazynie",
         badgeNew: "NOWOŚĆ", badgeSale: "PROMOCJA", badgeHit: "HIT", outOfStock: "Brak w magazynie",
         show_more: "Pokaż więcej", reviews_heading: "Opinie klientów", leave_review: "Zostaw swoją opinię", your_rating: "Twoja ocena:", 
-        pub_review: "Opublikuj opinię", pub_loading: "Ładowanie...", rev_choose_file: "Wybierz plik", label_photo: "Zdjęcie:", delete_btn: "Usuń",
+        pub_review: "Opublikuj opinię", pub_loading: "Ładowanie...", rev_choose_file: "Wybierz plik", label_photo: "Zdjęcie z galerii:", delete_btn: "Usuń",
         name_placeholder: "Twoje imię", text_placeholder: "Twoja opinia", no_reviews: "Tutaj pojawią się pierwsze opinie"
     }
 };
@@ -310,7 +310,7 @@ async function init() {
     } catch (e) { console.error("CSV Load Error", e); }
 }
 
-/* ==================== ХМАРНА СИСТЕМА ВІДГУКІВ ==================== */
+/* ==================== СИСТЕМА ВІДГУКІВ З БАЗОЮ ДАНИХ ФАЙРБЕЙС ==================== */
 function setFormRating(rating) {
     userRating = rating;
     const stars = document.querySelectorAll('#formStars i');
@@ -358,14 +358,14 @@ async function handleReviewSubmit(e) {
     };
 
     try {
-        // Надсилання відгуку на єдиний хмарний сервер
+        // Зберігаємо на сервер для всіх людей
         await fetch(GLOBAL_DB_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newReview)
         });
 
-        // Зберігаємо ID автора на його телефоні лише для можливості видалення
+        // Маркуємо на цьому телефоні для кнопки видалення
         let ownIds = JSON.parse(localStorage.getItem('ps_own_review_ids')) || [];
         ownIds.push(uniqueId);
         localStorage.setItem('ps_own_review_ids', JSON.stringify(ownIds));
@@ -435,7 +435,7 @@ async function loadGoogleReviews() {
             }
 
             return `
-                <div class="bg-white p-5 rounded-2xl border border-neutral-100 shadow-sm border-l-2 border-l-[#C5A059] relative">
+                <div class="bg-white p-5 rounded-2xl border border-neutral-100 shadow-sm border-l-2 border-l-[#C5A059] relative" data-aos="fade-up">
                     ${deleteButtonHTML}
                     <div class="flex justify-between items-center mb-1">
                         <span class="font-bold text-xs">${r.name}</span>
@@ -497,7 +497,7 @@ function updateUI() {
     document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = i18n[currentLang][el.getAttribute('data-i18n')]);
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = i18n[currentLang][el.getAttribute('data-i18n-placeholder')]);
     
-    // Повне перемикання текстовок форми
+    // Суворе зачищення мови форми
     document.getElementById('reviews-heading-text').innerText = i18n[currentLang].reviews_heading;
     document.getElementById('leave-review-text').innerText = i18n[currentLang].leave_review;
     document.getElementById('your-rating-text').innerText = i18n[currentLang].your_rating;
@@ -708,6 +708,17 @@ function refreshCatalog() {
     });
 
     area.innerHTML = `<div class="grid grid-cols-2 md:grid-cols-4 gap-4">${renderList(filtered)}</div>`;
+}
+
+function openPhotoModal(src) {
+    document.getElementById('photoFullImg').src = src;
+    document.getElementById('photoFullModal').classList.remove('hidden');
+    document.body.classList.add('lock-scroll');
+}
+
+function closePhotoModal() {
+    document.getElementById('photoFullModal').classList.add('hidden');
+    document.body.classList.remove('lock-scroll');
 }
 
 function openModal(idx) {
