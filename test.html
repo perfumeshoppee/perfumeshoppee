@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     
     <title>Perfume Shoppee | Perfumy niszowe i luksusowe / Нішеві та люксові аромати</title>
-    <meta name="description" content="Odlewki perfum od 2 ml. Szybka wysyłka w Polsce. / Розпив від 2 мл. Швидка доставка по всій Польщі. Wyłącznie oryginały.">
+    <meta name="description" content="Odlewki perfum od 2 ml. Szybka wysyłka w Polsce. / Rozpis` vid 2 ml. Shvydka dostavka po vsiy Pol'shchi. Wyłącznie oryginały.">
     
-    <meta name="keywords" content="perfumy, odlewki perfum, perfumy niszowe, oryginalne perfumy, próbki perfum, perfumy luksusowe, dekanty, perfumy Polska, rozlewane, парфуми, купити парфуми, оригінальні парфуми, пробники парфумів, парфумерія, люксові парфуми, нішеві аромати, парфуми Польща, розпив парфумів, відливанти">
+    <meta name="keywords" content="perfumy, odlewki perfum, perfumy niszowe, oryginalne perfumy, próbki perfum, perfumy luksusowe, dekanty perfum, perfumy Polska, rozlewane, markowe perfumy, testery, zapachy luksusowe, tom ford odlewki, chanel, creed, baccarat, perfumy warszawa, kraków, wysyłka polska, tanie próbki, парфуми, купити парфуми, оригінальні парфуми, пробники парфумів, парфумерія, люксові парфуми, нішеві аромати, парфуми Польща, розпив парфумів, відливанти, оригінал парфуми, елітні парфуми, стійкі парфуми, парфуми недорого, розпив ніші, парфуми варшава, доставка польща, інтернет магазин парфумів">
     
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://perfumeshoppee.pl">
@@ -15,7 +15,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://perfumeshoppee.pl/">
     <meta property="og:title" content="Perfume Shoppee | Perfumy niszowe i luksusowe / Нішеві та люксові аромати">
-    <meta property="og:description" content="Odlewki perfum od 2 ml. Szybka wysyłka w Polsce. / Розпив від 2 мл. Швидка доставка по всій Польщі. Wyłącznie oryginały.">
+    <meta property="og:description" content="Odlewki perfum od 2 ml. Szybka wysyłka w Polsce. / Rozpis від 2 мл. Shvydka dostavka po vsiy Pol'shchi. Wyłącznie oryginały.">
     <meta property="og:image" content="https://perfumeshoppee.pl/preview.jpg">
 
     <meta name="twitter:card" content="summary_large_image">
@@ -43,7 +43,9 @@
         
         .img-container img { max-width: 100%; max-height: 100%; object-fit: contain; mix-blend-multiply: multiply; }
 
-        .badges-wrapper { position: absolute; top: 10px; left: 10px; display: flex; flex-wrap: wrap; gap: 4px; z-index: 20; }
+        .badges-wrapper {
+            position: absolute; top: 10px; left: 10px; display: flex; flex-wrap: wrap; gap: 4px; z-index: 20;
+        }
 
         .product-badge {
             font-size: 8px; font-weight: 800; padding: 4px 8px; border-radius: 8px; text-transform: uppercase;
@@ -54,26 +56,20 @@
         .badge-new { background: rgba(197, 160, 89, 0.9); color: white; border: 1px solid rgba(255,255,255,0.2); }
         .badge-hit { background: rgba(6, 44, 34, 0.9); color: #FDFCFB; border: 1px solid rgba(255,255,255,0.15); }
         .badge-sale { background: rgba(220, 38, 38, 0.85); color: white; border: 1px solid rgba(255,255,255,0.15); }
-        .badge-out { position: absolute; bottom: 10px; right: 10px; background: rgba(23, 23, 23, 0.75); color: #f5f5f5; border: 1px solid rgba(255,255,255,0.1); z-index: 20; }
+        .badge-out { 
+            position: absolute; bottom: 10px; right: 10px; background: rgba(23, 23, 23, 0.75); 
+            color: #f5f5f5; border: 1px solid rgba(255,255,255,0.1); z-index: 20;
+        }
 
         .swiper-sets { width: 100%; height: 300px; border-radius: 24px; margin-bottom: 15px; background: transparent; position: relative; }
         .swiper-sets .swiper-slide { display: flex; align-items: center; justify-content: center; overflow: hidden; }
         .swiper-sets img { width: 100%; height: 100%; object-fit: contain; } 
 
         .product-title {
-            font-size: 11px; font-weight: 700; line-height: 1.2; margin-bottom: 8px;
+            font-size: 11px; font-weight: 700; line-height: 1.2; margin-bottom: 6px;
             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
             overflow: hidden; text-overflow: ellipsis; min-height: 28px;
         }
-
-        .scroll-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        .scroll-arrows { display: flex; gap: 8px; }
-        .arrow-btn { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(6, 44, 34, 0.1); display: flex; align-items: center; justify-content: center; background: white; color: var(--brand-deep); font-size: 10px; transition: all 0.3s; }
-        .arrow-btn:active { background: var(--brand-deep); color: white; }
-
-        .scroll-x { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px; padding-bottom: 15px; -webkit-overflow-scrolling: touch; scroll-behavior: smooth; }
-        .scroll-x::-webkit-scrollbar { display: none; }
-        .scroll-item { flex: 0 0 160px; scroll-snap-align: start; }
 
         .product-card { background: white; border-radius: 24px; border: 1px solid rgba(0,0,0,0.03); transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); position: relative; cursor: pointer; }
         .product-card.is-set-card { border: none; background: transparent; }
@@ -90,6 +86,20 @@
         .lock-scroll { overflow: hidden; }
         .price-new { color: #ef4444; font-weight: 900; }
         .price-old { color: #a3a3a3; text-decoration: line-through; font-size: 0.85em; margin-left: 5px; font-weight: 400; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+
+        .size-pill {
+            font-size: 8px; font-weight: 700; padding: 3px 6px; border-radius: 6px;
+            border: 1px solid rgba(6, 44, 34, 0.1); color: var(--brand-deep);
+            background: rgba(255, 255, 255, 0.8); transition: all 0.2s ease;
+            text-transform: uppercase; letter-spacing: 0.02em;
+        }
+        .size-pill.active {
+            background: var(--brand-deep); color: white; border-color: var(--brand-deep);
+        }
+
+        .star-rating i { cursor: pointer; transition: color 0.2s; }
+        .star-rating i.active { color: #C5A059; }
     </style>
 </head>
 <body>
@@ -150,6 +160,50 @@
     <div id="catalog-area" class="px-6"></div>
 </main>
 
+<section id="reviews-section" class="max-w-3xl mx-auto px-6 mb-16">
+    <div class="text-center mb-10">
+        <h2 class="text-[10px] font-extrabold uppercase tracking-[0.2em] mb-2 opacity-40" data-i18n="reviews_heading">Відгуки клієнтів</h2>
+        <div class="flex items-center justify-center gap-1 text-[#C5A059] text-sm font-bold">
+            <span id="average-rating-num">5.0 / 5</span>
+            <div id="average-stars" class="flex gap-0.5 text-xs">
+                <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+            </div>
+        </div>
+    </div>
+
+    <div id="reviews-list" class="space-y-4 mb-10">
+        <div class="text-center py-6 text-neutral-300 text-[9px] uppercase font-bold tracking-widest">Завантаження відгуків...</div>
+    </div>
+
+    <div class="bg-neutral-50 p-6 rounded-3xl border border-neutral-100">
+        <h3 class="text-xs font-bold uppercase tracking-wider mb-4 text-center" data-i18n="leave_review">Залишити свій відгук</h3>
+        <form id="reviewForm" onsubmit="handleReviewSubmit(event)" class="space-y-3">
+            <div class="flex justify-between items-center bg-white px-4 py-3 rounded-xl border border-neutral-100">
+                <span class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider" data-i18n="your_rating">Ваша оцінка:</span>
+                <div class="star-rating text-neutral-200 text-sm flex gap-1" id="formStars">
+                    <i class="fa-solid fa-star active" onclick="setFormRating(1)"></i>
+                    <i class="fa-solid fa-star active" onclick="setFormRating(2)"></i>
+                    <i class="fa-solid fa-star active" onclick="setFormRating(3)"></i>
+                    <i class="fa-solid fa-star active" onclick="setFormRating(4)"></i>
+                    <i class="fa-solid fa-star active" onclick="setFormRating(5)"></i>
+                </div>
+            </div>
+            <input type="text" id="revName" required class="w-full px-4 py-3 rounded-xl bg-white text-xs outline-none border border-neutral-100" placeholder="Ваше ім'я / Twoje imię">
+            <textarea id="revText" required rows="3" class="w-full px-4 py-3 rounded-xl bg-white text-xs outline-none border border-neutral-100 resize-none" placeholder="Ваш відгук / Twoja opinia"></textarea>
+            
+            <div class="bg-white px-4 py-3 rounded-xl border border-neutral-100 flex items-center justify-between">
+                <span class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider" data-i18n="rev_photo_label">Фото посилки / Zdjęcie:</span>
+                <label class="cursor-pointer bg-neutral-100 text-neutral-600 font-bold text-[10px] uppercase px-4 py-2 rounded-lg hover:bg-neutral-200 transition-colors">
+                    <span id="uploadBtnText" data-i18n="rev_choose_file">Обрати файл</span>
+                    <input type="file" id="revPhotoFile" accept="image/*" class="hidden" onchange="handleFileSelect(this)">
+                </label>
+            </div>
+
+            <button type="submit" id="submitReviewBtn" class="w-full bg-[#062C22] text-white py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all hover:bg-opacity-90" data-i18n="pub_review">Опублікувати відгук</button>
+        </form>
+    </div>
+</section>
+
 <section id="instagram-section" class="max-w-7xl mx-auto px-6 mb-16">
     <div class="text-center mb-8">
         <h2 class="text-[10px] font-extrabold uppercase tracking-[0.2em] mb-2 opacity-40" data-i18n="insta_title">Ми в Instagram</h2>
@@ -193,9 +247,12 @@
 
 <script>
 const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
+const REVIEWS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby47EOCC50m4yHBTDFk5yAF6mcse2UHudOiMW1VUqZ4Wif0MKL_0W1imvINNglPMPHMGg/exec';
 const TG_NICK = 'elenafragrance';
+const ITEMS_TO_SHOW_HOME = 4;
 
 let allProducts = [], cart = JSON.parse(localStorage.getItem('ps_cart')) || [];
+let userRating = 5, uploadedPhotoUrl = "";
 
 if (!sessionStorage.getItem('ps_session_active')) {
     localStorage.setItem('ps_currentFilter', 'home');
@@ -214,7 +271,9 @@ const i18n = {
         sets_title: "Набори", cart_title: "Ваш кошик", cart_total_label: "Разом", insta_title: "Ми в Instagram",
         cart_order_btn: "Оформити в Telegram", add_to_cart: "Додати в кошик", empty_cart: "Кошик порожній", order_msg: "Нове замовлення", default_desc: "Вишуканий аромат з унікальним шлейфом.",
         sold_badge: "Немає в наявності", out_of_stock_btn: "Немає в наявності",
-        badgeNew: "НОВИНКА", badgeSale: "АКЦІЯ", badgeHit: "ХІТ", outOfStock: "Немає в наявності"
+        badgeNew: "НОВИНКА", badgeSale: "АКЦІЯ", badgeHit: "ХІТ", outOfStock: "Немає в наявності",
+        show_more: "Показати більше", reviews_heading: "Відгуки клієнтів", leave_review: "Залишити свій відгук", your_rating: "Ваша оцінка:", pub_review: "Опублікувати відгук",
+        rev_photo_label: "Фото посилки:", rev_choose_file: "Обрати файл"
     },
     PL: {
         search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_hits: "Bestsellery", menu_news: "Nowości", menu_sale: "Promocje %",
@@ -222,7 +281,9 @@ const i18n = {
         sets_title: "Zestawy", cart_title: "Twój koszyk", cart_total_label: "Suma", insta_title: "Nasza taśma Instagram",
         cart_order_btn: "Zamów przez Telegram", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze.",
         sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak w magazynie",
-        badgeNew: "NOWOŚĆ", badgeSale: "PROMOCJA", badgeHit: "HIT", outOfStock: "Brak w magazynie"
+        badgeNew: "NOWOŚĆ", badgeSale: "PROMOCJA", badgeHit: "HIT", outOfStock: "Brak w magazynie",
+        show_more: "Pokaż więcej", reviews_heading: "Opinie klientów", leave_review: "Zostaw swoją opinię", your_rating: "Twoja ocena:", pub_review: "Opublikuj opinię",
+        rev_photo_label: "Zdjęcie paczki:", rev_choose_file: "Wybierz plik"
     }
 };
 
@@ -236,10 +297,151 @@ async function init() {
             if (b.brand === "BANNER") return 1;
             return (a.brand.localeCompare(b.brand)) || ((currentLang === 'UA' ? (a.nameUK || a.name) : (a.namePL || a.name)).localeCompare(currentLang === 'UA' ? (b.nameUK || b.name) : (b.namePL || b.name)));
         });
-        updateUI(); updateCatButtons(); refreshCatalog(); renderCart();
+        updateUI(); updateCatButtons(); refreshCatalog(); renderCart(); loadGoogleReviews();
         setTimeout(() => { AOS.init({ duration: 800, once: true, offset: 50 }); }, 200);
     } catch (e) { console.error("CSV Load Error", e); }
 }
+
+/* ==================== ІНТЕГРАЦІЯ СИСТЕМИ ВІДГУКІВ З GOOGLE-ТАБЛИЦЕЮ ==================== */
+function setFormRating(rating) {
+    userRating = rating;
+    const stars = document.querySelectorAll('#formStars i');
+    stars.forEach((star, idx) => {
+        if (idx < rating) star.classList.add('active'); else star.classList.remove('active');
+    });
+}
+
+function handleFileSelect(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    const btnText = document.getElementById('uploadBtnText');
+    btnText.innerText = currentLang === 'UA' ? "Завантаження..." : "Ładowanie...";
+    
+    const reader = new FileReader();
+    reader.onloadend = function() {
+        const base64Data = reader.result.split(',')[1];
+        const formData = new FormData();
+        formData.append('image', base64Data);
+
+        fetch('https://api.imgbb.com/1/upload?key=6dfbb016a3a410f84577f80dbca481f4', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.json())
+        .then(json => {
+            if(json.success) {
+                uploadedPhotoUrl = json.data.url;
+                btnText.innerText = "✓ OK";
+            } else {
+                btnText.innerText = currentLang === 'UA' ? "Помилка" : "Błąd";
+            }
+        })
+        .catch(() => { btnText.innerText = currentLang === 'UA' ? "Помилка" : "Błąd"; });
+    }
+    reader.readAsDataURL(file);
+}
+
+async function handleReviewSubmit(e) {
+    e.preventDefault();
+    const nameVal = document.getElementById('revName').value.trim();
+    const textVal = document.getElementById('revText').value.trim();
+    const btn = document.getElementById('submitReviewBtn');
+    
+    if(!nameVal || !textVal) return;
+    btn.disabled = true;
+    btn.innerText = currentLang === 'UA' ? "Надсилання..." : "Wysyłanie...";
+
+    const reviewData = {
+        name: nameVal,
+        text: textVal,
+        rating: userRating,
+        photo: uploadedPhotoUrl
+    };
+
+    try {
+        await fetch(REVIEWS_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reviewData)
+        });
+
+        document.getElementById('revName').value = '';
+        document.getElementById('revText').value = '';
+        document.getElementById('uploadBtnText').innerText = i18n[currentLang].rev_choose_file;
+        uploadedPhotoUrl = "";
+        setFormRating(5);
+        
+        btn.disabled = false;
+        btn.innerText = i18n[currentLang].pub_review;
+        
+        setTimeout(() => { loadGoogleReviews(); }, 1500);
+    } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+        btn.innerText = i18n[currentLang].pub_review;
+    }
+}
+
+async function loadGoogleReviews() {
+    const listContainer = document.getElementById('reviews-list');
+    try {
+        const res = await fetch(REVIEWS_SCRIPT_URL);
+        const data = await res.json();
+        
+        if (!data || data.length === 0) {
+            listContainer.innerHTML = `<div class="text-center py-6 text-neutral-300 text-[10px] uppercase font-bold tracking-widest">Тут будуть перші відгуки клієнтів</div>`;
+            updateAverageRating(5, []);
+            return;
+        }
+
+        data.reverse();
+
+        let totalStars = 0;
+        let reviewsHTML = data.map(r => {
+            const ratingNum = parseInt(r.rating) || 5;
+            totalStars += ratingNum;
+
+            let starIcons = '';
+            for(let i = 1; i <= 5; i++) {
+                starIcons += `<i class="fa-solid fa-star ${i <= ratingNum ? 'text-[#C5A059]' : 'text-neutral-200'}"></i>`;
+            }
+
+            return `
+                <div class="bg-white p-5 rounded-2xl border border-neutral-100 shadow-sm">
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-bold text-xs">${r.name}</span>
+                        <div class="text-[10px] flex gap-0.5">${starIcons}</div>
+                    </div>
+                    <div class="text-[9px] text-neutral-400 mb-2 font-medium">${r.date || ''}</div>
+                    <p class="text-neutral-500 text-xs leading-relaxed mb-3">${r.text}</p>
+                    ${r.photo ? `<div class="w-24 h-24 rounded-xl overflow-hidden bg-neutral-50 border border-neutral-100 shadow-sm"><img src="${r.photo}" class="w-full h-full object-cover cursor-pointer" onclick="window.open('${r.photo}', '_blank')"></div>` : ''}
+                </div>
+            `;
+        }).join('');
+
+        listContainer.innerHTML = reviewsHTML;
+        
+        const avg = (totalStars / data.length).toFixed(1);
+        updateAverageRating(avg, data);
+
+    } catch (e) {
+        listContainer.innerHTML = `<div class="text-center py-6 text-neutral-300 text-[10px] uppercase font-bold tracking-widest">Не вдалося завантажити відгуки</div>`;
+    }
+}
+
+function updateAverageRating(avg, dataList) {
+    document.getElementById('average-rating-num').innerText = `${avg} / 5 (${dataList.length})`;
+    const starsContainer = document.getElementById('average-stars');
+    let starsHTML = '';
+    const roundAvg = Math.round(parseFloat(avg));
+    for(let i=1; i<=5; i++) {
+        starsHTML += `<i class="fa-solid fa-star ${i <= roundAvg ? 'text-[#C5A059]' : 'text-neutral-200'}"></i>`;
+    }
+    starsContainer.innerHTML = starsHTML;
+}
+/* ===================================================================================== */
 
 function parseCSV(text) {
     let rows = [], row = [], col = '', q = false;
@@ -265,7 +467,7 @@ function setLang(l) {
     currentLang = l;
     document.querySelectorAll('.lang-node').forEach(b => b.classList.remove('active'));
     document.getElementById('btn-' + l.toLowerCase()).classList.add('active');
-    updateUI(); refreshCatalog(); renderCart();
+    updateUI(); refreshCatalog(); renderCart(); loadGoogleReviews();
 }
 
 function updateUI() {
@@ -273,6 +475,7 @@ function updateUI() {
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = i18n[currentLang][el.getAttribute('data-i18n-placeholder')]);
 }
 
+// Залишаємо старі робочі функції без змін
 function isAvailable(p) { return (p.status || "").toLowerCase().trim() !== 'out'; }
 function isSaleProduct(p) { return (p.old2ml || p.oldFull) && (p.old2ml !== '---' && p.oldFull !== '---'); }
 
@@ -295,96 +498,168 @@ function getBadgesHTML(p) {
     return badgesHtml;
 }
 
-function getPriceHTML(p) {
-    const mainPrice = p.price2ml || p.fullPrice;
-    const oldPrice = p.price2ml ? p.old2ml : p.oldFull;
+function switchCardSize(event, pIdx, sizeLabel, price, oldPrice) {
+    event.stopPropagation();
+    const container = document.getElementById(`price-block-${pIdx}`);
+    if (!container) return;
+
     if (oldPrice && oldPrice !== '---' && oldPrice !== '') {
-        return `<span class="price-new">${mainPrice} zł</span><span class="price-old">${oldPrice} zł</span>`;
+        container.innerHTML = `<span class="price-new">${price} zł</span><span class="price-old">${oldPrice} zł</span> <span class="text-[9px] text-neutral-400 font-normal">(${sizeLabel})</span>`;
+    } else {
+        container.innerHTML = `<span>${price} zł</span> <span class="text-[9px] text-neutral-400 font-normal">(${sizeLabel})</span>`;
     }
-    return `<span>${mainPrice} zł</span>`;
-}
 
-function scrollSection(direction, sectionId) {
-    const container = document.querySelector(`#scroll-container-${sectionId}`);
-    if (container) {
-        const scrollAmount = 172; 
-        if (direction === 'next') { container.scrollLeft += scrollAmount; } else { container.scrollLeft -= scrollAmount; }
+    const card = container.closest('.product-card');
+    if (card) {
+        card.querySelectorAll('.size-pill').forEach(btn => btn.classList.remove('active'));
+        const activeBtn = event.currentTarget;
+        if (activeBtn) activeBtn.classList.add('active');
+        card.setAttribute('data-selected-size', sizeLabel);
     }
-}
-
-function renderScrollList(list) {
-    return list.map((p) => {
-        const avail = isAvailable(p);
-        const isSet = p.category?.toLowerCase().trim() === 'sets';
-        const photo = p.photo.split(',')[0].trim();
-        return `<div onclick="openModal(${allProducts.indexOf(p)})" class="scroll-item product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''} ${isSet ? 'is-set-card' : ''}">
-            <div class="img-container mb-3">${getBadgesHTML(p)}<img src="${photo}" loading="lazy"></div>
-            <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
-            <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
-            <div class="text-[10px] font-black mt-auto text-[#062C22]">${getPriceHTML(p)}</div>
-        </div>`;
-    }).join('');
 }
 
 function renderList(list) {
     return list.map((p) => {
+        const pIdx = allProducts.indexOf(p);
         const avail = isAvailable(p);
         const isSet = p.category?.toLowerCase().trim() === 'sets';
         const photo = p.photo.split(',')[0].trim();
-        return `<div onclick="openModal(${allProducts.indexOf(p)})" class="product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''} ${isSet ? 'is-set-card' : ''}">
-        <div class="img-container mb-4">${getBadgesHTML(p)}<img src="${photo}" loading="lazy"></div>
-        <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
-        <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
-        <div class="text-xs font-black text-[#062C22]">${getPriceHTML(p)}</div>
-    </div>`;
+        
+        const sizes = [
+            { label: '2ml', price: p.price2ml, old: p.old2ml },
+            { label: '5ml', price: p.price5ml, old: p.old5ml },
+            { label: '10ml', price: p.price10ml, old: p.old10ml },
+            { label: 'Full', price: p.fullPrice, old: p.oldFull }
+        ].filter(s => s.price && s.price !== '---' && s.price !== '');
+
+        const initialSize = sizes[0] || { label: '', price: '0', old: '' };
+
+        let selectorHtml = '';
+        if (sizes.length > 1 && !isSet) {
+            selectorHtml = `<div class="flex flex-wrap gap-1 mb-3">`;
+            sizes.forEach((s, idx) => {
+                const isActive = idx === 0 ? 'active' : '';
+                selectorHtml += `
+                    <button onclick="switchCardSize(event, ${pIdx}, '${s.label}', '${s.price}', '${s.old || ''}')" 
+                            class="size-pill ${isActive}">
+                        ${s.label}
+                    </button>`;
+            });
+            selectorHtml += `</div>`;
+        }
+
+        let priceHtml = '';
+        if (initialSize.old && initialSize.old !== '---' && initialSize.old !== '') {
+            priceHtml = `<span class="price-new">${initialSize.price} zł</span><span class="price-old">${initialSize.old} zł</span>`;
+        } else {
+            priceHtml = `<span>${initialSize.price} zł</span>`;
+        }
+        if (!isSet && initialSize.label) {
+            priceHtml += ` <span class="text-[9px] text-neutral-400 font-normal">(${initialSize.label})</span>`;
+        }
+
+        return `
+        <div onclick="openModal(${pIdx})" id="prod-card-${pIdx}" data-selected-size="${initialSize.label}" class="product-card p-4 flex flex-col h-full ${!avail ? 'out-of-stock' : ''} ${isSet ? 'is-set-card' : ''}">
+            <div class="img-container mb-4">${getBadgesHTML(p)}<img src="${photo}" loading="lazy"></div>
+            <div class="text-[7px] font-black text-[#C5A059] uppercase tracking-widest mb-1">${p.brand}</div>
+            <div class="product-title">${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}</div>
+            
+            ${selectorHtml}
+            
+            <div class="mt-auto text-xs font-black text-[#062C22]" id="price-block-${pIdx}">
+                ${priceHtml}
+            </div>
+        </div>`;
     }).join('');
+}
+
+function expandHomeSection(sectionType) {
+    let filtered = [];
+    if (sectionType === 'sets') {
+        filtered = allProducts.filter(p => p.category?.toLowerCase().trim() === 'sets');
+    } else if (sectionType === 'hits') {
+        filtered = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
+    } else if (sectionType === 'news') {
+        filtered = allProducts.filter(p => p.isNew?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
+    }
+    
+    const grid = document.getElementById(`home-grid-${sectionType}`);
+    const btnContainer = document.getElementById(`home-btn-wrapper-${sectionType}`);
+    
+    if (grid) grid.innerHTML = renderList(filtered);
+    if (btnContainer) btnContainer.remove();
 }
 
 function refreshCatalog() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const area = document.getElementById('catalog-area');
+    const reviewsSec = document.getElementById('reviews-section');
     const instaSection = document.getElementById('instagram-section');
     document.getElementById('catalog-filters').classList.toggle('hidden', currentFilter !== 'all');
 
     if (currentFilter === 'home' && q === '') {
+        if(reviewsSec) reviewsSec.classList.remove('hidden');
         if(instaSection) instaSection.classList.remove('hidden');
         const banner = allProducts.find(p => p.brand === "BANNER");
+        const setsList = allProducts.filter(p => p.category?.toLowerCase().trim() === 'sets');
+        const hitsList = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
+        const newsList = allProducts.filter(p => p.isNew?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
+
         area.innerHTML = `
             ${banner ? `<div class="mb-10 rounded-[28px] overflow-hidden shadow-sm"><img src="${banner.photo}" class="w-full object-cover"></div>` : ''}
-            <div class="mb-12">
-                <div class="scroll-header">
-                    <h2 class="text-[10px] font-extrabold uppercase tracking-widest opacity-40">${i18n[currentLang].sets_title}</h2>
-                    <div class="scroll-arrows">
-                        <button onclick="scrollSection('prev', 'sets')" class="arrow-btn"><i class="fa-solid fa-chevron-left"></i></button>
-                        <button onclick="scrollSection('next', 'sets')" class="arrow-btn"><i class="fa-solid fa-chevron-right"></i></button>
+            
+            ${setsList.length > 0 ? `
+                <div class="mb-14">
+                    <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].sets_title}</h2>
+                    <div id="home-grid-sets" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${renderList(setsList.slice(0, ITEMS_TO_SHOW_HOME))}
                     </div>
+                    ${setsList.length > ITEMS_TO_SHOW_HOME ? `
+                        <div id="home-btn-wrapper-sets" class="text-center mt-8">
+                            <button onclick="expandHomeSection('sets')" class="px-8 py-3 border border-black text-[10px] uppercase tracking-widest font-bold hover:bg-black hover:text-white transition-all duration-300 rounded-xl">
+                                ${i18n[currentLang].show_more}
+                            </button>
+                        </div>
+                    ` : ''}
                 </div>
-                <div id="scroll-container-sets" class="scroll-x">${renderScrollList(allProducts.filter(p => p.category?.toLowerCase().trim() === 'sets'))}</div>
-            </div>
-            <div class="mb-12">
-                <div class="scroll-header">
-                    <h2 class="text-[10px] font-extrabold uppercase tracking-widest opacity-40">${i18n[currentLang].hits_title}</h2>
-                    <div class="scroll-arrows">
-                        <button onclick="scrollSection('prev', 'hits')" class="arrow-btn"><i class="fa-solid fa-chevron-left"></i></button>
-                        <button onclick="scrollSection('next', 'hits')" class="arrow-btn"><i class="fa-solid fa-chevron-right"></i></button>
+            ` : ''}
+
+            ${hitsList.length > 0 ? `
+                <div class="mb-14">
+                    <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].hits_title}</h2>
+                    <div id="home-grid-hits" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${renderList(hitsList.slice(0, ITEMS_TO_SHOW_HOME))}
                     </div>
+                    ${hitsList.length > ITEMS_TO_SHOW_HOME ? `
+                        <div id="home-btn-wrapper-hits" class="text-center mt-8">
+                            <button onclick="expandHomeSection('hits')" class="px-8 py-3 border border-black text-[10px] uppercase tracking-widest font-bold hover:bg-black hover:text-white transition-all duration-300 rounded-xl">
+                                ${i18n[currentLang].show_more}
+                            </button>
+                        </div>
+                    ` : ''}
                 </div>
-                <div id="scroll-container-hits" class="scroll-x">${renderScrollList(allProducts.filter(p => p.isBest?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets'))}</div>
-            </div>
-            <div class="mb-12">
-                <div class="scroll-header">
-                    <h2 class="text-[10px] font-extrabold uppercase tracking-widest opacity-40">${i18n[currentLang].news_title}</h2>
-                    <div class="scroll-arrows">
-                        <button onclick="scrollSection('prev', 'news')" class="arrow-btn"><i class="fa-solid fa-chevron-left"></i></button>
-                        <button onclick="scrollSection('next', 'news')" class="arrow-btn"><i class="fa-solid fa-chevron-right"></i></button>
+            ` : ''}
+
+            ${newsList.length > 0 ? `
+                <div class="mb-14">
+                    <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].news_title}</h2>
+                    <div id="home-grid-news" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${renderList(newsList.slice(0, ITEMS_TO_SHOW_HOME))}
                     </div>
+                    ${newsList.length > ITEMS_TO_SHOW_HOME ? `
+                        <div id="home-btn-wrapper-news" class="text-center mt-8">
+                            <button onclick="expandHomeSection('news')" class="px-8 py-3 border border-black text-[10px] uppercase tracking-widest font-bold hover:bg-black hover:text-white transition-all duration-300 rounded-xl">
+                                ${i18n[currentLang].show_more}
+                            </button>
+                        </div>
+                    ` : ''}
                 </div>
-                <div id="scroll-container-news" class="scroll-x">${renderScrollList(allProducts.filter(p => p.isNew?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets'))}</div>
-            </div>
+            ` : ''}
         `;
         return;
     }
 
+    if(reviewsSec) reviewsSec.classList.add('hidden');
     if(instaSection) instaSection.classList.add('hidden');
 
     let filtered = allProducts.filter(p => {
@@ -412,6 +687,9 @@ function openModal(idx) {
     const descEl = document.getElementById('m-desc');
     const brandWrapper = document.getElementById('m-brand-wrapper');
     
+    const cardEl = document.getElementById(`prod-card-${idx}`);
+    const preselectedSize = cardEl ? cardEl.getAttribute('data-selected-size') : '';
+
     btn.classList.add('opacity-20', 'cursor-not-allowed');
     btn.innerText = avail ? i18n[currentLang].add_to_cart : i18n[currentLang].sold_badge;
 
@@ -465,19 +743,29 @@ function openModal(idx) {
     
     let html = '';
     const sizes = [{l:'2ml', p:p.price2ml, old:p.old2ml}, {l:'5ml', p:p.price5ml, old:p.old5ml}, {l:'10ml', p:p.price10ml, old:p.old10ml}, {l:'Full', p:p.fullPrice, old:p.oldFull}];
-    sizes.forEach(o => {
+    
+    sizes.forEach((o, index) => {
         if(o.p && o.p !== '---' && o.p !== '') {
             const hasDiscount = o.old && o.old !== '---' && o.old !== '';
-            html += `<div onclick="${avail ? `selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo.split(',')[0].trim()}')` : ''}" 
+            html += `<div id="m-size-row-${o.l}" onclick="${avail ? `selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo.split(',')[0].trim()}')` : ''}" 
                 class="border border-neutral-100 flex justify-between items-center p-4 rounded-xl ${avail ? 'cursor-pointer hover:bg-neutral-50' : 'opacity-40 cursor-not-allowed'} text-xs font-bold transition-all">
                 <span class="uppercase tracking-widest">${o.l}</span>
                 <span class="text-[#062C22]">${hasDiscount ? `<span class="price-new">${o.p} zł</span><span class="price-old">${o.old} zł</span>` : `<span>${o.p} zł</span>`}</span>
             </div>`;
         }
     });
+    
     document.getElementById('m-prices').innerHTML = html;
     document.getElementById('pModal').classList.remove('hidden');
     document.body.classList.add('lock-scroll');
+
+    if (avail) {
+        const targetLabel = preselectedSize || sizes.find(s => s.p && s.p !== '---' && s.p !== '')?.l;
+        if (targetLabel) {
+            const rowEl = document.getElementById(`m-size-row-${targetLabel}`);
+            if (rowEl) rowEl.click();
+        }
+    }
 }
 
 function closeModal() { 
@@ -493,7 +781,6 @@ function selectSize(el, size, price, brand, name, img) {
     const btn = document.getElementById('add-to-cart-btn');
     btn.classList.remove('opacity-20', 'cursor-not-allowed');
     btn.innerText = `${i18n[currentLang].add_to_cart} • ${price} zł`;
-    btn.onclick = addToCart;
 }
 
 function addToCart() {
