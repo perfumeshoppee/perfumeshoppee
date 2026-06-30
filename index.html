@@ -272,7 +272,7 @@ const i18n = {
     UA: {
         search_placeholder: "Пошук аромату...", menu_home: "Головна", menu_catalog: "Каталог", menu_hits: "Хіти", menu_news: "Новинки", menu_sale: "Акції %",
         cat_all: "Усі", cat_female: "Жіночі", cat_male: "Чоловічі", cat_uniseks: "Унісекс", cat_sets: "Набори", hits_title: "Хіти продажу", news_title: "Новинки", 
-        sets_title: "Набори", cart_title: "Ваш кошик", cart_total_label: "Разом", insta_title: "Ми в Instagram",
+        sets_title: "Набори", catalog_title: "Усі аромати", cart_title: "Ваш кошик", cart_total_label: "Разом", insta_title: "Ми в Instagram",
         cart_order_btn: "Оформити в Telegram", add_to_cart: "Додати в кошик", empty_cart: "Кошик порожній", order_msg: "Нове замовлення", default_desc: "Вишуканий аромат з унікальним шлейфом.",
         sold_badge: "Немає в наявності", out_of_stock_btn: "Немає в наявності",
         badgeNew: "НОВИНКА", badgeSale: "АКЦІЯ", badgeHit: "ХІТ", outOfStock: "Немає в наявності",
@@ -283,7 +283,7 @@ const i18n = {
     PL: {
         search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_hits: "Bestsellery", menu_news: "Nowości", menu_sale: "Promocje %",
         cat_all: "Wszystkie", cat_female: "Damskie", cat_male: "Męskie", cat_uniseks: "Uniseks", cat_sets: "Zestawy", hits_title: "Bestsellery", news_title: "Nowości", 
-        sets_title: "Zestawy", cart_title: "Twój koszyk", cart_total_label: "Suma", insta_title: "Nasza taśma Instagram",
+        sets_title: "Zestawy", catalog_title: "Wszystkie perfumy", cart_title: "Twój koszyk", cart_total_label: "Suma", insta_title: "Nasza taśma Instagram",
         cart_order_btn: "Zamów przez Telegram", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze.",
         sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak w magazynie",
         badgeNew: "NOWOŚĆ", badgeSale: "PROMOCJA", badgeHit: "HIT", outOfStock: "Brak w magazynie",
@@ -480,7 +480,6 @@ function updateUI() {
     document.querySelectorAll('[data-i18n]').forEach(el => el.innerText = i18n[currentLang][el.getAttribute('data-i18n')]);
     document.querySelectorAll('[data-i18n-placeholder]').forEach(el => el.placeholder = i18n[currentLang][el.getAttribute('data-i18n-placeholder')]);
     
-    // Суворе перемикання мови форми
     document.getElementById('reviews-heading-text').innerText = i18n[currentLang].reviews_heading;
     document.getElementById('leave-review-text').innerText = i18n[currentLang].leave_review;
     document.getElementById('your-rating-text').innerText = i18n[currentLang].your_rating;
@@ -588,23 +587,6 @@ function renderList(list) {
     }).join('');
 }
 
-function expandHomeSection(sectionType) {
-    let filtered = [];
-    if (sectionType === 'sets') {
-        filtered = allProducts.filter(p => p.category?.toLowerCase().trim() === 'sets');
-    } else if (sectionType === 'hits') {
-        filtered = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
-    } else if (sectionType === 'news') {
-        filtered = allProducts.filter(p => p.isNew?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
-    }
-    
-    const grid = document.getElementById(`home-grid-${sectionType}`);
-    const btnContainer = document.getElementById(`home-btn-wrapper-${sectionType}`);
-    
-    if (grid) grid.innerHTML = renderList(filtered);
-    if (btnContainer) btnContainer.remove();
-}
-
 function refreshCatalog() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const area = document.getElementById('catalog-area');
@@ -619,6 +601,9 @@ function refreshCatalog() {
         const setsList = allProducts.filter(p => p.category?.toLowerCase().trim() === 'sets');
         const hitsList = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
         const newsList = allProducts.filter(p => p.isNew?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
+        
+        // Повний каталог усіх інших товарів для безкінечного скролу за запитом Лєни
+        const restList = allProducts.filter(p => p.brand !== "BANNER");
 
         area.innerHTML = `
             ${banner ? `<div class="mb-10 rounded-[28px] overflow-hidden shadow-sm"><img src="${banner.photo}" class="w-full object-cover"></div>` : ''}
@@ -629,13 +614,6 @@ function refreshCatalog() {
                     <div id="home-grid-sets" class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         ${renderList(setsList.slice(0, ITEMS_TO_SHOW_HOME))}
                     </div>
-                    ${setsList.length > ITEMS_TO_SHOW_HOME ? `
-                        <div id="home-btn-wrapper-sets" class="text-center mt-8">
-                            <button onclick="expandHomeSection('sets')" class="px-8 py-3 border border-black text-[10px] uppercase tracking-widest font-bold hover:bg-black hover:text-white transition-all duration-300 rounded-xl">
-                                ${i18n[currentLang].show_more}
-                            </button>
-                        </div>
-                    ` : ''}
                 </div>
             ` : ''}
 
@@ -645,13 +623,6 @@ function refreshCatalog() {
                     <div id="home-grid-hits" class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         ${renderList(hitsList.slice(0, ITEMS_TO_SHOW_HOME))}
                     </div>
-                    ${hitsList.length > ITEMS_TO_SHOW_HOME ? `
-                        <div id="home-btn-wrapper-hits" class="text-center mt-8">
-                            <button onclick="expandHomeSection('hits')" class="px-8 py-3 border border-black text-[10px] uppercase tracking-widest font-bold hover:bg-black hover:text-white transition-all duration-300 rounded-xl">
-                                ${i18n[currentLang].show_more}
-                            </button>
-                        </div>
-                    ` : ''}
                 </div>
             ` : ''}
 
@@ -661,13 +632,16 @@ function refreshCatalog() {
                     <div id="home-grid-news" class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         ${renderList(newsList.slice(0, ITEMS_TO_SHOW_HOME))}
                     </div>
-                    ${newsList.length > ITEMS_TO_SHOW_HOME ? `
-                        <div id="home-btn-wrapper-news" class="text-center mt-8">
-                            <button onclick="expandHomeSection('news')" class="px-8 py-3 border border-black text-[10px] uppercase tracking-widest font-bold hover:bg-black hover:text-white transition-all duration-300 rounded-xl">
-                                ${i18n[currentLang].show_more}
-                            </button>
-                        </div>
-                    ` : ''}
+                </div>
+            ` : ''}
+
+            <!-- ЛЄНА, ДИВИ СЮДИ! Автоматичний блок з усіма духами в самому низу -->
+            ${restList.length > 0 ? `
+                <div class="mb-14 pt-6 border-t border-neutral-100">
+                    <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].catalog_title}</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        ${renderList(restList)}
+                    </div>
                 </div>
             ` : ''}
         `;
@@ -848,7 +822,6 @@ function saveState() {
     localStorage.setItem('ps_curCat', curCat);
 }
 
-// Залізобетонна логіка перемикання розділів без багів
 function goHome() { currentFilter = 'home'; curCat = 'all'; saveState(); refreshCatalog(); }
 function showAllCatalog() { currentFilter = 'all'; curCat = 'all'; saveState(); updateCatButtons(); refreshCatalog(); }
 function setCategory(c) { curCat = c; saveState(); updateCatButtons(); refreshCatalog(); }
