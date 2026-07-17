@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
@@ -209,13 +208,13 @@
                 </div>
             </div>
             <input type="text" id="revName" required class="w-full px-4 py-3 rounded-xl bg-white text-xs outline-none border border-neutral-100" placeholder="">
-            <textarea id="revText" required rows="3" class="w-full px-4 py-3 rounded-xl bg-white text-xs outline-none border border-neutral-100 resize-none" placeholder=""></textarea>
+            <textarea id="revText" rows="3" class="w-full px-4 py-3 rounded-xl bg-white text-xs outline-none border border-neutral-100 resize-none" placeholder=""></textarea>
             
             <div class="bg-white px-4 py-3 rounded-xl border border-neutral-100 flex items-center justify-between">
                 <span id="label-photo-text" class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider"></span>
                 <label class="cursor-pointer bg-neutral-100 text-neutral-600 font-bold text-[10px] uppercase px-4 py-2 rounded-lg hover:bg-neutral-200 transition-colors">
                     <span id="uploadBtnText"></span>
-                    <input type="file" id="revPhotoFile" accept="image/*" class="hidden" onchange="handleFileSelect(this)">
+                    <input type="file" id="revPhotoFile" accept="image/*" multiple class="hidden" onchange="handleFileSelect(this)">
                 </label>
             </div>
 
@@ -294,7 +293,7 @@ const TG_NICK = 'elenafragrance';
 const ITEMS_TO_SHOW_HOME = 4;
 
 let allProducts = [], cart = JSON.parse(localStorage.getItem('ps_cart')) || [];
-let userRating = 5, uploadedPhotoUrl = "";
+let userRating = 5, uploadedPhotoUrls = [];
 let currentReviewUser = null;
 let firebaseReviews = [];
 let stopReviewsListener = null;
@@ -319,7 +318,7 @@ const i18n = {
         badgeNew: "НОВИНКА", badgeSale: "АКЦІЯ", badgeHit: "ХІТ", outOfStock: "Немає в наявності",
         show_more: "Показати більше", reviews_heading: "Відгуки клієнтів", leave_review: "Залишити свій відгук", your_rating: "Ваша оцінка:", 
         pub_review: "Опублікувати відгук", pub_loading: "Завантаження...", rev_choose_file: "Обрати фото", label_photo: "Фото з галереї:", delete_btn: "Видалити",
-        name_placeholder: "Ваше ім'я", text_placeholder: "Ваш відгук", no_reviews: "Тут з'являться перші відгуки", all_reviews: "Переглянути всі відгуки"
+        name_placeholder: "Ваше ім'я", text_placeholder: "Ваш відгук (необов'язково)", no_reviews: "Тут з'являться перші відгуки", all_reviews: "Переглянути всі відгуки"
     },
     PL: {
         search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_hits: "Bestsellery", menu_news: "Nowości", menu_sale: "Promocje %",
@@ -330,7 +329,7 @@ const i18n = {
         badgeNew: "NOWOŚĆ", badgeSale: "PROMOCJA", badgeHit: "HIT", outOfStock: "Brak w magazynie",
         show_more: "Pokaż więcej", reviews_heading: "Opinie klientów", leave_review: "Zostaw swoją opinię", your_rating: "Twoja ocena:", 
         pub_review: "Opublikuj opinię", pub_loading: "Ładowanie...", rev_choose_file: "Wybierz plik", label_photo: "Zdjęcie z galerii:", delete_btn: "Usuń",
-        name_placeholder: "Twoje imię", text_placeholder: "Twoja opinia", no_reviews: "Tutaj pojawią się pierwsze opinie", all_reviews: "Zobacz wszystkie opinie"
+        name_placeholder: "Twoje imię", text_placeholder: "Twoja opinia (opcjonalnie)", no_reviews: "Tutaj pojawią się pierwsze opinie", all_reviews: "Zobacz wszystkie opinie"
     }
 };
 
@@ -388,19 +387,23 @@ function setFormRating(rating) {
 }
 
 async function handleFileSelect(input) {
-    const file = input.files[0];
-    if (!file) return;
+    const files = Array.from(input.files).filter(file => file.type.startsWith('image/')).slice(0, 5);
+    if (!files.length) return;
 
-    if (!file.type.startsWith('image/')) return;
     const btnText = document.getElementById('uploadBtnText');
     btnText.innerText = "...";
 
     try {
-        uploadedPhotoUrl = await compressReviewImage(file);
-        btnText.innerText = "✓ OK";
+        uploadedPhotoUrls = [];
+        for (const file of files) {
+            uploadedPhotoUrls.push(await compressReviewImage(file));
+        }
+        btnText.innerText = currentLang === 'PL'
+            ? `✓ ${uploadedPhotoUrls.length} zdjęć`
+            : `✓ ${uploadedPhotoUrls.length} фото`;
     } catch (error) {
         console.error('Image compression error:', error);
-        uploadedPhotoUrl = "";
+        uploadedPhotoUrls = [];
         btnText.innerText = i18n[currentLang].rev_choose_file;
         input.value = "";
     }
@@ -414,14 +417,23 @@ function compressReviewImage(file) {
             const img = new Image();
             img.onerror = reject;
             img.onload = () => {
-                const maxSide = 900;
-                const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
                 const canvas = document.createElement('canvas');
-                canvas.width = Math.max(1, Math.round(img.width * scale));
-                canvas.height = Math.max(1, Math.round(img.height * scale));
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL('image/jpeg', 0.72));
+                let maxSide = 700;
+                let quality = 0.68;
+                let result = '';
+
+                for (let attempt = 0; attempt < 6; attempt++) {
+                    const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+                    canvas.width = Math.max(1, Math.round(img.width * scale));
+                    canvas.height = Math.max(1, Math.round(img.height * scale));
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    result = canvas.toDataURL('image/jpeg', quality);
+                    if (result.length <= 140000) break;
+                    maxSide = Math.round(maxSide * 0.85);
+                    quality = Math.max(0.42, quality - 0.07);
+                }
+                resolve(result);
             };
             img.src = reader.result;
         };
@@ -436,7 +448,7 @@ async function handleReviewSubmit(e) {
     const btn = document.getElementById('submitReviewBtn');
     const btnText = document.getElementById('btn-text-content');
     
-    if(!nameVal || !textVal || !currentReviewUser) {
+    if(!nameVal || !currentReviewUser) {
         if (!currentReviewUser) showReviewsError();
         return;
     }
@@ -450,7 +462,7 @@ async function handleReviewSubmit(e) {
             name: nameVal,
             text: textVal,
             rating: userRating,
-            photo: uploadedPhotoUrl,
+            photos: uploadedPhotoUrls,
             ownerUid: currentReviewUser.uid,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
@@ -459,7 +471,7 @@ async function handleReviewSubmit(e) {
         document.getElementById('revText').value = '';
         document.getElementById('revPhotoFile').value = '';
         document.getElementById('uploadBtnText').innerText = i18n[currentLang].rev_choose_file;
-        uploadedPhotoUrl = "";
+        uploadedPhotoUrls = [];
         setFormRating(5);
 
     } catch (error) {
@@ -523,9 +535,13 @@ function loadGoogleReviews() {
             stars += '<i class="fa-solid fa-star ' + isActive + '"></i>'; 
         }
         
+        const reviewPhotos = Array.isArray(r.photos) ? r.photos : (r.photo ? [r.photo] : []);
         let photoHTML = '';
-        if (r.photo && r.photo.startsWith('data:image/')) {
-            photoHTML = '<div class="w-20 h-20 rounded-xl overflow-hidden bg-neutral-50 border border-neutral-100 shadow-sm cursor-pointer mt-3"><img src="' + r.photo + '" class="w-full h-full object-cover" onclick="openPhotoModal(\'' + r.photo + '\')"></div>';
+        if (reviewPhotos.length) {
+            photoHTML = '<div class="flex gap-2 overflow-x-auto no-scrollbar mt-3">' + reviewPhotos
+                .filter(photo => typeof photo === 'string' && photo.startsWith('data:image/'))
+                .map(photo => '<div class="w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-neutral-50 border border-neutral-100 shadow-sm cursor-pointer"><img src="' + photo + '" class="w-full h-full object-cover" onclick="openPhotoModal(\'' + photo + '\')"></div>')
+                .join('') + '</div>';
         }
 
         const deleteButton = currentReviewUser && r.ownerUid === currentReviewUser.uid
@@ -540,7 +556,7 @@ function loadGoogleReviews() {
                     <div class="text-[10px] flex gap-0.5">${stars}</div>
                 </div>
                 <div class="text-[9px] text-neutral-400 mb-2 font-medium">${date}</div>
-                <p class="text-neutral-500 text-xs leading-relaxed">${safeText}</p>
+                ${safeText ? `<p class="text-neutral-500 text-xs leading-relaxed">${safeText}</p>` : ''}
                 ${photoHTML}
             </div>
         `;
@@ -575,17 +591,20 @@ function renderReviewsPreview(reviews) {
     container.innerHTML = reviews.slice(0, 2).map(r => {
         const safeName = escapeReviewHtml(r.name || '');
         const safeText = escapeReviewHtml(r.text || '');
+        const reviewPhotos = Array.isArray(r.photos) ? r.photos : (r.photo ? [r.photo] : []);
+        const firstPhoto = reviewPhotos.find(photo => typeof photo === 'string' && photo.startsWith('data:image/'));
         let stars = '';
         for (let i = 1; i <= 5; i++) {
             stars += `<i class="fa-solid fa-star ${i <= r.rating ? 'text-[#C5A059]' : 'text-neutral-200'}"></i>`;
         }
         return `
             <button onclick="scrollToReviews()" class="text-left bg-neutral-50 border border-neutral-100 rounded-2xl p-3 min-w-0 hover:border-[#C5A059]/40 transition-colors">
+                ${firstPhoto ? `<img src="${firstPhoto}" class="w-full h-20 object-cover rounded-xl mb-2" alt="">` : ''}
                 <div class="flex items-center justify-between gap-2 mb-1">
                     <span class="font-bold text-[10px] truncate">${safeName}</span>
                     <span class="flex gap-px text-[7px] shrink-0">${stars}</span>
                 </div>
-                <p class="review-preview-text text-neutral-500 text-[9px] leading-relaxed">${safeText}</p>
+                ${safeText ? `<p class="review-preview-text text-neutral-500 text-[9px] leading-relaxed">${safeText}</p>` : ''}
             </button>
         `;
     }).join('');
