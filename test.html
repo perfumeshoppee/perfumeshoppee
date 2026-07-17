@@ -15,7 +15,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://perfumeshoppee.pl/">
     <meta property="og:title" content="Perfume Shoppee | Perfumy niszowe i luksusowe / Нішеві та люксові аромати">
-    <meta property="og:description" content="Odlewki perfum od 2 ml. Szybka wysyłka w Polsce. / Rozpis` vid 2 ml. Shvydka dostavka po vsiy Pol'shchi. Wyłącznie oryginały.">
+    <meta property="og:description" content="Odlewki perfum od 2 ml. Szybka wysyłka w Polsce. / Розпив від 2 мл. Швидка доставка по всій Польщі. Wyłącznie oryginały.">
     <meta property="og:image" content="https://perfumeshoppee.pl/preview.jpg">
 
     <meta name="twitter:card" content="summary_large_image">
@@ -162,7 +162,7 @@
 
 <section id="reviews-section" class="max-w-3xl mx-auto px-6 mb-16">
     <div class="text-center mb-10">
-        <h2 class="text-[10px] font-extrabold uppercase tracking-[0.2em] mb-2 opacity-40" id="reviews-heading-text">Відгуки клієнтів</h2>
+        <h2 class="text-[10px] font-extrabold uppercase tracking-[0.2em] mb-2 opacity-40" id="reviews-heading-text"></h2>
         <div class="flex items-center justify-center gap-1 text-[#C5A059] text-sm font-bold">
             <span id="average-rating-num">5.0 / 5</span>
             <div id="average-stars" class="flex gap-0.5 text-xs">
@@ -174,23 +174,31 @@
     <div id="reviews-list" class="space-y-4 mb-10"></div>
 
     <div class="bg-neutral-50 p-6 rounded-3xl border border-neutral-100">
-        <h3 class="text-xs font-bold uppercase tracking-wider mb-4 text-center" id="leave-review-text">Залишити свій відгук</h3>
+        <h3 class="text-xs font-bold uppercase tracking-wider mb-4 text-center" id="leave-review-text"></h3>
         <form id="reviewForm" onsubmit="handleReviewSubmit(event)" class="space-y-3">
             <div class="flex justify-between items-center bg-white px-4 py-3 rounded-xl border border-neutral-100">
-                <span id="your-rating-text" class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider">Ваша оцінка:</span>
+                <span id="your-rating-text" class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider"></span>
                 <div class="star-rating text-neutral-200 text-sm flex gap-1" id="formStars">
-                    <i class="fa-solid fa-star active text-[#C5A059]" onclick="setFormRating(1)"></i>
-                    <i class="fa-solid fa-star active text-[#C5A059]" onclick="setFormRating(2)"></i>
-                    <i class="fa-solid fa-star active text-[#C5A059]" onclick="setFormRating(3)"></i>
-                    <i class="fa-solid fa-star active text-[#C5A059]" onclick="setFormRating(4)"></i>
-                    <i class="fa-solid fa-star active text-[#C5A059]" onclick="setFormRating(5)"></i>
+                    <i class="fa-solid fa-star active" onclick="setFormRating(1)"></i>
+                    <i class="fa-solid fa-star active" onclick="setFormRating(2)"></i>
+                    <i class="fa-solid fa-star active" onclick="setFormRating(3)"></i>
+                    <i class="fa-solid fa-star active" onclick="setFormRating(4)"></i>
+                    <i class="fa-solid fa-star active" onclick="setFormRating(5)"></i>
                 </div>
             </div>
-            <input type="text" id="revName" required class="w-full px-4 py-3 rounded-xl bg-white text-xs outline-none border border-neutral-100" placeholder="Ваше ім'я">
-            <textarea id="revText" required rows="3" class="w-full px-4 py-3 rounded-xl bg-white text-xs outline-none border border-neutral-100 resize-none" placeholder="Ваш відгук"></textarea>
+            <input type="text" id="revName" required class="w-full px-4 py-3 rounded-xl bg-white text-xs outline-none border border-neutral-100" placeholder="">
+            <textarea id="revText" required rows="3" class="w-full px-4 py-3 rounded-xl bg-white text-xs outline-none border border-neutral-100 resize-none" placeholder=""></textarea>
             
+            <div class="bg-white px-4 py-3 rounded-xl border border-neutral-100 flex items-center justify-between">
+                <span id="label-photo-text" class="text-[11px] font-bold text-neutral-400 uppercase tracking-wider"></span>
+                <label class="cursor-pointer bg-neutral-100 text-neutral-600 font-bold text-[10px] uppercase px-4 py-2 rounded-lg hover:bg-neutral-200 transition-colors">
+                    <span id="uploadBtnText"></span>
+                    <input type="file" id="revPhotoFile" accept="image/*" class="hidden" onchange="handleFileSelect(this)">
+                </label>
+            </div>
+
             <button type="submit" id="submitReviewBtn" class="w-full bg-[#062C22] text-white py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all hover:bg-opacity-90 flex items-center justify-center gap-2">
-                <span id="btn-text-content">Опублікувати відгук</span>
+                <span id="btn-text-content"></span>
             </button>
         </form>
     </div>
@@ -200,6 +208,17 @@
     <button class="absolute top-6 right-6 text-white/70 hover:text-white text-3xl"><i class="fa-solid fa-xmark"></i></button>
     <img id="photoFullImg" src="" class="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl">
 </div>
+
+<section id="instagram-section" class="max-w-7xl mx-auto px-6 mb-16">
+    <div class="text-center mb-8">
+        <h2 class="text-[10px] font-extrabold uppercase tracking-[0.2em] mb-2 opacity-40" data-i18n="insta_title">Ми в Instagram</h2>
+        <a href="https://www.instagram.com/perfume.shoppee" target="_blank" class="text-sm font-bold logo-font text-[#C5A059] hover:underline flex items-center justify-center gap-2">
+            <i class="fa-brands fa-instagram text-base"></i>@perfume.shoppee
+        </a>
+    </div>
+    <figure data-behold-id="6baefc08-0131-4a11-8524-7c5148fb3c24"></figure>
+    <script src="https://w.behold.so/widget.js" type="text/javascript" async></script>
+</section>
 
 <div id="cart-panel" class="fixed top-0 right-0 h-full w-full max-w-md bg-white z-[10000] shadow-2xl transform translate-x-full transition-transform duration-500 flex flex-col">
     <div class="p-6 border-b flex justify-between items-center bg-[#062C22] text-white">
@@ -230,17 +249,33 @@
 </div>
 
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
 <script>
+const firebaseConfig = {
+    apiKey: "AIzaSyCaR9-bwJSu0iY0f1EmyYg_FTcqKBRw8do",
+    authDomain: "perfumeshoppee.firebaseapp.com",
+    projectId: "perfumeshoppee",
+    storageBucket: "perfumeshoppee.firebasestorage.app",
+    messagingSenderId: "881208782064",
+    appId: "1:881208782064:web:34881367d79f9b0822e635"
+};
+
+firebase.initializeApp(firebaseConfig);
+const firestoreDb = firebase.firestore();
+const firebaseAuth = firebase.auth();
+
 const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
 const TG_NICK = 'elenafragrance';
 const ITEMS_TO_SHOW_HOME = 4;
 
-const TG_BOT_TOKEN = '6811244093:AAHO38w_z8Y4GfM6WzU5pX8TzB5O9v9wREw'; 
-const TG_CHAT_ID = '123849502'; 
-
 let allProducts = [], cart = JSON.parse(localStorage.getItem('ps_cart')) || [];
-let userRating = 5;
+let userRating = 5, uploadedPhotoUrl = "";
+let currentReviewUser = null;
+let firebaseReviews = [];
+let stopReviewsListener = null;
 
 if (!sessionStorage.getItem('ps_session_active')) {
     localStorage.setItem('ps_currentFilter', 'home');
@@ -260,9 +295,9 @@ const i18n = {
         cart_order_btn: "Оформити в Telegram", add_to_cart: "Додати в кошик", empty_cart: "Кошик порожній", order_msg: "Нове замовлення", default_desc: "Вишуканий аромат з унікальним шлейфом.",
         sold_badge: "Немає в наявності", out_of_stock_btn: "Немає в наявності",
         badgeNew: "НОВИНКА", badgeSale: "АКЦІЯ", badgeHit: "ХІТ", outOfStock: "Немає в наявності",
-        reviews_heading: "Відгуки клієнтів", leave_review: "Залишити свій відгук", your_rating: "Ваша оцінка:", 
-        pub_review: "Опублікувати відгук", pub_loading: "Завантаження...", name_placeholder: "Ваше ім'я", text_placeholder: "Ваш відгук",
-        thanks_msg: "Дякуємо за ваш відгук! Він відправлений на модерацію."
+        show_more: "Показати більше", reviews_heading: "Відгуки клієнтів", leave_review: "Залишити свій відгук", your_rating: "Ваша оцінка:", 
+        pub_review: "Опублікувати відгук", pub_loading: "Завантаження...", rev_choose_file: "Обрати фото", label_photo: "Фото з галереї:", delete_btn: "Видалити",
+        name_placeholder: "Ваше ім'я", text_placeholder: "Ваш відгук", no_reviews: "Тут з'являться перші відгуки"
     },
     PL: {
         search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_hits: "Bestsellery", menu_news: "Nowości", menu_sale: "Promocje %",
@@ -271,19 +306,14 @@ const i18n = {
         cart_order_btn: "Zamów przez Telegram", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze.",
         sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak w magazynie",
         badgeNew: "NOWOŚĆ", badgeSale: "PROMOCJA", badgeHit: "HIT", outOfStock: "Brak w magazynie",
-        reviews_heading: "Opinie klientów", leave_review: "Zostaw swoją opinię", your_rating: "Twoja ocena:", 
-        pub_review: "Opublikuj opinię", pub_loading: "Ładowanie...", name_placeholder: "Twoje imię", text_placeholder: "Twoja opinia",
-        thanks_msg: "Dziękujemy za opinię! Została wysłana do moderacji."
+        show_more: "Pokaż więcej", reviews_heading: "Opinie klientów", leave_review: "Zostaw swoją opinię", your_rating: "Twoja ocena:", 
+        pub_review: "Opublikuj opinię", pub_loading: "Ładowanie...", rev_choose_file: "Wybierz plik", label_photo: "Zdjęcie z galerii:", delete_btn: "Usuń",
+        name_placeholder: "Twoje imię", text_placeholder: "Twoja opinia", no_reviews: "Tutaj pojawią się pierwsze opinie"
     }
 };
 
-const defaultReviews = [
-    {name: "Анна", text: "Замовляла набір фаворитів, аромати тримаються неймовірно довго! Дуже швидка доставка по Польщі, дякую! ✨", rating: 5, date: "12.05.2026"},
-    {name: "Marek", text: "Wszystko super, zapachy w 100% oryginalne. Bardzo polecam ten sklep!", rating: 5, date: "28.04.2026"},
-    {name: "Олена", text: "Мій улюблений магазин розпиву. Завжди гарне пакування та швидкі відповіді в телеграмі.", rating: 5, date: "03.04.2026"}
-];
-
 async function init() {
+    initFirebaseReviews();
     try {
         const res = await fetch(SPREADSHEET_URL);
         const text = await res.text();
@@ -293,67 +323,226 @@ async function init() {
             if (b.brand === "BANNER") return 1;
             return (a.brand.localeCompare(b.brand)) || ((currentLang === 'UA' ? (a.nameUK || a.name) : (a.namePL || a.name)).localeCompare(currentLang === 'UA' ? (b.nameUK || b.name) : (b.namePL || b.name)));
         });
-        updateUI(); updateCatButtons(); refreshCatalog(); renderCart(); loadLocalReviews();
+        updateUI(); updateCatButtons(); refreshCatalog(); renderCart(); loadGoogleReviews();
         setTimeout(() => { AOS.init({ duration: 800, once: true, offset: 50 }); }, 200);
     } catch (e) { console.error("CSV Load Error", e); }
+}
+
+/* ==================== СПІЛЬНІ ВІДГУКИ FIREBASE ==================== */
+async function initFirebaseReviews() {
+    try {
+        const credential = await firebaseAuth.signInAnonymously();
+        currentReviewUser = credential.user;
+
+        if (stopReviewsListener) stopReviewsListener();
+        stopReviewsListener = firestoreDb.collection('reviews')
+            .orderBy('createdAt', 'desc')
+            .onSnapshot(snapshot => {
+                firebaseReviews = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                loadGoogleReviews();
+            }, error => {
+                console.error('Reviews listener error:', error);
+                showReviewsError();
+            });
+    } catch (error) {
+        console.error('Firebase authentication error:', error);
+        showReviewsError();
+    }
+}
+
+function showReviewsError() {
+    const list = document.getElementById('reviews-list');
+    if (list) {
+        list.innerHTML = '<div class="text-center py-6 text-red-400 text-[10px] uppercase font-bold tracking-widest">Firebase: перевірте Authentication і правила Firestore</div>';
+    }
 }
 
 function setFormRating(rating) {
     userRating = rating;
     const stars = document.querySelectorAll('#formStars i');
     stars.forEach((star, idx) => {
-        if (idx < rating) star.classList.add('text-[#C5A059]'); else star.classList.remove('text-[#C5A059]');
+        if (idx < rating) star.classList.add('active'); else star.classList.remove('active');
     });
 }
 
-function handleReviewSubmit(e) {
+async function handleFileSelect(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) return;
+    const btnText = document.getElementById('uploadBtnText');
+    btnText.innerText = "...";
+
+    try {
+        uploadedPhotoUrl = await compressReviewImage(file);
+        btnText.innerText = "✓ OK";
+    } catch (error) {
+        console.error('Image compression error:', error);
+        uploadedPhotoUrl = "";
+        btnText.innerText = i18n[currentLang].rev_choose_file;
+        input.value = "";
+    }
+}
+
+function compressReviewImage(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = reject;
+        reader.onload = () => {
+            const img = new Image();
+            img.onerror = reject;
+            img.onload = () => {
+                const maxSide = 900;
+                const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.max(1, Math.round(img.width * scale));
+                canvas.height = Math.max(1, Math.round(img.height * scale));
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL('image/jpeg', 0.72));
+            };
+            img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+async function handleReviewSubmit(e) {
     e.preventDefault();
     const nameVal = document.getElementById('revName').value.trim();
     const textVal = document.getElementById('revText').value.trim();
     const btn = document.getElementById('submitReviewBtn');
     const btnText = document.getElementById('btn-text-content');
     
-    if(!nameVal || !textVal) return;
+    if(!nameVal || !textVal || !currentReviewUser) {
+        if (!currentReviewUser) showReviewsError();
+        return;
+    }
 
     btn.disabled = true;
     btn.style.opacity = "0.6";
     btnText.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> ' + i18n[currentLang].pub_loading;
 
-    let message = `⭐️ НОВИЙ ВІДГУК НА САЙТІ ⭐️\n\n👤 Ім'я: ${nameVal}\n⭐️ Оцінка: ${userRating}/5\n💬 Текст: ${textVal}`;
-    
-    fetch(`https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chat_id: TG_CHAT_ID, text: message })
-    }).finally(() => {
-        alert(i18n[currentLang].thanks_msg);
+    try {
+        await firestoreDb.collection('reviews').add({
+            name: nameVal,
+            text: textVal,
+            rating: userRating,
+            photo: uploadedPhotoUrl,
+            ownerUid: currentReviewUser.uid,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
         document.getElementById('revName').value = '';
         document.getElementById('revText').value = '';
+        document.getElementById('revPhotoFile').value = '';
+        document.getElementById('uploadBtnText').innerText = i18n[currentLang].rev_choose_file;
+        uploadedPhotoUrl = "";
         setFormRating(5);
+
+    } catch (error) {
+        console.error('Review publish error:', error);
+        alert('Не вдалося опублікувати відгук. Перевірте налаштування Firebase.');
+    } finally {
         btn.disabled = false;
         btn.style.opacity = "1";
         btnText.innerText = i18n[currentLang].pub_review;
-    });
+    }
 }
 
-function loadLocalReviews() {
+async function deleteOwnReview(id) {
+    const review = firebaseReviews.find(r => r.id === id);
+    if (!review || !currentReviewUser || review.ownerUid !== currentReviewUser.uid) return;
+    try {
+        await firestoreDb.collection('reviews').doc(id).delete();
+    } catch (error) {
+        console.error('Review delete error:', error);
+        alert('Не вдалося видалити відгук.');
+    }
+}
+
+function openPhotoModal(src) {
+    document.getElementById('photoFullImg').src = src;
+    document.getElementById('photoFullModal').classList.remove('hidden');
+    document.body.classList.add('lock-scroll');
+}
+
+function closePhotoModal() {
+    document.getElementById('photoFullModal').classList.add('hidden');
+    document.body.classList.remove('lock-scroll');
+}
+
+function loadGoogleReviews() {
     const listContainer = document.getElementById('reviews-list');
-    let html = defaultReviews.map(r => {
+    const clientReviews = firebaseReviews;
+    
+    let totalStars = 0;
+    let count = 0;
+
+    if(clientReviews.length === 0) {
+        listContainer.innerHTML = '<div class="text-center py-6 text-neutral-300 text-[10px] uppercase font-bold tracking-widest">' + i18n[currentLang].no_reviews + '</div>';
+        document.getElementById('average-rating-num').innerText = "5.0 / 5 (0)";
+        return;
+    }
+
+    let clientHTML = clientReviews.map(r => {
+        totalStars += parseInt(r.rating);
+        count++;
+        const safeName = escapeReviewHtml(r.name || '');
+        const safeText = escapeReviewHtml(r.text || '');
+        const date = r.createdAt && r.createdAt.toDate
+            ? r.createdAt.toDate().toLocaleDateString(currentLang === 'PL' ? 'pl-PL' : 'uk-UA')
+            : '';
         let stars = '';
-        for(let i=1; i<=5; i++) { stars += `<i class="fa-solid fa-star ${i <= r.rating ? 'text-[#C5A059]' : 'text-neutral-200'}"></i>`; }
+        for(let i=1; i<=5; i++) { 
+            let isActive = i <= r.rating ? 'text-[#C5A059]' : 'text-neutral-200';
+            stars += '<i class="fa-solid fa-star ' + isActive + '"></i>'; 
+        }
+        
+        let photoHTML = '';
+        if (r.photo && r.photo.startsWith('data:image/')) {
+            photoHTML = '<div class="w-20 h-20 rounded-xl overflow-hidden bg-neutral-50 border border-neutral-100 shadow-sm cursor-pointer mt-3"><img src="' + r.photo + '" class="w-full h-full object-cover" onclick="openPhotoModal(\'' + r.photo + '\')"></div>';
+        }
+
+        const deleteButton = currentReviewUser && r.ownerUid === currentReviewUser.uid
+            ? `<button onclick="deleteOwnReview('${r.id}')" class="absolute top-4 right-4 text-[9px] font-bold text-red-400 bg-red-50 px-2 py-1 rounded-md uppercase tracking-wider">${i18n[currentLang].delete_btn}</button>`
+            : '';
+
         return `
-            <div class="bg-white p-5 rounded-2xl border border-neutral-100 shadow-sm border-l-2 border-l-[#C5A059]">
+            <div class="bg-white p-5 rounded-2xl border border-neutral-100 shadow-sm border-l-2 border-l-[#C5A059] relative">
+                ${deleteButton}
                 <div class="flex justify-between items-center mb-1">
-                    <span class="font-bold text-xs">${r.name}</span>
+                    <span class="font-bold text-xs">${safeName}</span>
                     <div class="text-[10px] flex gap-0.5">${stars}</div>
                 </div>
-                <div class="text-[9px] text-neutral-400 mb-2 font-medium">${r.date}</div>
-                <p class="text-neutral-500 text-xs leading-relaxed">${r.text}</p>
+                <div class="text-[9px] text-neutral-400 mb-2 font-medium">${date}</div>
+                <p class="text-neutral-500 text-xs leading-relaxed">${safeText}</p>
+                ${photoHTML}
             </div>
         `;
     }).join('');
-    listContainer.innerHTML = html;
+
+    listContainer.innerHTML = clientHTML;
+
+    const finalAvg = count > 0 ? (totalStars / count).toFixed(1) : "5.0";
+    document.getElementById('average-rating-num').innerText = `${finalAvg} / 5 (${count})`;
+    
+    const starsContainer = document.getElementById('average-stars');
+    let avgStarsHTML = '';
+    const roundAvg = Math.round(parseFloat(finalAvg));
+    for(let i=1; i<=5; i++) { 
+        let isActive = i <= roundAvg ? 'text-[#C5A059]' : 'text-neutral-200';
+        avgStarsHTML += '<i class="fa-solid fa-star ' + isActive + '"></i>'; 
+    }
+    starsContainer.innerHTML = avgStarsHTML;
 }
+
+function escapeReviewHtml(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    })[char]);
+}
+/* ===================================================================================== */
 
 function parseCSV(text) {
     let rows = [], row = [], col = '', q = false;
@@ -379,7 +568,7 @@ function setLang(l) {
     currentLang = l;
     document.querySelectorAll('.lang-node').forEach(b => b.classList.remove('active'));
     document.getElementById('btn-' + l.toLowerCase()).classList.add('active');
-    updateUI(); refreshCatalog(); renderCart();
+    updateUI(); refreshCatalog(); renderCart(); loadGoogleReviews();
 }
 
 function updateUI() {
@@ -391,6 +580,8 @@ function updateUI() {
     document.getElementById('your-rating-text').innerText = i18n[currentLang].your_rating;
     document.getElementById('revName').placeholder = i18n[currentLang].name_placeholder;
     document.getElementById('revText').placeholder = i18n[currentLang].text_placeholder;
+    document.getElementById('label-photo-text').innerText = i18n[currentLang].label_photo;
+    document.getElementById('uploadBtnText').innerText = i18n[currentLang].rev_choose_file;
     document.getElementById('btn-text-content').innerText = i18n[currentLang].pub_review;
 }
 
@@ -495,14 +686,18 @@ function refreshCatalog() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const area = document.getElementById('catalog-area');
     const reviewsSec = document.getElementById('reviews-section');
+    const instaSection = document.getElementById('instagram-section');
     document.getElementById('catalog-filters').classList.toggle('hidden', currentFilter !== 'all');
 
     if (currentFilter === 'home' && q === '') {
         if(reviewsSec) reviewsSec.classList.remove('hidden');
+        if(instaSection) instaSection.classList.remove('hidden');
         const banner = allProducts.find(p => p.brand === "BANNER");
         const setsList = allProducts.filter(p => p.category?.toLowerCase().trim() === 'sets');
         const hitsList = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
         const newsList = allProducts.filter(p => p.isNew?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
+        
+        // Повний каталог усіх інших товарів для безкінечного скролу за запитом Лєни
         const restList = allProducts.filter(p => p.brand !== "BANNER");
 
         area.innerHTML = `
@@ -535,6 +730,7 @@ function refreshCatalog() {
                 </div>
             ` : ''}
 
+            <!-- ЛЄНА, ДИВИ СЮДИ! Автоматичний блок з усіма духами в самому низу -->
             ${restList.length > 0 ? `
                 <div class="mb-14 pt-6 border-t border-neutral-100">
                     <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].catalog_title}</h2>
@@ -548,6 +744,7 @@ function refreshCatalog() {
     }
 
     if(reviewsSec) reviewsSec.classList.add('hidden');
+    if(instaSection) instaSection.classList.add('hidden');
 
     let filtered = allProducts.filter(p => {
         if(p.brand === "BANNER") return false;
@@ -631,11 +828,10 @@ function openModal(idx) {
     let html = '';
     const sizes = [{l:'2ml', p:p.price2ml, old:p.old2ml}, {l:'5ml', p:p.price5ml, old:p.old5ml}, {l:'10ml', p:p.price10ml, old:p.old10ml}, {l:'Full', p:p.fullPrice, old:p.oldFull}];
     
-    sizes.forEach((o) => {
+    sizes.forEach((o, index) => {
         if(o.p && o.p !== '---' && o.p !== '') {
             const hasDiscount = o.old && o.old !== '---' && o.old !== '';
-            // ЗАХИСТ ВІД ВЕЛИКИХ ЛІТЕР: Перетворюємо ID елемента в нижній регістр для безпеки
-            html += `<div id="m-size-row-${o.l.toLowerCase()}" onclick="${avail ? `selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo.split(',')[0].trim()}')` : ''}" 
+            html += `<div id="m-size-row-${o.l}" onclick="${avail ? `selectSize(this, '${o.l}', '${o.p}', '${p.brand}', '${currentLang === 'UA' ? (p.nameUK || p.name) : (p.namePL || p.name)}', '${p.photo.split(',')[0].trim()}')` : ''}" 
                 class="border border-neutral-100 flex justify-between items-center p-4 rounded-xl ${avail ? 'cursor-pointer hover:bg-neutral-50' : 'opacity-40 cursor-not-allowed'} text-xs font-bold transition-all">
                 <span class="uppercase tracking-widest">${o.l}</span>
                 <span class="text-[#062C22]">${hasDiscount ? `<span class="price-new">${o.p} zł</span><span class="price-old">${o.old} zł</span>` : `<span>${o.p} zł</span>`}</span>
@@ -648,8 +844,7 @@ function openModal(idx) {
     document.body.classList.add('lock-scroll');
 
     if (avail) {
-        // Гарантований авто-клік: приводимо назву об'єму до нижнього регістру
-        const targetLabel = (preselectedSize || sizes.find(s => s.p && s.p !== '---' && s.p !== '')?.l || '').toLowerCase();
+        const targetLabel = preselectedSize || sizes.find(s => s.p && s.p !== '---' && s.p !== '')?.l;
         if (targetLabel) {
             const rowEl = document.getElementById(`m-size-row-${targetLabel}`);
             if (rowEl) rowEl.click();
