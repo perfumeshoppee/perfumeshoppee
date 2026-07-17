@@ -249,14 +249,33 @@
 </div>
 
 <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
 
 <script>
+const firebaseConfig = {
+    apiKey: "AIzaSyCaR9-bwJSu0iYOf1EmyYg_FTcqKBRw8do",
+    authDomain: "perfumeshoppee.firebaseapp.com",
+    projectId: "perfumeshoppee",
+    storageBucket: "perfumeshoppee.firebasestorage.app",
+    messagingSenderId: "881208782064",
+    appId: "1:881208782064:web:34881367d79f9b0822e635"
+};
+
+firebase.initializeApp(firebaseConfig);
+const firestoreDb = firebase.firestore();
+const firebaseAuth = firebase.auth();
+
 const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQA6BrgyLNH6Jw3BOZKxMQ2X2MAJed7xT6CBepxG-c9D3qjKJJmPzwTPypMM3fxCLipzxHrq4exkdKS/pub?output=csv';
 const TG_NICK = 'elenafragrance';
 const ITEMS_TO_SHOW_HOME = 4;
 
 let allProducts = [], cart = JSON.parse(localStorage.getItem('ps_cart')) || [];
 let userRating = 5, uploadedPhotoUrl = "";
+let currentReviewUser = null;
+let firebaseReviews = [];
+let stopReviewsListener = null;
 
 if (!sessionStorage.getItem('ps_session_active')) {
     localStorage.setItem('ps_currentFilter', 'home');
@@ -294,6 +313,7 @@ const i18n = {
 };
 
 async function init() {
+    initFirebaseReviews();
     try {
         const res = await fetch(SPREADSHEET_URL);
         const text = await res.text();
@@ -308,7 +328,35 @@ async function init() {
     } catch (e) { console.error("CSV Load Error", e); }
 }
 
-/* ==================== СИСТЕМА ЛОКАЛЬНИХ ВІДГУКІВ ==================== */
+/* ==================== СПІЛЬНІ ВІДГУКИ FIREBASE ==================== */
+async function initFirebaseReviews() {
+    try {
+        const credential = await firebaseAuth.signInAnonymously();
+        currentReviewUser = credential.user;
+
+        if (stopReviewsListener) stopReviewsListener();
+        stopReviewsListener = firestoreDb.collection('reviews')
+            .orderBy('createdAt', 'desc')
+            .onSnapshot(snapshot => {
+                firebaseReviews = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                loadGoogleReviews();
+            }, error => {
+                console.error('Reviews listener error:', error);
+                showReviewsError();
+            });
+    } catch (error) {
+        console.error('Firebase authentication error:', error);
+        showReviewsError();
+    }
+}
+
+function showReviewsError() {
+    const list = document.getElementById('reviews-list');
+    if (list) {
+        list.innerHTML = '<div class="text-center py-6 text-red-400 text-[10px] uppercase font-bold tracking-widest">Firebase: перевірте Authentication і правила Firestore</div>';
+    }
+}
+
 function setFormRating(rating) {
     userRating = rating;
     const stars = document.querySelectorAll('#formStars i');
@@ -317,68 +365,100 @@ function setFormRating(rating) {
     });
 }
 
-function handleFileSelect(input) {
+async function handleFileSelect(input) {
     const file = input.files[0];
     if (!file) return;
-    
+
+    if (!file.type.startsWith('image/')) return;
     const btnText = document.getElementById('uploadBtnText');
     btnText.innerText = "...";
-    
-    const reader = new FileReader();
-    reader.onloadend = function() {
-        uploadedPhotoUrl = reader.result;
+
+    try {
+        uploadedPhotoUrl = await compressReviewImage(file);
         btnText.innerText = "✓ OK";
+    } catch (error) {
+        console.error('Image compression error:', error);
+        uploadedPhotoUrl = "";
+        btnText.innerText = i18n[currentLang].rev_choose_file;
+        input.value = "";
     }
-    reader.readAsDataURL(file);
 }
 
-function handleReviewSubmit(e) {
+function compressReviewImage(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = reject;
+        reader.onload = () => {
+            const img = new Image();
+            img.onerror = reject;
+            img.onload = () => {
+                const maxSide = 900;
+                const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.max(1, Math.round(img.width * scale));
+                canvas.height = Math.max(1, Math.round(img.height * scale));
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL('image/jpeg', 0.72));
+            };
+            img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+async function handleReviewSubmit(e) {
     e.preventDefault();
     const nameVal = document.getElementById('revName').value.trim();
     const textVal = document.getElementById('revText').value.trim();
     const btn = document.getElementById('submitReviewBtn');
     const btnText = document.getElementById('btn-text-content');
     
-    if(!nameVal || !textVal) return;
+    if(!nameVal || !textVal || !currentReviewUser) {
+        if (!currentReviewUser) showReviewsError();
+        return;
+    }
 
     btn.disabled = true;
     btn.style.opacity = "0.6";
     btnText.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> ' + i18n[currentLang].pub_loading;
 
-    setTimeout(() => {
-        const uniqueId = 'rev_' + Date.now();
-        const newReview = {
-            id: uniqueId,
+    try {
+        await firestoreDb.collection('reviews').add({
             name: nameVal,
             text: textVal,
             rating: userRating,
             photo: uploadedPhotoUrl,
-            date: new Date().toLocaleDateString()
-        };
-
-        let clientReviews = JSON.parse(localStorage.getItem('ps_client_reviews')) || [];
-        clientReviews.unshift(newReview);
-        localStorage.setItem('ps_client_reviews', JSON.stringify(clientReviews));
+            ownerUid: currentReviewUser.uid,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
 
         document.getElementById('revName').value = '';
         document.getElementById('revText').value = '';
+        document.getElementById('revPhotoFile').value = '';
         document.getElementById('uploadBtnText').innerText = i18n[currentLang].rev_choose_file;
         uploadedPhotoUrl = "";
         setFormRating(5);
-        
+
+    } catch (error) {
+        console.error('Review publish error:', error);
+        alert('Не вдалося опублікувати відгук. Перевірте налаштування Firebase.');
+    } finally {
         btn.disabled = false;
         btn.style.opacity = "1";
         btnText.innerText = i18n[currentLang].pub_review;
-        
-        loadGoogleReviews();
-    }, 800);
+    }
 }
 
-function deleteOwnReview(id) {
-    let clientReviews = JSON.parse(localStorage.getItem('ps_client_reviews')) || [];
-    clientReviews = clientReviews.filter(r => r.id !== id);
-    localStorage.setItem('ps_client_reviews', JSON.stringify(clientReviews));
-    loadGoogleReviews();
+async function deleteOwnReview(id) {
+    const review = firebaseReviews.find(r => r.id === id);
+    if (!review || !currentReviewUser || review.ownerUid !== currentReviewUser.uid) return;
+    try {
+        await firestoreDb.collection('reviews').doc(id).delete();
+    } catch (error) {
+        console.error('Review delete error:', error);
+        alert('Не вдалося видалити відгук.');
+    }
 }
 
 function openPhotoModal(src) {
@@ -394,7 +474,7 @@ function closePhotoModal() {
 
 function loadGoogleReviews() {
     const listContainer = document.getElementById('reviews-list');
-    let clientReviews = JSON.parse(localStorage.getItem('ps_client_reviews')) || [];
+    const clientReviews = firebaseReviews;
     
     let totalStars = 0;
     let count = 0;
@@ -408,6 +488,11 @@ function loadGoogleReviews() {
     let clientHTML = clientReviews.map(r => {
         totalStars += parseInt(r.rating);
         count++;
+        const safeName = escapeReviewHtml(r.name || '');
+        const safeText = escapeReviewHtml(r.text || '');
+        const date = r.createdAt && r.createdAt.toDate
+            ? r.createdAt.toDate().toLocaleDateString(currentLang === 'PL' ? 'pl-PL' : 'uk-UA')
+            : '';
         let stars = '';
         for(let i=1; i<=5; i++) { 
             let isActive = i <= r.rating ? 'text-[#C5A059]' : 'text-neutral-200';
@@ -415,19 +500,23 @@ function loadGoogleReviews() {
         }
         
         let photoHTML = '';
-        if (r.photo) {
+        if (r.photo && r.photo.startsWith('data:image/')) {
             photoHTML = '<div class="w-20 h-20 rounded-xl overflow-hidden bg-neutral-50 border border-neutral-100 shadow-sm cursor-pointer mt-3"><img src="' + r.photo + '" class="w-full h-full object-cover" onclick="openPhotoModal(\'' + r.photo + '\')"></div>';
         }
 
+        const deleteButton = currentReviewUser && r.ownerUid === currentReviewUser.uid
+            ? `<button onclick="deleteOwnReview('${r.id}')" class="absolute top-4 right-4 text-[9px] font-bold text-red-400 bg-red-50 px-2 py-1 rounded-md uppercase tracking-wider">${i18n[currentLang].delete_btn}</button>`
+            : '';
+
         return `
             <div class="bg-white p-5 rounded-2xl border border-neutral-100 shadow-sm border-l-2 border-l-[#C5A059] relative">
-                <button onclick="deleteOwnReview('${r.id}')" class="absolute top-4 right-4 text-[9px] font-bold text-red-400 bg-red-50 px-2 py-1 rounded-md uppercase tracking-wider">${i18n[currentLang].delete_btn}</button>
+                ${deleteButton}
                 <div class="flex justify-between items-center mb-1">
-                    <span class="font-bold text-xs">${r.name}</span>
+                    <span class="font-bold text-xs">${safeName}</span>
                     <div class="text-[10px] flex gap-0.5">${stars}</div>
                 </div>
-                <div class="text-[9px] text-neutral-400 mb-2 font-medium">${r.date}</div>
-                <p class="text-neutral-500 text-xs leading-relaxed">${r.text}</p>
+                <div class="text-[9px] text-neutral-400 mb-2 font-medium">${date}</div>
+                <p class="text-neutral-500 text-xs leading-relaxed">${safeText}</p>
                 ${photoHTML}
             </div>
         `;
@@ -446,6 +535,12 @@ function loadGoogleReviews() {
         avgStarsHTML += '<i class="fa-solid fa-star ' + isActive + '"></i>'; 
     }
     starsContainer.innerHTML = avgStarsHTML;
+}
+
+function escapeReviewHtml(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+    })[char]);
 }
 /* ===================================================================================== */
 
