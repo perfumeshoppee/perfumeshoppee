@@ -1,0 +1,1 @@
+Eksplozja Swiezosci set images
