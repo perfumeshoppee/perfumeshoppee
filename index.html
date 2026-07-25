@@ -334,6 +334,13 @@ if (!sessionStorage.getItem('ps_session_active')) {
 
 let curCat = localStorage.getItem('ps_curCat') || 'all';
 let currentFilter = localStorage.getItem('ps_currentFilter') || 'home';
+let homeSectionExpanded = {
+    sets: false,
+    hits: false,
+    news: false,
+    catalog: false
+};
+
 function getInitialLanguage() {
     const savedLanguage = localStorage.getItem('ps_lang');
     if (savedLanguage === 'UA' || savedLanguage === 'PL') return savedLanguage;
@@ -350,7 +357,7 @@ const i18n = {
         cart_order_btn: "Оформити в Telegram", cart_instagram_btn: "Оформити в Instagram", instagram_copied: "Замовлення скопійовано. Вставте його в Direct.", add_to_cart: "Додати в кошик", empty_cart: "Кошик порожній", order_msg: "Нове замовлення", default_desc: "Вишуканий аромат з унікальним шлейфом.",
         sold_badge: "Немає в наявності", out_of_stock_btn: "Немає в наявності",
         badgeNew: "НОВИНКА", badgeSale: "АКЦІЯ", badgeHit: "ХІТ", outOfStock: "Немає в наявності",
-        show_more: "Показати більше", reviews_heading: "Відгуки клієнтів", leave_review: "Залишити свій відгук", your_rating: "Ваша оцінка:", 
+        show_more: "Показати більше", show_less: "Згорнути", reviews_heading: "Відгуки клієнтів", leave_review: "Залишити свій відгук", your_rating: "Ваша оцінка:", 
         pub_review: "Опублікувати відгук", pub_loading: "Завантаження...", rev_choose_file: "Обрати фото", label_photo: "Фото з галереї:", delete_btn: "Видалити",
         name_placeholder: "Ваше ім'я", text_placeholder: "Ваш відгук (необов'язково)", no_reviews: "Тут з'являться перші відгуки", all_reviews: "Переглянути всі відгуки"
     },
@@ -361,7 +368,7 @@ const i18n = {
         cart_order_btn: "Zamów przez Telegram", cart_instagram_btn: "Zamów przez Instagram", instagram_copied: "Zamówienie zostało skopiowane. Wklej je w wiadomości Direct.", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze.",
         sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak w magazynie",
         badgeNew: "NOWOŚĆ", badgeSale: "PROMOCJA", badgeHit: "HIT", outOfStock: "Brak w magazynie",
-        show_more: "Pokaż więcej", reviews_heading: "Opinie klientów", leave_review: "Zostaw swoją opinię", your_rating: "Twoja ocena:", 
+        show_more: "Pokaż więcej", show_less: "Pokaż mniej", reviews_heading: "Opinie klientów", leave_review: "Zostaw swoją opinię", your_rating: "Twoja ocena:", 
         pub_review: "Opublikuj opinię", pub_loading: "Ładowanie...", rev_choose_file: "Wybierz plik", label_photo: "Zdjęcie z galerii:", delete_btn: "Usuń",
         name_placeholder: "Twoje imię", text_placeholder: "Twoja opinia (opcjonalnie)", no_reviews: "Tutaj pojawią się pierwsze opinie", all_reviews: "Zobacz wszystkie opinie"
     }
@@ -716,7 +723,7 @@ function getBadgesHTML(p) {
 
     if (isNew) badgesHtml += `<span class="product-badge badge-new">✨ ${i18n[currentLang].badgeNew}</span>`;
     if (isHit) badgesHtml += `<span class="product-badge badge-hit">🔥 ${i18n[currentLang].badgeHit}</span>`;
-    if (isSale) badgesHtml += `<span class="product-badge badge-sale">% ${i18n[currentLang].badgeSale}</span>`;
+    if (isSale) badgesHtml += `<span class="product-badge badge-sale">%% ${i18n[currentLang].badgeSale}</span>`;
     
     badgesHtml += '</div>';
 
@@ -802,6 +809,34 @@ function renderList(list) {
     }).join('');
 }
 
+function getHomeSectionItems(list, sectionKey) {
+    return homeSectionExpanded[sectionKey]
+        ? list
+        : list.slice(0, ITEMS_TO_SHOW_HOME);
+}
+
+function renderHomeSectionButton(list, sectionKey) {
+    if (list.length <= ITEMS_TO_SHOW_HOME) return '';
+
+    const isExpanded = homeSectionExpanded[sectionKey];
+    const label = isExpanded ? i18n[currentLang].show_less : i18n[currentLang].show_more;
+    const icon = isExpanded ? 'fa-chevron-up' : 'fa-chevron-down';
+
+    return `
+        <button onclick="toggleHomeSection('${sectionKey}')" 
+                class="mx-auto mt-6 flex items-center justify-center gap-2 rounded-2xl border border-neutral-200 bg-white px-7 py-3 text-[9px] font-extrabold uppercase tracking-[0.14em] text-[#062C22] shadow-sm transition-all hover:border-[#C5A059] hover:text-[#C5A059]">
+            <span>${label}</span>
+            <i class="fa-solid ${icon}"></i>
+        </button>
+    `;
+}
+
+function toggleHomeSection(sectionKey) {
+    if (!(sectionKey in homeSectionExpanded)) return;
+    homeSectionExpanded[sectionKey] = !homeSectionExpanded[sectionKey];
+    refreshCatalog();
+}
+
 function refreshCatalog() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const area = document.getElementById('catalog-area');
@@ -829,8 +864,9 @@ function refreshCatalog() {
                 <div class="mb-14">
                     <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].sets_title}</h2>
                     <div id="home-grid-sets" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        ${renderList(setsList.slice(0, ITEMS_TO_SHOW_HOME))}
+                        ${renderList(getHomeSectionItems(setsList, 'sets'))}
                     </div>
+                    ${renderHomeSectionButton(setsList, 'sets')}
                 </div>
             ` : ''}
 
@@ -838,8 +874,9 @@ function refreshCatalog() {
                 <div class="mb-14">
                     <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].hits_title}</h2>
                     <div id="home-grid-hits" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        ${renderList(hitsList.slice(0, ITEMS_TO_SHOW_HOME))}
+                        ${renderList(getHomeSectionItems(hitsList, 'hits'))}
                     </div>
+                    ${renderHomeSectionButton(hitsList, 'hits')}
                 </div>
             ` : ''}
 
@@ -847,18 +884,19 @@ function refreshCatalog() {
                 <div class="mb-14">
                     <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].news_title}</h2>
                     <div id="home-grid-news" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        ${renderList(newsList.slice(0, ITEMS_TO_SHOW_HOME))}
+                        ${renderList(getHomeSectionItems(newsList, 'news'))}
                     </div>
+                    ${renderHomeSectionButton(newsList, 'news')}
                 </div>
             ` : ''}
 
-            <!-- ЛЄНА, ДИВИ СЮДИ! Автоматичний блок з усіма духами в самому низу -->
             ${restList.length > 0 ? `
                 <div class="mb-14 pt-6 border-t border-neutral-100">
                     <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].catalog_title}</h2>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        ${renderList(restList)}
+                        ${renderList(getHomeSectionItems(restList, 'catalog'))}
                     </div>
+                    ${renderHomeSectionButton(restList, 'catalog')}
                 </div>
             ` : ''}
         `;
