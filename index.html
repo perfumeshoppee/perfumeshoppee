@@ -894,9 +894,8 @@ function refreshCatalog() {
                 <div class="mb-14 pt-6 border-t border-neutral-100">
                     <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].catalog_title}</h2>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        ${renderList(getHomeSectionItems(restList, 'catalog'))}
+                        ${renderList(restList)}
                     </div>
-              
                 </div>
             ` : ''}
         `;
