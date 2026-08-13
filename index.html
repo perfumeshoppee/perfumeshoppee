@@ -270,8 +270,22 @@
         <button onclick="toggleCart()"><i class="fa-solid fa-xmark text-xl"></i></button>
     </div>
     <div id="cart-items" class="flex-1 overflow-y-auto p-6 space-y-6"></div>
-    <div class="p-8 border-t bg-neutral-50 space-y-6">
-        <div class="flex justify-between items-center"><span class="text-[10px] font-bold uppercase text-neutral-400" data-i18n="cart_total_label"></span><span id="cart-total" class="text-xl font-bold">0 zł</span></div>
+    <div class="p-8 border-t bg-neutral-50 space-y-4">
+        <div class="rounded-2xl border border-[#C5A059]/20 bg-white p-4 space-y-3">
+            <div class="flex justify-between items-center text-neutral-400">
+                <span class="text-[9px] font-bold uppercase tracking-wider" data-i18n="cart_subtotal_label"></span>
+                <span id="cart-subtotal" class="text-sm font-bold">0 zł</span>
+            </div>
+            <div id="cart-discount-row" class="hidden flex justify-between items-center text-emerald-700">
+                <span id="cart-discount-label" class="text-[9px] font-bold uppercase tracking-wider"></span>
+                <span id="cart-discount" class="text-sm font-bold">−0 zł</span>
+            </div>
+            <div class="flex justify-between items-center border-t border-neutral-100 pt-3">
+                <span class="text-[10px] font-bold uppercase text-[#062C22]" data-i18n="cart_total_label"></span>
+                <span id="cart-total" class="text-xl font-bold text-[#062C22]">0 zł</span>
+            </div>
+        </div>
+        <p id="cart-discount-hint" class="hidden rounded-xl bg-emerald-50 px-4 py-3 text-center text-[9px] font-bold leading-relaxed text-emerald-800"></p>
         <button onclick="sendOrder()" class="w-full bg-[#062C22] text-white py-5 rounded-2xl text-[10px] font-bold uppercase tracking-widest" data-i18n="cart_order_btn"></button>
         <button onclick="sendInstagramOrder()" class="w-full bg-gradient-to-r from-[#833AB4] via-[#E1306C] to-[#F77737] text-white py-5 rounded-2xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2">
             <i class="fa-brands fa-instagram text-sm"></i>
@@ -353,8 +367,9 @@ const i18n = {
     UA: {
         search_placeholder: "Пошук аромату...", menu_home: "Головна", menu_catalog: "Каталог", menu_hits: "Хіти", menu_news: "Новинки", menu_sale: "Акції %",
         cat_all: "Усі", cat_female: "Жіночі", cat_male: "Чоловічі", cat_uniseks: "Унісекс", cat_sets: "Набори", hits_title: "Хіти продажу", news_title: "Новинки", 
-        sets_title: "Набори", catalog_title: "Усі аромати", cart_title: "Ваш кошик", cart_total_label: "Разом", insta_title: "Ми в Instagram",
+        sets_title: "Набори", catalog_title: "Усі аромати", cart_title: "Ваш кошик", cart_subtotal_label: "Сума товарів", cart_discount_label: "Знижка", cart_total_label: "Разом", insta_title: "Ми в Instagram",
         cart_order_btn: "Оформити в Telegram", cart_instagram_btn: "Оформити в Instagram", instagram_copied: "Замовлення скопійовано. Вставте його в Direct.", add_to_cart: "Додати в кошик", empty_cart: "Кошик порожній", order_msg: "Нове замовлення", default_desc: "Вишуканий аромат з унікальним шлейфом.",
+        discount_rules: "💚 2 флакони −10% · 3 −15% · 4+ −20%", discount_next_10: "Додайте ще 1 флакон та отримайте знижку −10%", discount_next_15: "Додайте ще 1 флакон та отримайте знижку −15%", discount_next_20: "Додайте ще 1 флакон та отримайте знижку −20%", discount_max: "Максимальна знижка −20% застосована!",
         sold_badge: "Немає в наявності", out_of_stock_btn: "Немає в наявності",
         badgeNew: "НОВИНКА", badgeSale: "АКЦІЯ", badgeHit: "ХІТ", outOfStock: "Немає в наявності",
         show_more: "Показати більше", show_less: "Згорнути", reviews_heading: "Відгуки клієнтів", leave_review: "Залишити свій відгук", your_rating: "Ваша оцінка:", 
@@ -364,8 +379,9 @@ const i18n = {
     PL: {
         search_placeholder: "Szukaj zapachu...", menu_home: "Główna", menu_catalog: "Katalog", menu_hits: "Bestsellery", menu_news: "Nowości", menu_sale: "Promocje %",
         cat_all: "Wszystkie", cat_female: "Damskie", cat_male: "Męskie", cat_uniseks: "Uniseks", cat_sets: "Zestawy", hits_title: "Bestsellery", news_title: "Nowości", 
-        sets_title: "Zestawy", catalog_title: "Wszystkie perfumy", cart_title: "Twój koszyk", cart_total_label: "Suma", insta_title: "Nasza taśma Instagram",
+        sets_title: "Zestawy", catalog_title: "Wszystkie perfumy", cart_title: "Twój koszyk", cart_subtotal_label: "Wartość produktów", cart_discount_label: "Rabat", cart_total_label: "Razem", insta_title: "Nasza taśma Instagram",
         cart_order_btn: "Zamów przez Telegram", cart_instagram_btn: "Zamów przez Instagram", instagram_copied: "Zamówienie zostało skopiowane. Wklej je w wiadomości Direct.", add_to_cart: "Dodaj do koszyka", empty_cart: "Koszyk jest pusty", order_msg: "Nowe zamówienie", default_desc: "Wyrafunowany zapach o wyjątkowym charakterze.",
+        discount_rules: "💚 2 flakony −10% · 3 −15% · 4+ −20%", discount_next_10: "Dodaj jeszcze 1 flakon i odbierz rabat −10%", discount_next_15: "Dodaj jeszcze 1 flakon i odbierz rabat −15%", discount_next_20: "Dodaj jeszcze 1 flakon i odbierz rabat −20%", discount_max: "Maksymalny rabat −20% został naliczony!",
         sold_badge: "Brak w magazynie", out_of_stock_btn: "Brak w magazynie",
         badgeNew: "NOWOŚĆ", badgeSale: "PROMOCJA", badgeHit: "HIT", outOfStock: "Brak w magazynie",
         show_more: "Pokaż więcej", show_less: "Pokaż mniej", reviews_heading: "Opinie klientów", leave_review: "Zostaw swoją opinię", your_rating: "Twoja ocena:", 
@@ -894,8 +910,9 @@ function refreshCatalog() {
                 <div class="mb-14 pt-6 border-t border-neutral-100">
                     <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].catalog_title}</h2>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        ${renderList(restList)}
+                        ${renderList(getHomeSectionItems(restList, 'catalog'))}
                     </div>
+                    ${renderHomeSectionButton(restList, 'catalog')}
                 </div>
             ` : ''}
         `;
@@ -1034,17 +1051,46 @@ function addToCart() {
     renderCart(); closeModal(); toggleCart(true);
 }
 
+function getDiscountPercent(itemCount) {
+    if (itemCount >= 4) return 20;
+    if (itemCount === 3) return 15;
+    if (itemCount === 2) return 10;
+    return 0;
+}
+
+function parseCartPrice(value) {
+    const price = Number(String(value ?? '').replace(',', '.').replace(/[^0-9.-]/g, ''));
+    return Number.isFinite(price) ? price : 0;
+}
+
+function getCartTotals() {
+    const subtotal = cart.reduce((sum, item) => sum + parseCartPrice(item.price), 0);
+    const discountPercent = getDiscountPercent(cart.length);
+    const discountAmount = subtotal * discountPercent / 100;
+    return { subtotal, discountPercent, discountAmount, total: subtotal - discountAmount };
+}
+
+function formatPrice(value) {
+    return `${value.toFixed(2)} zł`;
+}
+
+function getDiscountHint(itemCount) {
+    if (itemCount === 0) return i18n[currentLang].discount_rules;
+    if (itemCount === 1) return i18n[currentLang].discount_next_10;
+    if (itemCount === 2) return i18n[currentLang].discount_next_15;
+    if (itemCount === 3) return i18n[currentLang].discount_next_20;
+    return i18n[currentLang].discount_max;
+}
+
 function renderCart() {
     const c = document.getElementById('cart-items');
     const countEl = document.getElementById('cart-count');
     countEl.innerText = cart.length;
     countEl.classList.toggle('hidden', cart.length === 0);
-    let total = 0;
     if (cart.length === 0) {
         c.innerHTML = `<div class="text-center py-10 text-neutral-300 text-[9px] uppercase font-bold">${i18n[currentLang].empty_cart}</div>`;
     } else {
         c.innerHTML = cart.map((item, i) => {
-            total += parseFloat(item.price);
             return `<div class="flex gap-4 items-center">
                 <div class="w-14 h-14 bg-neutral-50 rounded-xl p-2 flex items-center justify-center"><img src="${item.img}" class="max-w-full max-h-full object-contain"></div>
                 <div class="flex-1 min-w-0">
@@ -1056,15 +1102,33 @@ function renderCart() {
             </div>`;
         }).join('');
     }
-    document.getElementById('cart-total').innerText = total.toFixed(2) + ' zł';
+
+    const totals = getCartTotals();
+    document.getElementById('cart-subtotal').innerText = formatPrice(totals.subtotal);
+    document.getElementById('cart-total').innerText = formatPrice(totals.total);
+
+    const discountRow = document.getElementById('cart-discount-row');
+    discountRow.classList.toggle('hidden', totals.discountPercent === 0);
+    document.getElementById('cart-discount-label').innerText = `${i18n[currentLang].cart_discount_label} −${totals.discountPercent}%`;
+    document.getElementById('cart-discount').innerText = `−${formatPrice(totals.discountAmount)}`;
+
+    const hint = document.getElementById('cart-discount-hint');
+    hint.innerText = getDiscountHint(cart.length);
+    hint.classList.remove('hidden');
 }
 
 function removeFromCart(i) { cart.splice(i, 1); localStorage.setItem('ps_cart', JSON.stringify(cart)); renderCart(); }
 
 function buildOrderText() {
+    const totals = getCartTotals();
     let t = `${i18n[currentLang].order_msg}!\n\n`;
     cart.forEach((it, i) => t += `${i+1}. ${it.brand} ${it.name} (${it.size}) - ${it.price} zł\n`);
-    t += `\n💰 ${i18n[currentLang].cart_total_label}: ${document.getElementById('cart-total').innerText}`;
+    t += `\n🧴 ${cart.length}`;
+    t += `\n💰 ${i18n[currentLang].cart_subtotal_label}: ${formatPrice(totals.subtotal)}`;
+    if (totals.discountPercent > 0) {
+        t += `\n💚 ${i18n[currentLang].cart_discount_label} −${totals.discountPercent}%: −${formatPrice(totals.discountAmount)}`;
+    }
+    t += `\n✅ ${i18n[currentLang].cart_total_label}: ${formatPrice(totals.total)}`;
     return t;
 }
 
