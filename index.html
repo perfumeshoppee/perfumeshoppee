@@ -364,8 +364,7 @@ let currentFilter = localStorage.getItem('ps_currentFilter') || 'home';
 let homeSectionExpanded = {
     sets: false,
     hits: false,
-    news: false,
-    catalog: false
+    news: false
 };
 
 function getInitialLanguage() {
@@ -923,9 +922,8 @@ function refreshCatalog() {
                 <div class="mb-14 pt-6 border-t border-neutral-100">
                     <h2 class="text-[10px] font-extrabold uppercase tracking-widest mb-6 opacity-40">${i18n[currentLang].catalog_title}</h2>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        ${renderList(getHomeSectionItems(restList, 'catalog'))}
+                        ${renderList(restList)}
                     </div>
-                    ${renderHomeSectionButton(restList, 'catalog')}
                 </div>
             ` : ''}
         `;
@@ -977,7 +975,7 @@ function openModal(idx) {
     } else {
         if (isNew) modalBadges += `<span class="bg-amber-500/15 text-amber-600 text-[9px] font-extrabold px-2 py-1 rounded-md tracking-wider uppercase flex items-center gap-1">✨ ${i18n[currentLang].badgeNew}</span>`;
         if (isHit) modalBadges += `<span class="bg-emerald-600/15 text-emerald-700 text-[9px] font-extrabold px-2 py-1 rounded-md tracking-wider uppercase flex items-center gap-1">🔥 ${i18n[currentLang].badgeHit}</span>`;
-        if (isSale) modalBadges += `<span class="bg-red-600/15 text-red-600 text-[9px] font-extrabold px-2 py-1 rounded-md tracking-wider uppercase flex items-center gap-1">% ${i18n[currentLang].badgeSale}</span>`;
+        if (isSale) modalBadges += `<span class="bg-red-600/15 text-red-600 text-[9px] font-extrabold px-2 py-1 rounded-md tracking-wider uppercase flex items-center gap-1">%% ${i18n[currentLang].badgeSale}</span>`;
     }
 
     brandWrapper.innerHTML = `
