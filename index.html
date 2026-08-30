@@ -382,7 +382,10 @@ async function init() {
     try {
         const res = await fetch(SPREADSHEET_URL);
         const text = await res.text();
-        allProducts = parseCSV(text);
+        allProducts = parseCSV(text).map((product, sheetIndex) => ({
+            ...product,
+            _sheetIndex: sheetIndex
+        }));
         allProducts.sort((a, b) => {
             if (a.brand === "BANNER") return -1;
             if (b.brand === "BANNER") return 1;
@@ -725,7 +728,7 @@ function getBadgesHTML(p) {
 
     if (isNew) badgesHtml += `<span class="product-badge badge-new">✨ ${i18n[currentLang].badgeNew}</span>`;
     if (isHit) badgesHtml += `<span class="product-badge badge-hit">🔥 ${i18n[currentLang].badgeHit}</span>`;
-    if (isSale) badgesHtml += `<span class="product-badge badge-sale">%% ${i18n[currentLang].badgeSale}</span>`;
+    if (isSale) badgesHtml += `<span class="product-badge badge-sale">% ${i18n[currentLang].badgeSale}</span>`;
     
     badgesHtml += '</div>';
 
@@ -839,6 +842,12 @@ function toggleHomeSection(sectionKey) {
     refreshCatalog();
 }
 
+function sortSetsForHome(sets) {
+    return [...sets].sort((a, b) =>
+        Number(b._sheetIndex ?? -1) - Number(a._sheetIndex ?? -1)
+    );
+}
+
 function refreshCatalog() {
     const q = document.getElementById('searchInput').value.toLowerCase();
     const area = document.getElementById('catalog-area');
@@ -852,7 +861,9 @@ function refreshCatalog() {
         if(reviewsPreviewSec) reviewsPreviewSec.classList.remove('hidden');
         if(instaSection) instaSection.classList.remove('hidden');
         const banner = allProducts.find(p => p.brand === "BANNER");
-        const setsList = allProducts.filter(p => p.category?.toLowerCase().trim() === 'sets');
+        const setsList = sortSetsForHome(
+            allProducts.filter(p => p.category?.toLowerCase().trim() === 'sets')
+        );
         const hitsList = allProducts.filter(p => p.isBest?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
         const newsList = allProducts.filter(p => p.isNew?.toLowerCase() === 'yes' && p.category?.toLowerCase().trim() !== 'sets');
         
